@@ -1781,6 +1781,13 @@ function showToast(msg) {
 load();
 render();
 updateHeaderSubtitle();
+
+// Service worker — offline-tuki
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
