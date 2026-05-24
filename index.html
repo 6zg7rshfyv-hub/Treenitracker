@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Treenikirja">
+<title>Treenikirja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1c1c26;
+  --border: #2a2a38;
+  --text: #f0f0f5;
+  --text2: #8888a0;
+  --text3: #55556a;
+  --accent: #7c6af0;
+  --accent2: #9b8df5;
+  --green: #4ade80;
+  --green-dim: #1a3d2a;
+  --orange: #fb923c;
+  --orange-dim: #3d2010;
+  --red: #f87171;
+  --blue: #60a5fa;
+  --rehab: #34d399;
+  --rehab-dim: #0d2e20;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overflow: hidden; }
+
+#app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+
+/* Header */
+.header { padding: 52px 20px 16px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.header h1 { font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text2); }
+.header .subtitle { font-size: 22px; font-weight: 700; margin-top: 2px; }
+.header .subtitle span { color: var(--accent2); }
+
+/* Content */
+.content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 80px; }
+
+/* Tab bar */
+.tabbar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; padding-bottom: env(safe-area-inset-bottom); z-index: 100; }
+.tab { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0 8px; gap: 4px; font-size: 10px; font-weight: 500; color: var(--text3); cursor: pointer; transition: color 0.15s; white-space: nowrap; }
+.tab.active { color: var(--accent2); }
+.tab svg { width: 21px; height: 21px; }
+
+/* Cards */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin: 12px 16px; padding: 16px; }
+.card-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text2); margin-bottom: 12px; }
+
+/* Buttons */
+.btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; }
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:active { background: var(--accent2); transform: scale(0.97); }
+.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:active { background: var(--border); }
+.btn-sm { padding: 8px 14px; font-size: 13px; border-radius: 8px; }
+.btn-icon { width: 44px; height: 44px; padding: 0; border-radius: 10px; }
+
+/* Day selector */
+.day-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 16px; }
+.day-card { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 16px 12px; text-align: center; cursor: pointer; transition: all 0.15s; }
+.day-card:active { transform: scale(0.97); }
+.day-card.selected { border-color: var(--accent); background: rgba(124,106,240,0.1); }
+.day-card .day-letter { font-size: 32px; font-weight: 700; font-family: 'DM Mono', monospace; }
+.day-card.A .day-letter { color: #60a5fa; }
+.day-card.B .day-letter { color: var(--green); }
+.day-card.C .day-letter { color: var(--orange); }
+.day-card .day-name { font-size: 11px; font-weight: 500; color: var(--text2); margin-top: 4px; line-height: 1.3; }
+
+/* Exercise row in workout */
+.ex-block { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin: 10px 16px; overflow: hidden; }
+.ex-header { padding: 14px 16px 10px; display: flex; align-items: flex-start; gap: 8px; }
+.ex-name { font-size: 15px; font-weight: 600; flex: 1; }
+.rehab-badge { background: var(--rehab-dim); color: var(--rehab); font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; white-space: nowrap; margin-top: 2px; }
+.ex-meta { font-size: 12px; color: var(--text2); padding: 0 16px 10px; font-family: 'DM Mono', monospace; }
+
+/* Set row */
+.set-row { display: flex; align-items: center; gap: 0; padding: 10px 12px; border-top: 1px solid var(--border); }
+.set-num { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text3); width: 28px; flex-shrink: 0; }
+.set-field { flex: 1; display: flex; flex-direction: column; align-items: center; }
+.set-label { font-size: 10px; color: var(--text3); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+.stepper { display: flex; align-items: center; gap: 0; }
+.step-btn { width: 36px; height: 36px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text); }
+.step-btn:active { background: var(--border); }
+.step-val { font-family: 'DM Mono', monospace; font-size: 17px; font-weight: 500; width: 52px; text-align: center; }
+.set-check { width: 44px; flex-shrink: 0; display: flex; justify-content: flex-end; }
+.check-btn { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.check-btn.done { background: var(--green); border-color: var(--green); }
+.check-btn.done svg { color: #000; }
+.check-btn svg { width: 18px; height: 18px; color: var(--text3); }
+
+/* Bilateral split */
+.bilateral-note { font-size: 11px; color: var(--text2); padding: 0 16px 8px; }
+.side-tabs { display: flex; gap: 0; padding: 0 12px 8px; }
+.side-tab { flex: 1; padding: 6px; text-align: center; font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; color: var(--text3); }
+.side-tab.active { background: var(--surface2); color: var(--text); }
+
+/* Summary / done state */
+.done-banner { background: var(--green-dim); border: 1px solid var(--green); border-radius: 12px; padding: 16px; margin: 16px; display: flex; align-items: center; gap: 12px; }
+.done-banner svg { color: var(--green); flex-shrink: 0; }
+.done-banner .done-text { font-size: 15px; font-weight: 600; }
+.done-banner .done-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+/* History */
+.session-row { padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); cursor: pointer; }
+.session-row:active { background: var(--surface2); }
+.session-day-badge { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace; flex-shrink: 0; }
+.session-day-badge.A { background: rgba(96,165,250,0.15); color: #60a5fa; }
+.session-day-badge.B { background: rgba(74,222,128,0.15); color: var(--green); }
+.session-day-badge.C { background: rgba(251,146,60,0.15); color: var(--orange); }
+.session-info { flex: 1; }
+.session-date { font-size: 15px; font-weight: 600; }
+.session-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.session-sets { font-size: 13px; font-family: 'DM Mono', monospace; color: var(--accent2); }
+
+/* Goals */
+.goal-row { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.goal-row:last-child { border-bottom: none; }
+.goal-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.goal-name { font-size: 14px; font-weight: 600; }
+.goal-values { font-size: 12px; font-family: 'DM Mono', monospace; color: var(--text2); }
+.goal-values span { color: var(--green); font-weight: 500; }
+.progress-bar { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+.milestone-row { display: flex; gap: 8px; margin-top: 6px; }
+.milestone { flex: 1; text-align: center; }
+.milestone-val { font-size: 12px; font-family: 'DM Mono', monospace; font-weight: 500; }
+.milestone-label { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.milestone.reached .milestone-val { color: var(--green); }
+.milestone.current .milestone-val { color: var(--accent2); }
+
+/* Stats row */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 16px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.stat-value { font-size: 26px; font-weight: 700; font-family: 'DM Mono', monospace; }
+.stat-label { font-size: 11px; color: var(--text2); margin-top: 3px; }
+
+/* Phase badge */
+.phase-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(124,106,240,0.15); color: var(--accent2); font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+
+/* Week input */
+.week-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+.week-label { font-size: 14px; flex: 1; }
+.week-stepper { display: flex; align-items: center; gap: 8px; }
+.week-val { font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 700; width: 36px; text-align: center; }
+
+/* Tabs */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* Toast */
+.toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); background: var(--green); color: #000; font-weight: 600; font-size: 13px; padding: 10px 20px; border-radius: 20px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+.toast.show { opacity: 1; }
+
+/* Section header */
+.section-header { padding: 20px 16px 8px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); }
+
+/* Empty state */
+.empty { text-align: center; padding: 60px 20px; color: var(--text3); }
+.empty svg { width: 48px; height: 48px; margin: 0 auto 12px; display: block; }
+.empty p { font-size: 15px; }
+
+/* Phase selector */
+.phase-selector { display: flex; gap: 8px; padding: 0 16px 12px; }
+.phase-btn { flex: 1; padding: 10px; border-radius: 10px; border: 2px solid var(--border); background: transparent; color: var(--text2); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; }
+.phase-btn.active { border-color: var(--accent); color: var(--accent2); background: rgba(124,106,240,0.1); }
+
+/* Collapse */
+.session-detail { display: none; background: var(--surface2); padding: 12px 16px; }
+.session-detail.open { display: block; }
+.detail-ex { font-size: 13px; padding: 4px 0; color: var(--text2); display: flex; justify-content: space-between; }
+.detail-ex span { font-family: 'DM Mono', monospace; color: var(--text); }
+
+/* Weight update modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: flex; align-items: flex-end; }
+.modal { background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); width: 100%; }
+.modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 16px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+
+.divider { height: 1px; background: var(--border); margin: 0 16px; }
+
+/* Exercise instructions (collapsible) */
+.ex-instr-toggle { display: flex; align-items: center; justify-content: space-between; padding: 9px 16px; cursor: pointer; border-top: 1px solid var(--border); color: var(--accent2); font-size: 12px; font-weight: 600; }
+.ex-instr-toggle .chev { width: 16px; height: 16px; transition: transform 0.2s; }
+.ex-instr-toggle.open .chev { transform: rotate(180deg); }
+.ex-instr { padding: 4px 16px 12px; font-size: 13px; line-height: 1.5; border-top: 1px solid var(--border); background: var(--surface2); }
+.ex-instr .instr-label { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; color: var(--text3); margin: 10px 0 3px; text-transform: uppercase; }
+.ex-instr .instr-text { color: var(--text); }
+
+/* Goal ahead badges & buttons */
+.ahead-badge { background: var(--orange-dim); color: var(--orange); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; margin-left: 6px; white-space: nowrap; }
+.auto-label { font-size: 11px; color: var(--text3); }
+.raise-btn { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--orange); }
+.ahead-banner { background: var(--orange-dim); border: 1px solid var(--orange); border-radius: 12px; padding: 14px 16px; margin: 12px 16px; display: flex; align-items: center; gap: 12px; }
+.ahead-banner .ab-text { flex: 1; font-size: 13px; }
+.ahead-banner .ab-text b { color: var(--orange); }
+
+/* Last-time reference */
+.last-time { font-size: 12px; color: var(--text2); padding: 4px 16px 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.last-time b { color: var(--text); font-family: 'DM Mono', monospace; }
+.pr-tag { background: rgba(124,106,240,0.15); color: var(--accent2); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+
+/* PR celebration */
+.pr-celebrate { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 300; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; opacity: 0; pointer-events: none; transition: opacity 0.3s; padding: 40px; }
+.pr-celebrate.show { opacity: 1; pointer-events: auto; }
+.pr-celebrate .trophy { font-size: 72px; animation: bounce 0.6s ease; }
+.pr-celebrate .pr-title { font-size: 24px; font-weight: 700; color: var(--accent2); text-align: center; }
+.pr-celebrate .pr-list { font-size: 15px; color: var(--text); text-align: center; line-height: 1.6; }
+@keyframes bounce { 0%{transform:scale(0)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
+
+/* Rest timer */
+.rest-timer { position: fixed; bottom: 78px; left: 16px; right: 16px; background: var(--accent); color: white; border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; z-index: 150; box-shadow: 0 6px 24px rgba(124,106,240,0.4); }
+.rest-timer.done { background: var(--green); color: #000; }
+.rest-timer .rt-time { font-family: 'DM Mono', monospace; font-size: 24px; font-weight: 700; }
+.rest-timer .rt-label { flex: 1; font-size: 13px; font-weight: 600; }
+.rest-timer .rt-btn { background: rgba(255,255,255,0.2); border: none; color: inherit; border-radius: 8px; padding: 8px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+/* Streak / weekly grid */
+.streak-banner { display: flex; align-items: center; gap: 14px; margin: 12px 16px; background: linear-gradient(135deg, rgba(124,106,240,0.15), rgba(155,141,245,0.05)); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+.streak-flame { font-size: 36px; }
+.streak-num { font-size: 28px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--accent2); }
+.streak-label { font-size: 12px; color: var(--text2); }
+.week-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin: 12px 16px; }
+.week-cell { aspect-ratio: 1; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; }
+.week-cell .wc-num { font-family: 'DM Mono', monospace; font-weight: 700; font-size: 13px; }
+.week-cell.done { background: var(--green-dim); border-color: var(--green); }
+.week-cell.done .wc-num { color: var(--green); }
+.week-cell.partial { background: var(--orange-dim); border-color: var(--orange); }
+.week-cell.partial .wc-num { color: var(--orange); }
+.week-cell.current { box-shadow: 0 0 0 2px var(--accent); }
+.week-cell .wc-dots { color: var(--text3); font-size: 9px; margin-top: 1px; }
+
+/* Chart */
+.chart-card { margin: 12px 16px; }
+.chart-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 0 16px 8px; -webkit-overflow-scrolling: touch; }
+.chart-tab { flex-shrink: 0; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text2); font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.chart-tab.active { border-color: var(--accent); color: var(--accent2); background: rgba(124,106,240,0.1); }
+.symmetry-hero { margin: 12px 16px; background: var(--surface); border: 1px solid var(--rehab); border-radius: 14px; padding: 16px; }
+.symmetry-hero .sh-title { font-size: 13px; font-weight: 700; color: var(--rehab); margin-bottom: 4px; }
+.symmetry-hero .sh-big { font-size: 32px; font-weight: 700; font-family: 'DM Mono', monospace; }
+.symmetry-hero .sh-sub { font-size: 12px; color: var(--text2); margin-bottom: 10px; }
+
+/* Run tracker */
+.run-form { margin: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+.run-field { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.run-field:last-of-type { border-bottom: none; }
+.run-field-label { font-size: 14px; font-weight: 500; }
+.run-field-label small { display: block; font-size: 11px; color: var(--text3); font-weight: 400; }
+.run-stepper { display: flex; align-items: center; gap: 8px; }
+.run-val { font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 700; min-width: 64px; text-align: center; }
+.run-val small { font-size: 12px; color: var(--text3); font-weight: 400; }
+.run-type-tabs { display: flex; gap: 8px; margin: 6px 0; }
+.run-type-tab { flex: 1; padding: 10px; border-radius: 10px; border: 2px solid var(--border); background: transparent; color: var(--text2); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; }
+.run-type-tab.active { border-color: var(--accent); color: var(--accent2); background: rgba(124,106,240,0.1); }
+.run-pace-preview { text-align: center; font-size: 13px; color: var(--text2); margin: 10px 0; font-family: 'DM Mono', monospace; }
+.run-pace-preview b { color: var(--accent2); font-size: 16px; }
+.run-row { padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+.run-row:last-child { border-bottom: none; }
+.run-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.run-icon.easy { background: rgba(74,222,128,0.15); }
+.run-icon.tempo { background: rgba(251,146,60,0.15); }
+.run-info { flex: 1; }
+.run-dist { font-size: 15px; font-weight: 700; font-family: 'DM Mono', monospace; }
+.run-meta { font-size: 12px; color: var(--text2); margin-top: 1px; }
+.run-type-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+.run-type-badge.easy { background: var(--green-dim); color: var(--green); }
+.run-type-badge.tempo { background: var(--orange-dim); color: var(--orange); }
+.run-del { color: var(--text3); font-size: 18px; padding: 4px 8px; cursor: pointer; }
+
+/* Weekly schedule card */
+.sched-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+.sched-row:last-child { border-bottom: none; }
+.sched-day { width: 34px; font-size: 12px; font-weight: 700; color: var(--text2); font-family: 'DM Mono', monospace; }
+.sched-act { flex: 1; font-size: 13px; }
+.sched-load { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+.sched-load.low { background: var(--green-dim); color: var(--green); }
+.sched-load.mid { background: rgba(251,146,60,0.12); color: var(--orange); }
+.sched-load.high { background: var(--orange-dim); color: var(--orange); }
+.sched-load.rest { background: var(--surface2); color: var(--text3); }
+
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <div class="h1">TREENIKIRJA</div>
+    <div class="subtitle" id="header-subtitle">Hyvää treeniä <span>💪</span></div>
+  </div>
+
+  <div class="content" id="main-content">
+    <!-- screens rendered by JS -->
+  </div>
+
+  <div class="tabbar">
+    <div class="tab active" id="tab-home" onclick="showTab('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Koti
+    </div>
+    <div class="tab" id="tab-workout" onclick="showTab('workout')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 6.5h11m-11 5h11m-11 5h11M4 6.5h1m-1 5h1m-1 5h1M18 6.5h1m-1 5h1m-1 5h1"/></svg>
+      Treeni
+    </div>
+    <div class="tab" id="tab-runs" onclick="showTab('runs')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Juoksu
+    </div>
+    <div class="tab" id="tab-history" onclick="showTab('history')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Historia
+    </div>
+    <div class="tab" id="tab-goals" onclick="showTab('goals')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      Tavoitteet
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+
+const PROGRAM = {
+  1: {
+    A: { title: "Jalat (etuketju) + Push", day: "Ma/Ti",
+      exercises: [
+        { id:"oj", name:"Jalan ojennus laitteessa", isRehab:true, sets:4, reps:8, bilateral:true, defaultWeight:{L:40,R:40} },
+        { id:"ko", name:"Jalan koukistus laitteessa", isRehab:true, sets:4, reps:8, bilateral:true, defaultWeight:{L:40,R:50} },
+        { id:"fp", name:"Yhden jalan jalkaprässi", isRehab:true, sets:4, reps:8, bilateral:true, defaultWeight:{L:141,R:181} },
+        { id:"pu", name:"Käsipainopunnerrus tasapenkillä", sets:3, reps:12, defaultWeight:16, note:"kg / käsi" },
+        { id:"hp", name:"Käsipainohartiaprässi", sets:3, reps:12, defaultWeight:12, note:"kg / käsi" },
+        { id:"tp", name:"Triceps pushdown kaapelilla", sets:3, reps:12, defaultWeight:20 },
+      ]
+    },
+    B: { title: "Jalat (takaketju) + Pull", day: "Ke/To",
+      exercises: [
+        { id:"ky", name:"Takakyykky", isRehab:true, sets:4, reps:12, defaultWeight:90 },
+        { id:"md", name:"Maastaveto kahvakuulalla", isRehab:true, sets:4, reps:12, defaultWeight:32 },
+        { id:"la", name:"Lantionnosto boksin päällä (yhd. jalka)", isRehab:true, sets:4, reps:15, bilateral:true, defaultWeight:{L:0,R:0}, note:"kehonpaino" },
+        { id:"av", name:"Alasvetolaite", sets:3, reps:12, defaultWeight:70 },
+        { id:"so", name:"Soutuveto laitteessa", sets:3, reps:12, defaultWeight:40 },
+        { id:"bk", name:"Käsipainokääntö", sets:3, reps:12, defaultWeight:12, note:"kg / käsi" },
+      ]
+    },
+    C: { title: "Koko jalka + Core", day: "La/Su",
+      exercises: [
+        { id:"go", name:"Goblet squat kahvakuulalla", sets:3, reps:12, defaultWeight:20 },
+        { id:"ll", name:"Lantionnosto lattialla (yhd. jalka)", isRehab:true, sets:4, reps:15, bilateral:true, defaultWeight:{L:0,R:0}, note:"kehonpaino" },
+        { id:"rt", name:"Rotary torso -laite", sets:3, reps:15, defaultWeight:81 },
+        { id:"pl", name:"Plankki", sets:3, reps:"30s", defaultWeight:0, isTime:true },
+        { id:"cr", name:"Kaapelicrunch", sets:3, reps:15, defaultWeight:25 },
+        { id:"fp2", name:"Kasvosveto kaapelilla", sets:3, reps:15, defaultWeight:15 },
+        { id:"pd", name:"Pec deck", sets:3, reps:12, defaultWeight:30 },
+      ]
+    }
+  },
+  2: {
+    A: { title: "Jalat (etuketju) + Push", day: "Ma/Ti",
+      exercises: [
+        { id:"oj", name:"Jalan ojennus laitteessa", isRehab:true, sets:4, reps:8, bilateral:true, defaultWeight:{L:45,R:45} },
+        { id:"ko", name:"Jalan koukistus laitteessa", isRehab:true, sets:4, reps:8, bilateral:true, defaultWeight:{L:45,R:55} },
+        { id:"fp", name:"Yhden jalan jalkaprässi", isRehab:true, sets:4, reps:8, bilateral:true, defaultWeight:{L:155,R:195} },
+        { id:"vi", name:"Vinopenkkipunnerrus käsipainoilla", sets:4, reps:10, defaultWeight:18, note:"kg / käsi" },
+        { id:"sh", name:"Seisova käsipainohartiaprässi", sets:4, reps:10, defaultWeight:14, note:"kg / käsi" },
+        { id:"si", name:"Sivunousu käsipainoilla", sets:3, reps:12, defaultWeight:8, note:"kg / käsi" },
+        { id:"to", name:"Triceps overhead extension", sets:3, reps:12, defaultWeight:16 },
+      ]
+    },
+    B: { title: "Jalat (takaketju) + Pull", day: "Ke/To",
+      exercises: [
+        { id:"ky", name:"Takakyykky", isRehab:true, sets:4, reps:12, defaultWeight:100 },
+        { id:"md", name:"Maastaveto kahvakuulalla", isRehab:true, sets:4, reps:12, defaultWeight:36 },
+        { id:"la", name:"Lantionnosto boksin päällä + paino", isRehab:true, sets:4, reps:15, bilateral:true, defaultWeight:{L:5,R:5} },
+        { id:"av2", name:"Alasvetolaite (leveä ote)", sets:4, reps:10, defaultWeight:80 },
+        { id:"sk", name:"Soutuveto kaapelilla yksivarinen", sets:4, reps:10, defaultWeight:22, note:"kg / käsi" },
+        { id:"hk", name:"Haameriote käsipainokääntö", sets:3, reps:12, defaultWeight:14, note:"kg / käsi" },
+        { id:"ks", name:"Kasvosveto kaapelilla", sets:3, reps:15, defaultWeight:17 },
+      ]
+    },
+    C: { title: "Koko jalka + Core", day: "La/Su",
+      exercises: [
+        { id:"bs", name:"Bulgarian split squat", sets:3, reps:"10/jalka", defaultWeight:0, note:"kehonpaino" },
+        { id:"nc", name:"Nordic curl / jalan koukistus lattialla", isRehab:true, sets:3, reps:8, defaultWeight:0, note:"kehonpaino" },
+        { id:"rt", name:"Rotary torso -laite", sets:4, reps:15, defaultWeight:90 },
+        { id:"ab", name:"Ab wheel / kaapelicrunch", sets:3, reps:12, defaultWeight:30 },
+        { id:"sp", name:"Sivuplanki", sets:3, reps:"30s/puoli", defaultWeight:0, isTime:true },
+        { id:"wc", name:"Woodchop kaapelilla", sets:3, reps:12, defaultWeight:15 },
+        { id:"ss", name:"Pec deck + kasvosveto (supersetti)", sets:3, reps:"12+15", defaultWeight:32 },
+      ]
+    }
+  },
+  3: {
+    A: { title: "Jalat (etuketju) + Push", day: "Ma/Ti",
+      exercises: [
+        { id:"oj", name:"Jalan ojennus laitteessa", isRehab:true, sets:4, reps:8, bilateral:true, defaultWeight:{L:50,R:55} },
+        { id:"ko", name:"Jalan koukistus laitteessa", isRehab:true, sets:4, reps:8, bilateral:true, defaultWeight:{L:52,R:60} },
+        { id:"fp", name:"Yhden jalan jalkaprässi", isRehab:true, sets:4, reps:8, bilateral:true, defaultWeight:{L:170,R:210} },
+        { id:"vi", name:"Vinopenkkipunnerrus käsipainoilla", sets:4, reps:8, defaultWeight:20, note:"kg / käsi" },
+        { id:"sh", name:"Seisova käsipainohartiaprässi", sets:4, reps:8, defaultWeight:16, note:"kg / käsi" },
+        { id:"si", name:"Sivunousu käsipainoilla", sets:4, reps:12, defaultWeight:10, note:"kg / käsi" },
+        { id:"ts", name:"Triceps pushdown + overhead (supersetti)", sets:3, reps:"10+10", defaultWeight:22 },
+      ]
+    },
+    B: { title: "Jalat (takaketju) + Pull", day: "Ke/To",
+      exercises: [
+        { id:"ky", name:"Takakyykky", isRehab:true, sets:4, reps:12, defaultWeight:110 },
+        { id:"md", name:"Maastaveto kahvakuulalla tai tangolla", isRehab:true, sets:4, reps:12, defaultWeight:40 },
+        { id:"la", name:"Lantionnosto boksin päällä + paino", isRehab:true, sets:4, reps:15, bilateral:true, defaultWeight:{L:10,R:10} },
+        { id:"av3", name:"Alasvetolaite", sets:4, reps:8, defaultWeight:90 },
+        { id:"sv", name:"Soutuveto vapaaotteella / T-palkki", sets:4, reps:8, defaultWeight:55 },
+        { id:"ks2", name:"Käsipainokääntö + haamarikääntö (supersetti)", sets:3, reps:"10+10", defaultWeight:16, note:"kg / käsi" },
+        { id:"ks3", name:"Kasvosveto kaapelilla", sets:4, reps:15, defaultWeight:20 },
+      ]
+    },
+    C: { title: "Koko jalka + Core", day: "La/Su",
+      exercises: [
+        { id:"bs2", name:"Bulgarian split squat käsipainoilla", sets:4, reps:"8/jalka", defaultWeight:10, note:"kg / käsi" },
+        { id:"nc2", name:"Nordic curl", isRehab:true, sets:3, reps:6, defaultWeight:0, note:"kehonpaino — hidas" },
+        { id:"rt", name:"Rotary torso -laite", sets:4, reps:12, defaultWeight:99 },
+        { id:"hl", name:"Kaapelicrunch / hanging leg raise", sets:3, reps:12, defaultWeight:35 },
+        { id:"spr", name:"Sivuplanki + rotaatio", sets:3, reps:"10/puoli", defaultWeight:0, isTime:true },
+        { id:"wc2", name:"Woodchop kaapelilla", sets:3, reps:12, defaultWeight:20 },
+        { id:"ss2", name:"Pec deck + kasvosveto (supersetti)", sets:4, reps:"12+15", defaultWeight:35 },
+      ]
+    }
+  }
+};
+
+// ── EXERCISE INSTRUCTIONS ──────────────────────────────────────────────────────
+// Keyed by exercise id. Variants (av/av2/av3 etc.) point to same base text.
+
+const I = {
+  legext: { laite:"Jalkojen ojennuslaite (leg extension). Tuoli jossa pehmustettu rulla nilkan edessä.", suoritus:"Istu selkä tukevasti, jalka rullan alle nilkan yläpuolelle. Ojenna polvi suoraksi hallitusti, pidä 1 s, laske rauhallisesti. Tee toistot yhdellä jalalla, sitten vaihda." },
+  legcurl: { laite:"Jalkojen koukistuslaite (leg curl) — makuu- tai istuva versio.", suoritus:"Aseta nilkka rullan alle/taakse. Koukista polvi tuomalla kantapää kohti pakaraa, laske hallitusti. Yksi jalka kerrallaan. Vasemmalla kevyempi paino — tärkeä kuntoutusliike." },
+  legpress: { laite:"Jalkaprässilaite. Iso laite jossa työnnetään alustaa jaloilla. Penkin asento lukitaan.", suoritus:"Jalka alustan keskelle hartianlevyisesti. Laske alusta hallitusti (~90° polvessa), ojenna — älä lukitse polvea. Yksi jalka kerrallaan. Pidä penkin asento samana (asento 11)." },
+  squat: { laite:"Olympiatanko + tangonpidike (squat/power rack).", suoritus:"Tanko hartioille (ei niskaan). Jalat hartianlevyisesti, varpaat hieman ulos. Laske lantio taakse ja alas vähintään reidet vaakatasoon, nouse ylös. Selkä suorana, kantapäät maassa." },
+  kbdl: { laite:"Kahvakuula.", suoritus:"Kahvakuula jalkojen väliin. Kumarra alas selkä suorana (lantio taakse, polvet hieman koukussa). Nouse ojentamalla lonkkaa ja polvia — lantio ohjaa, ei kädet. Saranaliike, ei kyykky." },
+  hipthrust: { laite:"Matala boksi / korotettu alusta (tai lattia aluksi).", suoritus:"Yksi jalka boksille kantapää kiinni, toinen ilmassa. Makaa selällesi, nosta lantio ylös suoraan linjaan, purista pakaraa 1–2 s, laske hallitusti. Molemmat jalat erikseen." },
+  dbbench: { laite:"Tasainen penkki + käsipainot.", suoritus:"Selällesi, käsipainot rinnan vieressä kyynärpäät ~45–60° vartalosta. Paina ylös kunnes kädet lähes suorana, laske hallitusti. Lavat yhdessä, rinta ylhäällä." },
+  inclinebench: { laite:"Vinopenkki (30–45°) + käsipainot.", suoritus:"Selällesi vinopenkille, käsipainot rinnan yläosan vieressä. Paina ylös, laske hallitusti. Kohdistuu rinnan yläosaan ja etuhartiaan." },
+  shoulderpress: { laite:"Penkki pystyssä (istuen) tai seisaaltaan + käsipainot.", suoritus:"Käsipainot olkapäiden korkeudelle, kyynärpäät 90°. Paina pään yläpuolelle, laske hallitusti. Jännitä vatsa, älä kaarra alaselkää." },
+  lateral: { laite:"Käsipainot (kevyet). Seisaaltaan.", suoritus:"Nosta käsipainot suoraan sivuille hartian tasolle, peukalot hieman alas. Ei vauhtia eikä heilautusta. Laske hallitusti. Kevyt paino + puhdas tekniikka." },
+  pushdown: { laite:"Kaapelilaite, suora tanko tai köysi yläkaapelissa.", suoritus:"Kyynärpäät kiinni kylkiin ja paikallaan. Ojenna kädet alas suoraksi, pidä 1 s, palaa hallitusti 90°:een. Kyynärpäät eivät liiku." },
+  overhead: { laite:"Yksi käsipaino molemmin käsin (tai kaksi).", suoritus:"Käsipaino pään yläpuolelle, kyynärpäät ylös lähellä korvia. Laske hallitusti pään taakse vain kyynärpäistä taivuttaen, ojenna takaisin." },
+  tsuperset: { laite:"Kaapelilaite (pushdown + overhead).", suoritus:"Tee ensin pushdown (kyynärpäät kiinni), heti perään overhead extension ilman taukoa. Supersetti — koko sarja kerralla." },
+  latpull: { laite:"Alasvetolaite (lat pulldown). Polvituki + tanko ylhäällä.", suoritus:"Polvet tuen alle. Ota tanko leveällä yliotteella, nojaa hieman taakse. Vedä rinnan yläosaan, lavat alas ja yhteen. Laske hallitusti täyteen ojennukseen." },
+  seatedrow: { laite:"Istuva soutuveto (seated cable row) tai soutulaite. V-kahva tai tanko.", suoritus:"Istu, jalat tuelle polvet hieman koukussa, selkä suorana. Vedä kahva kohti napaa, kyynärpäät lähellä kylkiä, purista lavat yhteen. Laske hallitusti." },
+  row1arm: { laite:"Kaapelilaite, yksi kahva.", suoritus:"Vedä kahva kohti kylkeä kyynärpää lähellä vartaloa, anna vartalon kiertyä hieman. Purista lapa yhteen. Tee toinen käsi erikseen." },
+  tbarrow: { laite:"Levytanko tai T-bar row -laite.", suoritus:"Seiso tangon päällä, etukumara ~45° selkä suorana. Vedä tanko kohti napaa, purista lavat yhteen, laske hallitusti. Polvet hieman koukussa." },
+  curl: { laite:"Käsipainot. Seisaaltaan tai istuen.", suoritus:"Kämmenet ylöspäin, kyynärpäät kiinni kyljissä (eivät liiku). Koukista käsipainot kohti olkapäitä, laske hallitusti. Ei heilautusta." },
+  hammer: { laite:"Käsipainot.", suoritus:"Kuten käsipainokääntö, mutta kämmenet sisäänpäin (peukalo ylös) koko ajan — kuin pitäisit vasaraa. Aktivoi brachialiksen." },
+  curlsuperset: { laite:"Käsipainot.", suoritus:"Tee ensin normaali kääntö (kämmenet ylös), heti perään haamarikääntö (peukalo ylös) ilman taukoa." },
+  facepull: { laite:"Kaapelilaite, köyskahva silmän korkeudella tai ylempänä.", suoritus:"Vedä köyttä kohti kasvoja hajottaen kädet sivuille, kyynärpäät hartiakorkeudella. Purista olkapäät taakse (ulkorotaatio). Laske hallitusti." },
+  goblet: { laite:"Kahvakuula. Seisaaltaan.", suoritus:"Pidä kahvakuulaa molemmin käsin rinnan edessä. Laske kyykkyyn kyynärpäät polvien sisäpuolelle, selkä suorana. Nouse ylös. Hyvä kyykyn perusliike." },
+  bulgarian: { laite:"Penkki/boksi takajalalle (+ käsipainot myöhemmin).", suoritus:"Takajalka penkille, etummainen jalka edessä. Laske molempia polvia, takapolvi kohti lattiaa. Nouse etummaisen jalan voimalla. Ylävartalo pystyssä." },
+  nordic: { laite:"Kiinteä tuki jalkaterille (laite/penkki/kaveri pitää nilkoista).", suoritus:"Polvet lattialla, keho pystyssä. Laske itsesi hitaasti (5 s) eteenpäin vain polvista taivuttaen — takareidet jarruttavat. Käytä käsiä apuna. Raskas liike!" },
+  rotary: { laite:"Rotary torso -laite. Istuva kiertolaite.", suoritus:"Rintakehä pehmustetta vasten, ota kahvoista. Kierrä vartaloa rauhallisesti sivulle (liike ylävartalosta), palaa keskelle. Tee toistot ensin yhteen suuntaan." },
+  plank: { laite:"Ei välineitä.", suoritus:"Kyynärpäät hartioiden alla, keho suorassa linjassa kantapäistä hartioihin. Älä anna lantion vajota. Jännitä vatsa ja pakara. Hengitä rauhallisesti." },
+  sideplank: { laite:"Ei välineitä.", suoritus:"Kyljelläsi alemman kyynärpään varassa. Nosta lantio niin että keho on suorassa. Pidä asento. Kehittyneempi: lisää rotaatio yläkädellä lattian kautta." },
+  cablecrunch: { laite:"Kaapelilaite, köysi yläkaapelissa. Polvillaan.", suoritus:"Köysi korvien viereen. Koukista ylävartaloa alas kohti polvia vatsalihaksilla (ei käsillä). Pylly ylhäällä. Palaa hallitusti." },
+  abwheel: { laite:"Vatsapyörä (ab wheel) tai kaapelicrunch.", suoritus:"Polvillaan, rullauta pyörää hitaasti eteen keho suorana (lantio ei vajoa), vedä takaisin vatsalihaksilla. Aloita lyhyellä matkalla." },
+  hanging: { laite:"Leuanvetotanko tai dippiteline käsinojilla.", suoritus:"Roiku tangosta. Tuo jalat ylös ~90° vatsalla (ei vauhdilla), laske hallitusti. Aloita polvet koukussa, etene suoriin jalkoihin." },
+  woodchop: { laite:"Kaapelilaite, yksi kahva ylhäällä.", suoritus:"Vedä kahva diagonaalisesti ylhäältä alas vastakkaiselle lantiolle, käsivarret lähes suorina. Liike kiertää koko vartalon lantiosta. Tee molemmat suunnat." },
+  pecdeck: { laite:"Pec deck / butterfly -laite.", suoritus:"Säädä istuin niin että kahvat rinnan korkeudella. Tuo käsivarret yhteen edessä, purista rintaa, laske hallitusti ilman yliojennusta." },
+  pecsuperset: { laite:"Pec deck + kaapelilaite (kasvosveto).", suoritus:"Tee ensin pec deck, heti perään kasvosveto kaapelilla ilman taukoa. Supersetti rinta + takahartia." },
+};
+
+const INSTRUCTIONS = {
+  oj:I.legext, ko:I.legcurl, fp:I.legpress, pu:I.dbbench, hp:I.shoulderpress, tp:I.pushdown,
+  ky:I.squat, md:I.kbdl, la:I.hipthrust, av:I.latpull, so:I.seatedrow, bk:I.curl,
+  go:I.goblet, ll:I.hipthrust, rt:I.rotary, pl:I.plank, cr:I.cablecrunch, fp2:I.facepull, pd:I.pecdeck,
+  vi:I.inclinebench, sh:I.shoulderpress, si:I.lateral, to:I.overhead, av2:I.latpull, sk:I.row1arm, hk:I.hammer, ks:I.facepull,
+  bs:I.bulgarian, nc:I.nordic, ab:I.abwheel, sp:I.sideplank, wc:I.woodchop, ss:I.pecsuperset,
+  ts:I.tsuperset, av3:I.latpull, sv:I.tbarrow, ks2:I.curlsuperset, ks3:I.facepull,
+  bs2:I.bulgarian, nc2:I.nordic, hl:I.hanging, spr:I.sideplank, wc2:I.woodchop, ss2:I.pecsuperset,
+};
+
+function getInstr(id) { return INSTRUCTIONS[id] || null; }
+
+// Painon säätöporras liikkeen tyypin mukaan:
+// kahvakuula 2 kg · käsipainot 1 kg · muut (tanko/laite/kaapeli) 5 kg
+function getStep(ex) {
+  const laite = (getInstr(ex.id)?.laite || '').toLowerCase();
+  const name = (ex.name || '').toLowerCase();
+  if (laite.includes('kahvakuula') || name.includes('kahvakuula')) return 2;
+  if (laite.includes('käsipaino') || name.includes('käsipaino')) return 1;
+  return 5;
+}
+
+// ── GOALS ──────────────────────────────────────────────────────────────────────
+// auto:true → seurataan automaattisesti treenilokeista (match = liikkeen nimen osa)
+// physio-testit (symm, hq, polven koukistus -testi) pidetään manuaalisina
+
+const GOALS = {
+  rehab: [
+    { id:"flexL", name:"Polven koukistus testi (vasen)", start:34.1, targets:[40,45,50], unit:"kg", current:34.1, weeks:[4,8,12] },
+    { id:"symm", name:"Puoliero (vasen vs. oikea)", start:55.6, targets:[65,75,80], unit:"%", current:55.6, weeks:[4,8,12] },
+    { id:"hq", name:"H:Q-suhde vasen", start:68, targets:[72,77,80], unit:"%", current:68, weeks:[4,8,12] },
+    { id:"fpL", name:"Jalkaprässi vasen", start:141, targets:[155,170,185], unit:"kg", current:141, weeks:[4,8,12], auto:true, match:"jalkaprässi", side:"L" },
+  ],
+  strength: [
+    { id:"squat", name:"Takakyykky", start:90, targets:[100,110,120], unit:"kg", current:90, weeks:[4,8,12], auto:true, match:"takakyykky" },
+    { id:"dead", name:"Maastaveto (kahvakuula)", start:32, targets:[36,40,44], unit:"kg", current:32, weeks:[4,8,12], auto:true, match:"maastaveto" },
+    { id:"lat", name:"Alasvetolaite", start:70, targets:[80,90,100], unit:"kg", current:70, weeks:[4,8,12], auto:true, match:"alasvetolaite" },
+    { id:"row", name:"Soutuveto", start:40, targets:[50,57,65], unit:"kg", current:40, weeks:[4,8,12], auto:true, match:"soutuveto" },
+    { id:"bench", name:"Punnerrus käsipainoilla (per käsi)", start:16, targets:[18,20,22], unit:"kg", current:16, weeks:[4,8,12], auto:true, match:"punnerrus" },
+  ]
+};
+
+let state = {
+  currentTab: 'home',
+  currentWeek: 1,
+  activeWorkout: null, // { phase, day, exercises: [{sets:[{weight,reps,done}]}] }
+  sessions: [],
+  goals: JSON.parse(JSON.stringify(GOALS)),
+  selectedDay: null,
+  expandedSession: null,
+  instrOpen: {},
+  measurements: [],   // [{date, goalId, value}]
+  chartExercise: 'squat',
+  restTimer: null,    // {remaining, total, interval}
+  runs: [],           // [{id, date, dateStr, week, distance, durationSec, type}]
+  runDraft: { distance: 5, min: 30, sec: 0, type: 'Rauhallinen' },
+};
+
+function getPhase(week) {
+  if (week <= 4) return 1;
+  if (week <= 8) return 2;
+  return 3;
+}
+
+// ── PROGRESS HELPERS ────────────────────────────────────────────────────────────
+
+// Viimeisin suoritus annetulle liikkeelle (nimimatchilla). side: 'L'|'R'|null
+function getLastPerformance(exName, side) {
+  for (let i = state.sessions.length - 1; i >= 0; i--) {
+    const s = state.sessions[i];
+    const ex = s.exercises.find(e => e.name === exName);
+    if (!ex) continue;
+    let sets = ex.bilateral ? (side === 'R' ? ex.setsR : ex.setsL) : ex.sets;
+    if (!sets || !sets.length) continue;
+    const top = sets.reduce((a, b) => b.weight > a.weight ? b : a, sets[0]);
+    return { weight: top.weight, reps: top.reps, dateStr: s.dateStr, sets };
+  }
+  return null;
+}
+
+// Suurin koskaan kirjattu paino liikkeelle (ennen annettua sessiota jos beforeId annettu)
+function getPR(exName, side, beforeId) {
+  let pr = 0;
+  for (const s of state.sessions) {
+    if (beforeId && s.id >= beforeId) continue;
+    const ex = s.exercises.find(e => e.name === exName);
+    if (!ex) continue;
+    let sets = ex.bilateral ? (side === 'R' ? ex.setsR : ex.setsL) : ex.sets;
+    if (!sets || !sets.length) continue;
+    const max = Math.max(...sets.map(x => x.weight));
+    if (max > pr) pr = max;
+  }
+  return pr;
+}
+
+// Aikasarja liikkeen painokehityksestä treenilokeista
+function exerciseSeries(matchName, side) {
+  const series = [];
+  state.sessions.forEach(s => {
+    const ex = s.exercises.find(e => e.name.toLowerCase().includes(matchName));
+    if (!ex) return;
+    let sets = ex.bilateral ? (side === 'R' ? ex.setsR : ex.setsL) : ex.sets;
+    if (!sets || !sets.length) return;
+    const max = Math.max(...sets.map(x => x.weight));
+    series.push({ label: s.date.slice(5), value: max });
+  });
+  return series;
+}
+
+// Mittaussarja manuaalisille tavoitteille (mittaushistoria)
+function measurementSeries(goalId, startValue) {
+  const pts = state.measurements
+    .filter(m => m.goalId === goalId)
+    .map(m => ({ label: m.date.slice(5), value: m.value }));
+  if (startValue != null) pts.unshift({ label: 'alku', value: startValue });
+  return pts;
+}
+
+function recordMeasurement(goalId, value) {
+  const today = new Date().toISOString().slice(0, 10);
+  // korvaa saman päivän mittaus jos on
+  const existing = state.measurements.find(m => m.goalId === goalId && m.date === today);
+  if (existing) existing.value = value;
+  else state.measurements.push({ date: today, goalId, value });
+}
+
+// Pieni SVG-viivakaavio. data: [{label,value}], opts: {color,target,unit,min,max}
+function lineChart(data, opts = {}) {
+  const W = 320, H = 130, pad = { l: 34, r: 12, t: 12, b: 22 };
+  if (!data || data.length === 0) {
+    return `<div style="padding:24px;text-align:center;color:var(--text3);font-size:13px">Ei vielä dataa — kirjaa treenejä nähdäksesi kehityksen</div>`;
+  }
+  const color = opts.color || 'var(--accent)';
+  const vals = data.map(d => d.value);
+  let min = opts.min != null ? opts.min : Math.min(...vals);
+  let max = opts.max != null ? opts.max : Math.max(...vals);
+  if (opts.target != null) { min = Math.min(min, opts.target); max = Math.max(max, opts.target); }
+  if (min === max) { min -= 1; max += 1; }
+  const range = max - min;
+  min -= range * 0.1; max += range * 0.1;
+  const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
+  const x = i => pad.l + (data.length === 1 ? plotW / 2 : (i / (data.length - 1)) * plotW);
+  const y = v => pad.t + plotH - ((v - min) / (max - min)) * plotH;
+
+  let pathD = data.map((d, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(d.value).toFixed(1)}`).join(' ');
+  let areaD = pathD + ` L${x(data.length - 1).toFixed(1)},${(pad.t + plotH).toFixed(1)} L${x(0).toFixed(1)},${(pad.t + plotH).toFixed(1)} Z`;
+
+  const dots = data.map((d, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(d.value).toFixed(1)}" r="3.5" fill="${color}"/>`).join('');
+  const targetLine = opts.target != null
+    ? `<line x1="${pad.l}" y1="${y(opts.target).toFixed(1)}" x2="${W - pad.r}" y2="${y(opts.target).toFixed(1)}" stroke="var(--green)" stroke-width="1.5" stroke-dasharray="4 3"/>
+       <text x="${W - pad.r}" y="${(y(opts.target) - 4).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--green)">tavoite ${opts.target}${opts.unit || ''}</text>`
+    : '';
+
+  // y-axis labels
+  const yLabels = [max, min].map(v =>
+    `<text x="${pad.l - 6}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--text3)">${Math.round(v)}</text>`
+  ).join('');
+  // x labels (first & last)
+  const xLabels = `<text x="${x(0)}" y="${H - 6}" text-anchor="middle" font-size="9" fill="var(--text3)">${data[0].label}</text>
+    ${data.length > 1 ? `<text x="${x(data.length - 1)}" y="${H - 6}" text-anchor="middle" font-size="9" fill="var(--text3)">${data[data.length - 1].label}</text>` : ''}`;
+
+  const gradId = 'g' + Math.random().toString(36).slice(2, 7);
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
+    <defs><linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${color}" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+    </linearGradient></defs>
+    ${targetLine}
+    <path d="${areaD}" fill="url(#${gradId})"/>
+    <path d="${pathD}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}${yLabels}${xLabels}
+  </svg>`;
+}
+
+// Viikkokohtaiset treenimäärät + putki
+function getWeeklyData() {
+  const weeks = {};
+  state.sessions.forEach(s => { weeks[s.week] = (weeks[s.week] || 0) + 1; });
+  return weeks;
+}
+function getStreak() {
+  const weeks = getWeeklyData();
+  let streak = 0;
+  for (let w = state.currentWeek; w >= 1; w--) {
+    if ((weeks[w] || 0) >= 3) streak++;
+    else if (w < state.currentWeek) break; // nykyviikko kesken ei katkaise
+  }
+  return streak;
+}
+
+// ── STORAGE ───────────────────────────────────────────────────────────────────
+
+function save() {
+  localStorage.setItem('treenikirja_v2', JSON.stringify({
+    currentWeek: state.currentWeek,
+    sessions: state.sessions,
+    goals: state.goals,
+    measurements: state.measurements,
+    runs: state.runs,
+    lastBackup: state.lastBackup || null,
+  }));
+}
+
+function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem('treenikirja_v2'));
+    if (d) {
+      state.currentWeek = d.currentWeek || 1;
+      state.sessions = d.sessions || [];
+      state.measurements = d.measurements || [];
+      state.runs = d.runs || [];
+      state.lastBackup = d.lastBackup || null;
+      // Aloita aina tuoreista tavoitemäärittelyistä (match/auto/weeks),
+      // mutta säilytä käyttäjän tallentamat nykyiset arvot ja tavoitteet.
+      state.goals = JSON.parse(JSON.stringify(GOALS));
+      if (d.goals) {
+        ['rehab','strength'].forEach(cat => {
+          (state.goals[cat] || []).forEach(g => {
+            const saved = (d.goals[cat] || []).find(x => x.id === g.id);
+            if (saved) {
+              if (typeof saved.current === 'number') g.current = saved.current;
+              if (Array.isArray(saved.targets)) g.targets = saved.targets;
+            }
+          });
+        });
+      }
+    }
+  } catch(e) {}
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+
+function showTab(tab) {
+  state.currentTab = tab;
+  ['home','workout','runs','history','goals'].forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+  });
+  render();
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+
+function render() {
+  const c = document.getElementById('main-content');
+  if (state.currentTab === 'home') { c.innerHTML = renderHome(); updateHeaderSubtitle(); }
+  else if (state.currentTab === 'workout') { c.innerHTML = renderWorkout(); }
+  else if (state.currentTab === 'runs') { c.innerHTML = renderRuns(); }
+  else if (state.currentTab === 'history') { c.innerHTML = renderHistory(); }
+  else if (state.currentTab === 'goals') { c.innerHTML = renderGoals(); }
+}
+
+function updateHeaderSubtitle() {
+  const el = document.getElementById('header-subtitle');
+  const phase = getPhase(state.currentWeek);
+  const phaseNames = {1:'Perusta',2:'Kehitys',3:'Teho'};
+  el.innerHTML = `Viikko <span>${state.currentWeek}</span> · Vaihe ${phase}: ${phaseNames[phase]}`;
+}
+
+// ── HOME ──────────────────────────────────────────────────────────────────────
+
+function renderHome() {
+  const phase = getPhase(state.currentWeek);
+  const phaseNames = {1:'Perusta',2:'Kehitys',3:'Teho'};
+  const lastSession = state.sessions[state.sessions.length - 1];
+  const totalSessions = state.sessions.length;
+  const thisWeekSessions = state.sessions.filter(s => s.week === state.currentWeek).length;
+  const streak = getStreak();
+  const weekly = getWeeklyData();
+  const backupDays = daysSinceBackup();
+  const runsThisWeek = state.runs.filter(r => r.week === state.currentWeek).length;
+
+  const schedule = [
+    { day:'Ma', act:'Sali — Päivä A (etuketju + Push)', load:'low', txt:'Matala' },
+    { day:'Ti', act:'Rauhallinen juoksu', load:'low', txt:'Matala' },
+    { day:'Ke', act:'Sali — Päivä B (takaketju + Pull)', load:'high', txt:'Korkea' },
+    { day:'To', act:'Lepo', load:'rest', txt:'Lepo' },
+    { day:'Pe', act:'Sali — Päivä C (jalat + Core)', load:'mid', txt:'Keski' },
+    { day:'La', act:'Lepo', load:'rest', txt:'Lepo' },
+    { day:'Su', act:'Pidempi rauhallinen lenkki', load:'low', txt:'Matala' },
+  ];
+
+  return `
+    ${streak > 0 ? `
+    <div class="streak-banner">
+      <div class="streak-flame">🔥</div>
+      <div>
+        <div class="streak-num">${streak} ${streak===1?'viikko':'viikkoa'}</div>
+        <div class="streak-label">putkeen täydet treeniviikot — jatka samaan malliin!</div>
+      </div>
+    </div>` : ''}
+
+    ${backupDays !== null && backupDays >= 7 ? `
+    <div class="ahead-banner" style="background:var(--orange-dim);border-color:var(--orange)">
+      <div style="font-size:22px">💾</div>
+      <div class="ab-text">Edellisestä varmuuskopiosta ${backupDays} päivää. Suosittelen ottamaan uuden.</div>
+      <button class="btn btn-sm raise-btn" onclick="downloadBackup()">Varmuuskopioi</button>
+    </div>` : ''}
+
+    <div class="section-header">TÄLLÄ VIIKOLLA</div>
+    <div class="week-row">
+      <div class="week-label">Nykyinen viikko</div>
+      <div class="week-stepper">
+        <button class="step-btn" onclick="changeWeek(-1)">−</button>
+        <div class="week-val">${state.currentWeek}</div>
+        <button class="step-btn" onclick="changeWeek(1)">+</button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--accent2)">${thisWeekSessions}/3</div>
+        <div class="stat-label">Salitreenejä tällä viikolla</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--orange)">${runsThisWeek}/2</div>
+        <div class="stat-label">Lenkkejä tällä viikolla</div>
+      </div>
+    </div>
+
+    <div class="section-header">SUOSITELTU VIIKKO</div>
+    <div class="card" style="margin-top:0">
+      ${schedule.map(s => `
+        <div class="sched-row">
+          <div class="sched-day">${s.day}</div>
+          <div class="sched-act">${s.act}</div>
+          <div class="sched-load ${s.load}">${s.txt}</div>
+        </div>`).join('')}
+      <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5">Kovat takareisikuormat (Ke ja Pe) on eroteltu 48 h välein, juoksut osuvat matalan kuorman päiville. Voit siirtää päiviä, kunhan pidät tämän rytmin.</div>
+    </div>
+
+    <div class="section-header">12 VIIKON EDISTYMINEN</div>
+    <div class="week-grid">
+      ${Array.from({length:12},(_,i)=>{
+        const wk = i+1;
+        const n = weekly[wk] || 0;
+        const cls = n >= 3 ? 'done' : (n > 0 ? 'partial' : '');
+        const cur = wk === state.currentWeek ? 'current' : '';
+        return `<div class="week-cell ${cls} ${cur}">
+          <div class="wc-num">${wk}</div>
+          <div class="wc-dots">${'●'.repeat(n)}${'○'.repeat(Math.max(0,3-n))}</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="section-header">TÄNÄÄN</div>
+    <div class="day-grid">
+      ${['A','B','C'].map(d => {
+        const info = PROGRAM[phase][d];
+        const done = state.sessions.some(s => s.week === state.currentWeek && s.day === d);
+        return `<div class="day-card ${d} ${state.selectedDay===d?'selected':''}" onclick="selectDay('${d}')">
+          <div class="day-letter">${d}</div>
+          <div class="day-name">${info.day}</div>
+          ${done ? '<div style="color:var(--green);font-size:11px;margin-top:4px">✓ tehty</div>' : ''}
+        </div>`;
+      }).join('')}
+    </div>
+
+    ${state.selectedDay ? `
+    <div style="padding:0 16px 16px">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:8px">${PROGRAM[phase][state.selectedDay].title}</div>
+      <button class="btn btn-primary" style="width:100%" onclick="startWorkout('${state.selectedDay}')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Aloita päivä ${state.selectedDay}
+      </button>
+    </div>` : ''}
+
+    ${lastSession ? `
+    <div class="section-header">EDELLINEN TREENI</div>
+    <div class="card" style="margin-top:0">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="session-day-badge ${lastSession.day}">${lastSession.day}</div>
+        <div>
+          <div style="font-size:15px;font-weight:600">${lastSession.dateStr}</div>
+          <div style="font-size:12px;color:var(--text2)">Vaihe ${lastSession.phase} · Viikko ${lastSession.week} · ${lastSession.totalSets} sarjaa</div>
+        </div>
+      </div>
+    </div>` : `
+    <div class="card" style="text-align:center;color:var(--text3);margin-top:0">
+      <div style="font-size:28px;margin-bottom:8px">🏋️</div>
+      <div style="font-size:14px">Ei vielä kirjattuja treenejä.<br>Valitse päivä ja aloita!</div>
+    </div>`}
+  `;
+}
+
+function changeWeek(d) {
+  state.currentWeek = Math.max(1, Math.min(12, state.currentWeek + d));
+  save();
+  render();
+}
+
+function selectDay(d) {
+  state.selectedDay = state.selectedDay === d ? null : d;
+  render();
+}
+
+// ── WORKOUT ───────────────────────────────────────────────────────────────────
+
+function startWorkout(day) {
+  const phase = getPhase(state.currentWeek);
+  const dayPlan = PROGRAM[phase][day];
+  state.instrOpen = {};
+  state.activeWorkout = {
+    phase, day,
+    week: state.currentWeek,
+    exercises: dayPlan.exercises.map(ex => {
+      const baseReps = typeof ex.reps === 'number' ? ex.reps : 8;
+      if (ex.bilateral) {
+        const lastL = getLastPerformance(ex.name, 'L');
+        const lastR = getLastPerformance(ex.name, 'R');
+        const wL = lastL ? lastL.weight : ex.defaultWeight.L;
+        const wR = lastR ? lastR.weight : ex.defaultWeight.R;
+        return {
+          ...ex,
+          activeSide: 'L',
+          sets: {
+            L: Array.from({length:ex.sets},(_,i) => ({ weight: wL, reps: baseReps, done:false })),
+            R: Array.from({length:ex.sets},(_,i) => ({ weight: wR, reps: baseReps, done:false })),
+          }
+        };
+      }
+      const last = getLastPerformance(ex.name, null);
+      const w0 = last ? last.weight : ex.defaultWeight;
+      return {
+        ...ex,
+        sets: Array.from({length:ex.sets},(_,i) => ({ weight: w0, reps: baseReps, done:false }))
+      };
+    })
+  };
+  showTab('workout');
+}
+
+function renderWorkout() {
+  if (!state.activeWorkout) {
+    return `
+      <div class="empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6.5 6.5h11m-11 5h11m-11 5h11M4 6.5h1m-1 5h1m-1 5h1M18 6.5h1m-1 5h1m-1 5h1"/></svg>
+        <p>Ei aktiivista treeniä</p>
+        <p style="font-size:13px;margin-top:6px">Mene Koti-välilehdelle ja valitse päivä</p>
+      </div>`;
+  }
+
+  const w = state.activeWorkout;
+  const totalSets = w.exercises.reduce((sum,ex) => {
+    if (ex.bilateral) return sum + ex.sets.L.length + ex.sets.R.length;
+    return sum + ex.sets.length;
+  }, 0);
+  const doneSets = w.exercises.reduce((sum,ex) => {
+    if (ex.bilateral) return sum + ex.sets.L.filter(s=>s.done).length + ex.sets.R.filter(s=>s.done).length;
+    return sum + ex.sets.filter(s=>s.done).length;
+  }, 0);
+  const allDone = doneSets === totalSets;
+
+  return `
+    <div style="padding:14px 16px 6px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div class="phase-badge">Päivä ${w.day} · Vaihe ${w.phase}</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px">${doneSets}/${totalSets} sarjaa valmis</div>
+      </div>
+      <button class="btn btn-sm btn-secondary" onclick="cancelWorkout()">Peruuta</button>
+    </div>
+
+    <div style="padding:4px 16px 12px">
+      <div class="progress-bar" style="height:8px">
+        <div class="progress-fill" style="width:${totalSets?Math.round(doneSets/totalSets*100):0}%;background:var(--accent)"></div>
+      </div>
+    </div>
+
+    ${allDone ? `
+    <div class="done-banner">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      <div>
+        <div class="done-text">Treeni valmis! 🎉</div>
+        <div class="done-sub">Tallenna tulokset klikkaamalla</div>
+      </div>
+    </div>
+    <div style="padding:0 16px 12px">
+      <button class="btn btn-primary" style="width:100%;background:var(--green);color:#000" onclick="finishWorkout()">
+        Tallenna treeni
+      </button>
+    </div>` : ''}
+
+    ${w.exercises.map((ex,ei) => renderExerciseBlock(ex,ei)).join('')}
+
+    <div style="height:20px"></div>
+  `;
+}
+
+function renderExerciseBlock(ex, ei) {
+  const isBilateral = ex.bilateral;
+  const side = isBilateral ? ex.activeSide : null;
+  const sets = isBilateral ? ex.sets[side] : ex.sets;
+  const step = getStep(ex);
+
+  return `
+    <div class="ex-block" id="ex-${ei}">
+      <div class="ex-header">
+        <div>
+          <div class="ex-name">${ex.name}</div>
+          ${ex.isRehab ? '<div class="rehab-badge">KUNTOUTUS</div>' : ''}
+        </div>
+      </div>
+      <div class="ex-meta">${ex.sets.length || Object.values(ex.sets||{L:[]})[0]?.length || ex.sets} sarjaa × ${ex.reps} toistoa${ex.note ? ' · ' + ex.note : ''}</div>
+
+      ${(() => {
+        const instr = getInstr(ex.id);
+        if (!instr) return '';
+        const open = state.instrOpen[ei];
+        return `
+        <div class="ex-instr-toggle ${open?'open':''}" id="instrtog-${ei}" onclick="toggleInstr(${ei})">
+          <span>📖 Ohjeet & laite</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="ex-instr" id="instr-${ei}" style="display:${open?'block':'none'}">
+          <span class="instr-label">Laite / väline</span>
+          <span class="instr-text">${instr.laite}</span>
+          <span class="instr-label">Suoritus</span>
+          <span class="instr-text">${instr.suoritus}</span>
+        </div>`;
+      })()}
+
+      ${isBilateral ? `
+      <div class="side-tabs">
+        <div class="side-tab ${side==='L'?'active':''}" onclick="switchSide(${ei},'L')">Vasen</div>
+        <div class="side-tab ${side==='R'?'active':''}" onclick="switchSide(${ei},'R')">Oikea</div>
+      </div>` : ''}
+
+      ${(() => {
+        const last = getLastPerformance(ex.name, side);
+        if (!last) return `<div class="last-time">Ensimmäinen kerta — aseta sopiva paino</div>`;
+        const pr = getPR(ex.name, side, null);
+        return `<div class="last-time">
+          <span>Viimeksi (${last.dateStr.split(' ').slice(-2).join(' ')}): <b>${last.weight} kg × ${last.reps}</b></span>
+          ${pr ? `<span class="pr-tag">PR ${pr} kg</span>` : ''}
+        </div>`;
+      })()}
+
+      ${sets.map((s,si) => `
+      <div class="set-row" style="${s.done?'opacity:0.5':''}">
+        <div class="set-num">${si+1}</div>
+        <div class="set-field">
+          <div class="set-label">KG <span style="color:var(--text3);font-weight:400">±${step}</span></div>
+          <div class="stepper">
+            <button class="step-btn" onclick="adjustWeight(${ei},${si},${isBilateral?`'${side}'`:'null'},-${step})">−</button>
+            <div class="step-val" id="w-${ei}-${si}-${isBilateral?side:'x'}">${s.weight}</div>
+            <button class="step-btn" onclick="adjustWeight(${ei},${si},${isBilateral?`'${side}'`:'null'},${step})">+</button>
+          </div>
+        </div>
+        <div class="set-field">
+          <div class="set-label">TOISTOT</div>
+          <div class="stepper">
+            <button class="step-btn" onclick="adjustReps(${ei},${si},${isBilateral?`'${side}'`:'null'},-1)">−</button>
+            <div class="step-val" id="r-${ei}-${si}-${isBilateral?side:'x'}">${s.reps}</div>
+            <button class="step-btn" onclick="adjustReps(${ei},${si},${isBilateral?`'${side}'`:'null'},1)">+</button>
+          </div>
+        </div>
+        <div class="set-check">
+          <button class="check-btn ${s.done?'done':''}" onclick="toggleSet(${ei},${si},${isBilateral?`'${side}'`:'null'})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
+      </div>`).join('')}
+    </div>
+  `;
+}
+
+function switchSide(ei, side) {
+  state.activeWorkout.exercises[ei].activeSide = side;
+  render();
+}
+
+function toggleInstr(ei) {
+  state.instrOpen[ei] = !state.instrOpen[ei];
+  const box = document.getElementById('instr-' + ei);
+  const tog = document.getElementById('instrtog-' + ei);
+  if (box) box.style.display = state.instrOpen[ei] ? 'block' : 'none';
+  if (tog) tog.classList.toggle('open', state.instrOpen[ei]);
+}
+
+function adjustWeight(ei, si, side, delta) {
+  const w = state.activeWorkout;
+  if (side) {
+    w.exercises[ei].sets[side][si].weight = Math.max(0, Math.round((w.exercises[ei].sets[side][si].weight + delta) * 10) / 10);
+  } else {
+    w.exercises[ei].sets[si].weight = Math.max(0, Math.round((w.exercises[ei].sets[si].weight + delta) * 10) / 10);
+  }
+  // Inline update for speed
+  const key = side ? `w-${ei}-${si}-${side}` : `w-${ei}-${si}-x`;
+  const el = document.getElementById(key);
+  if (el) el.textContent = side ? w.exercises[ei].sets[side][si].weight : w.exercises[ei].sets[si].weight;
+}
+
+function adjustReps(ei, si, side, delta) {
+  const w = state.activeWorkout;
+  if (side) {
+    w.exercises[ei].sets[side][si].reps = Math.max(1, w.exercises[ei].sets[side][si].reps + delta);
+  } else {
+    w.exercises[ei].sets[si].reps = Math.max(1, w.exercises[ei].sets[si].reps + delta);
+  }
+  const key = side ? `r-${ei}-${si}-${side}` : `r-${ei}-${si}-x`;
+  const el = document.getElementById(key);
+  if (el) el.textContent = side ? w.exercises[ei].sets[side][si].reps : w.exercises[ei].sets[si].reps;
+}
+
+function toggleSet(ei, si, side) {
+  const w = state.activeWorkout;
+  let nowDone;
+  if (side) {
+    w.exercises[ei].sets[side][si].done = !w.exercises[ei].sets[side][si].done;
+    nowDone = w.exercises[ei].sets[side][si].done;
+  } else {
+    w.exercises[ei].sets[si].done = !w.exercises[ei].sets[si].done;
+    nowDone = w.exercises[ei].sets[si].done;
+  }
+  render();
+  if (nowDone) startRestTimer(90);
+}
+
+// ── REST TIMER ───────────────────────────────────────────────────────────────
+
+function startRestTimer(seconds) {
+  stopRestTimer();
+  state.restTimer = { remaining: seconds, total: seconds };
+  renderRestTimer();
+  state.restTimer.interval = setInterval(() => {
+    state.restTimer.remaining--;
+    if (state.restTimer.remaining <= 0) {
+      clearInterval(state.restTimer.interval);
+      beep();
+      renderRestTimer(true);
+      setTimeout(stopRestTimer, 4000);
+    } else {
+      renderRestTimer();
+    }
+  }, 1000);
+}
+
+function stopRestTimer() {
+  if (state.restTimer && state.restTimer.interval) clearInterval(state.restTimer.interval);
+  state.restTimer = null;
+  const el = document.getElementById('rest-timer');
+  if (el) el.remove();
+}
+
+function addRestTime(sec) {
+  if (state.restTimer) { state.restTimer.remaining += sec; renderRestTimer(); }
+}
+
+function renderRestTimer(done) {
+  let el = document.getElementById('rest-timer');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'rest-timer';
+    document.body.appendChild(el);
+  }
+  if (done) {
+    el.className = 'rest-timer done';
+    el.innerHTML = `<div class="rt-time">0:00</div><div class="rt-label">Lepo ohi — seuraava sarja!</div><button class="rt-btn" onclick="stopRestTimer()">OK</button>`;
+    return;
+  }
+  const m = Math.floor(state.restTimer.remaining / 60);
+  const s = state.restTimer.remaining % 60;
+  el.className = 'rest-timer';
+  el.innerHTML = `<div class="rt-time">${m}:${String(s).padStart(2,'0')}</div>
+    <div class="rt-label">Lepo</div>
+    <button class="rt-btn" onclick="addRestTime(30)">+30s</button>
+    <button class="rt-btn" onclick="stopRestTimer()">Ohita</button>`;
+}
+
+function beep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = 880; o.type = 'sine';
+    g.gain.setValueAtTime(0.3, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+    o.start(); o.stop(ctx.currentTime + 0.5);
+  } catch(e) {}
+}
+
+function cancelWorkout() {
+  if (!confirm('Peruutetaanko treeni? Tietoja ei tallenneta.')) return;
+  stopRestTimer();
+  state.activeWorkout = null;
+  showTab('home');
+}
+
+function finishWorkout() {
+  const w = state.activeWorkout;
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('fi-FI', {weekday:'long',day:'numeric',month:'long'});
+
+  const totalSets = w.exercises.reduce((sum,ex) => {
+    if (ex.bilateral) return sum + ex.sets.L.filter(s=>s.done).length + ex.sets.R.filter(s=>s.done).length;
+    return sum + ex.sets.filter(s=>s.done).length;
+  }, 0);
+
+  const session = {
+    id: Date.now(),
+    date: now.toISOString().slice(0,10),
+    dateStr,
+    day: w.day,
+    phase: w.phase,
+    week: w.week,
+    totalSets,
+    exercises: w.exercises.map(ex => {
+      if (ex.bilateral) {
+        return { name: ex.name, bilateral: true, isRehab: ex.isRehab,
+          setsL: ex.sets.L.filter(s=>s.done), setsR: ex.sets.R.filter(s=>s.done) };
+      }
+      return { name: ex.name, isRehab: ex.isRehab, sets: ex.sets.filter(s=>s.done) };
+    })
+  };
+
+  // Tunnista ennätykset ENNEN session tallennusta (vertaa aiempiin)
+  const prs = [];
+  w.exercises.forEach(ex => {
+    if (ex.bilateral) {
+      ['L','R'].forEach(sd => {
+        const doneSets = ex.sets[sd].filter(s=>s.done);
+        if (!doneSets.length) return;
+        const maxW = Math.max(...doneSets.map(s=>s.weight));
+        const prevPR = getPR(ex.name, sd, null);
+        if (maxW > prevPR && prevPR > 0 && maxW > 0) prs.push(`${ex.name} (${sd==='L'?'vasen':'oikea'}): ${maxW} kg`);
+      });
+    } else {
+      const doneSets = ex.sets.filter(s=>s.done);
+      if (!doneSets.length) return;
+      const maxW = Math.max(...doneSets.map(s=>s.weight));
+      const prevPR = getPR(ex.name, null, null);
+      if (maxW > prevPR && prevPR > 0 && maxW > 0) prs.push(`${ex.name}: ${maxW} kg`);
+    }
+  });
+
+  state.sessions.push(session);
+  state.activeWorkout = null;
+  stopRestTimer();
+  const res = updateGoalsFromSession(session);
+  save();
+
+  if (prs.length) {
+    celebratePR(prs);
+    return; // juhlinta hoitaa siirtymän
+  }
+  if (res.ahead) showToast('Tallennettu — olet edellä tavoitteissa! 🔥');
+  else if (res.advanced) showToast('Tallennettu — tavoitteet päivitetty! 💪');
+  else showToast('Treeni tallennettu! 💪');
+  showTab('history');
+}
+
+function celebratePR(prs) {
+  beep();
+  let el = document.getElementById('pr-celebrate');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'pr-celebrate';
+    el.className = 'pr-celebrate';
+    el.onclick = () => { el.classList.remove('show'); showTab('history'); };
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `
+    <div class="trophy">🏆</div>
+    <div class="pr-title">${prs.length > 1 ? 'Uudet ennätykset!' : 'Uusi ennätys!'}</div>
+    <div class="pr-list">${prs.join('<br>')}</div>
+    <div style="font-size:13px;color:var(--text3);margin-top:8px">Napauta jatkaaksesi</div>`;
+  requestAnimationFrame(() => el.classList.add('show'));
+}
+
+// ── DYNAMIC GOALS ───────────────────────────────────────────────────────────────
+
+// Päivittää tavoitteiden "nykyinen"-arvon treenilokin perusteella (auto-tracked)
+function updateGoalsFromSession(session) {
+  const all = [...state.goals.rehab, ...state.goals.strength];
+  let advanced = false, ahead = false;
+  session.exercises.forEach(ex => {
+    all.forEach(g => {
+      if (!g.match) return;
+      if (!ex.name.toLowerCase().includes(g.match)) return;
+      let sets = ex.bilateral ? (g.side === 'R' ? ex.setsR : ex.setsL) : ex.sets;
+      if (!sets || !sets.length) return;
+      const maxW = Math.max(...sets.map(s => s.weight));
+      if (maxW > g.current) { g.current = maxW; advanced = true; recordMeasurement(g.id, maxW); }
+    });
+  });
+  all.forEach(g => { if (goalStatus(g).ahead) ahead = true; });
+  return { advanced, ahead };
+}
+
+// Onko tavoitteessa edellä aikataulusta?
+function goalStatus(g) {
+  const weeks = g.weeks || [4, 8, 12];
+  let reached = -1;
+  for (let i = 0; i < 3; i++) if (g.current >= g.targets[i]) reached = i;
+  const ahead = reached >= 0 && reached < 2 && state.currentWeek < weeks[reached];
+  return { reached, ahead };
+}
+
+function roundNice(v, unit) {
+  if (unit === '%') return Math.round(v);
+  return Math.round(v / 2.5) * 2.5;
+}
+
+// Nostaa yksittäisen tavoitteen säilyttäen alkuperäisen kehitysvauhdin
+function doRaise(g) {
+  const inc = (g.targets[2] - g.start) / 3; // alkuperäinen keskim. nousu / välietappi
+  const step = g.unit === '%' ? 1 : 2.5;
+  let nt = [1, 2, 3].map(n => roundNice(g.current + inc * n, g.unit));
+  // varmista kasvava ja > nykyinen
+  nt[0] = Math.max(nt[0], g.current + step);
+  nt[1] = Math.max(nt[1], nt[0] + step);
+  nt[2] = Math.max(nt[2], nt[1] + step);
+  g.targets = nt;
+}
+
+function raiseGoal(id) {
+  const g = [...state.goals.rehab, ...state.goals.strength].find(x => x.id === id);
+  if (!g) return;
+  doRaise(g);
+  save();
+  render();
+  showToast('Tavoite nostettu! 🎯');
+}
+
+function raiseAllAhead() {
+  let n = 0;
+  [...state.goals.rehab, ...state.goals.strength].forEach(g => {
+    if (goalStatus(g).ahead) { doRaise(g); n++; }
+  });
+  save();
+  render();
+  showToast(`${n} tavoitetta nostettu! 🔥`);
+}
+
+// ── HISTORY ───────────────────────────────────────────────────────────────────
+
+function renderHistory() {
+  if (state.sessions.length === 0) {
+    return `<div class="empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <p>Ei tallennettuja treenejä</p>
+    </div>`;
+  }
+
+  const sorted = [...state.sessions].reverse();
+  return `
+    <div class="section-header">TREENIHISTORIA (${state.sessions.length} treeniä)</div>
+    <div class="card" style="padding:0;overflow:hidden">
+      ${sorted.map((s,i) => `
+        <div>
+          <div class="session-row" onclick="toggleSessionDetail('${s.id}')">
+            <div class="session-day-badge ${s.day}">${s.day}</div>
+            <div class="session-info">
+              <div class="session-date">${s.dateStr}</div>
+              <div class="session-meta">Vaihe ${s.phase} · Viikko ${s.week} · ${s.totalSets} sarjaa</div>
+            </div>
+            <div style="color:var(--text3);font-size:18px">${state.expandedSession===s.id?'▲':'▼'}</div>
+          </div>
+          <div class="session-detail ${state.expandedSession===s.id?'open':''}">
+            ${s.exercises.map(ex => `
+              <div class="detail-ex">
+                <div>${ex.isRehab?'🟢 ':''}${ex.name}</div>
+                ${ex.bilateral ? `<span>V:${ex.setsL.length} · O:${ex.setsR.length} sarjaa</span>` :
+                  `<span>${ex.sets.length} sarjaa${ex.sets.length>0?' · '+ex.sets[ex.sets.length-1].weight+'kg':''}</span>`}
+              </div>`).join('')}
+          </div>
+          ${i < sorted.length-1 ? '<div class="divider"></div>' : ''}
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function toggleSessionDetail(id) {
+  state.expandedSession = state.expandedSession === id ? null : id;
+  render();
+}
+
+// ── GOALS ─────────────────────────────────────────────────────────────────────
+
+function renderGoals() {
+  const milestoneLabels = ['Vko 4','Vko 8','Vko 12'];
+  const anyAhead = [...state.goals.rehab, ...state.goals.strength].some(g => goalStatus(g).ahead);
+
+  function renderGoalCard(goal) {
+    const status = goalStatus(goal);
+    const weeks = goal.weeks || [4,8,12];
+    const pct = Math.min(100, Math.max(0, Math.round((goal.current - goal.start) / (goal.targets[2] - goal.start) * 100)));
+
+    return `
+      <div class="goal-row">
+        <div class="goal-top">
+          <div class="goal-name">${goal.name}${status.ahead ? '<span class="ahead-badge">EDELLÄ 🔥</span>' : ''}</div>
+          <div class="goal-values">${goal.current} → <span>${goal.targets[2]} ${goal.unit}</span></div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${pct}%;background:${pct>=100?'var(--green)':pct>60?'var(--accent)':'var(--orange)'}"></div>
+        </div>
+        <div class="milestone-row">
+          ${goal.targets.map((t,i) => {
+            const reached = goal.current >= t;
+            return `<div class="milestone ${reached?'reached':''}">
+              <div class="milestone-val">${t}${goal.unit}</div>
+              <div class="milestone-label">${milestoneLabels[i]}</div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="font-size:12px;color:var(--text3)">
+            ${goal.auto ? '<span class="auto-label">⚡ Seurataan treeneistä</span>' : 'Nykyinen: <b style="color:var(--text)">'+goal.current+' '+goal.unit+'</b>'}
+          </div>
+          <div style="flex:1"></div>
+          ${status.ahead ? `<button class="btn btn-sm raise-btn" onclick="raiseGoal('${goal.id}')">Nosta tavoitetta</button>` : ''}
+          <button class="btn btn-sm btn-secondary" onclick="updateGoalCurrent('${goal.id}')">Päivitä</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // Symmetria-data: puoliero ajan myötä (sankarikuva)
+  const symmGoal = state.goals.rehab.find(g => g.id === 'symm');
+  const symmSeries = measurementSeries('symm', symmGoal.start);
+
+  // Voimakäyrän liikevalinta
+  const chartOptions = [
+    { id:'squat', label:'Kyykky', match:'takakyykky', side:null, target: state.goals.strength.find(g=>g.id==='squat').targets[2] },
+    { id:'dead', label:'Maastaveto', match:'maastaveto', side:null, target: state.goals.strength.find(g=>g.id==='dead').targets[2] },
+    { id:'lat', label:'Alasveto', match:'alasvetolaite', side:null, target: state.goals.strength.find(g=>g.id==='lat').targets[2] },
+    { id:'fpL', label:'Jalkaprässi V', match:'jalkaprässi', side:'L', target: state.goals.rehab.find(g=>g.id==='fpL').targets[2] },
+    { id:'fpR', label:'Jalkaprässi O', match:'jalkaprässi', side:'R', target:null },
+    { id:'bench', label:'Punnerrus', match:'punnerrus', side:null, target: state.goals.strength.find(g=>g.id==='bench').targets[2] },
+  ];
+  const chosen = chartOptions.find(o => o.id === state.chartExercise) || chartOptions[0];
+  const strSeries = exerciseSeries(chosen.match, chosen.side);
+  const backupDays = daysSinceBackup();
+
+  return `
+    ${anyAhead ? `
+    <div class="ahead-banner">
+      <div style="font-size:24px">🔥</div>
+      <div class="ab-text">Olet <b>edellä aikataulusta</b> joissakin tavoitteissa! Haluatko nostaa rimaa?</div>
+      <button class="btn btn-sm raise-btn" onclick="raiseAllAhead()">Nosta kaikki</button>
+    </div>` : ''}
+
+    <div class="section-header">🟢 TAKAREIDEN PALAUTUMINEN</div>
+    <div class="symmetry-hero">
+      <div class="sh-title">PUOLIERO — vasen vs. oikea</div>
+      <div class="sh-big" style="color:${symmGoal.current>=80?'var(--green)':symmGoal.current>=70?'var(--accent2)':'var(--orange)'}">${symmGoal.current}%</div>
+      <div class="sh-sub">Lähtötaso ${symmGoal.start}% · tavoite 80%${symmGoal.current>symmGoal.start?` · +${(symmGoal.current-symmGoal.start).toFixed(1)} %-yksikköä 💪`:''}</div>
+      ${lineChart(symmSeries, { color:'var(--rehab)', target:80, unit:'%', min:50, max:100 })}
+      <div style="font-size:11px;color:var(--text3);margin-top:6px">Päivitä arvo fysioterapian mittauksen jälkeen kohdasta Kuntoutustavoitteet → Päivitä.</div>
+    </div>
+
+    <div class="section-header">📈 VOIMAKEHITYS</div>
+    <div class="chart-tabs">
+      ${chartOptions.map(o => `<div class="chart-tab ${o.id===state.chartExercise?'active':''}" onclick="setChartExercise('${o.id}')">${o.label}</div>`).join('')}
+    </div>
+    <div class="card chart-card" style="margin-top:0">
+      <div class="card-title">${chosen.label} — paino (kg)</div>
+      ${lineChart(strSeries, { color:'var(--accent)', target:chosen.target, unit:'kg' })}
+    </div>
+
+    <div class="section-header">🟢 KUNTOUTUSTAVOITTEET</div>
+    <div class="card" style="margin-top:0">
+      ${state.goals.rehab.map(renderGoalCard).join('')}
+    </div>
+
+    <div class="section-header">💪 VOIMATAVOITTEET</div>
+    <div class="card" style="margin-top:0">
+      ${state.goals.strength.map(renderGoalCard).join('')}
+    </div>
+
+    <div class="card" style="background:var(--surface2);font-size:12px;color:var(--text2);line-height:1.5">
+      <b style="color:var(--text)">Näin tavoitteet toimivat:</b> Voima- ja jalkaprässitavoitteet päivittyvät automaattisesti treeniesi perusteella. Fysioterapian testitulokset (puoliero, H:Q, polven koukistus) päivität itse "Päivitä"-napilla mittausten jälkeen. Kun saavutat välietapin etuajassa, voit nostaa tavoitetta — uusi tavoite säilyttää saman kehitysvauhdin.
+    </div>
+
+    <div class="section-header">💾 VARMUUSKOPIOINTI</div>
+    <div class="card" style="margin-top:0">
+      <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">
+        ${backupDays === null ? 'Et ole vielä ottanut varmuuskopiota. Suosittelen ottamaan sen säännöllisesti — näin tietosi ovat turvassa vaikka selaimen tiedot tyhjennettäisiin.' : `Edellinen varmuuskopio: ${backupDays === 0 ? 'tänään' : backupDays + ' päivää sitten'}.`}
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-bottom:10px" onclick="downloadBackup()">
+        💾 Tallenna varmuuskopio (tiedosto)
+      </button>
+      <button class="btn btn-secondary" style="width:100%;margin-bottom:10px" onclick="triggerImport()">
+        📂 Palauta varmuuskopiosta
+      </button>
+      <button class="btn btn-secondary" style="width:100%;margin-bottom:10px" onclick="copyBackup()">
+        Kopioi data leikepöydälle
+      </button>
+      <input type="file" id="import-file" accept="application/json,.json" style="display:none" onchange="handleImportFile(event)">
+    </div>
+
+    <div class="section-header">⚙️ ASETUKSET</div>
+    <div class="card" style="margin-top:0">
+      <button class="btn" style="width:100%;background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange)" onclick="resetData()">
+        Nollaa kaikki tiedot
+      </button>
+    </div>
+  `;
+}
+
+function setChartExercise(id) {
+  state.chartExercise = id;
+  render();
+}
+
+function updateGoalCurrent(id) {
+  const goal = [...state.goals.rehab, ...state.goals.strength].find(g => g.id === id);
+  if (!goal) return;
+  const val = parseFloat(prompt(`Syötä ${goal.name} arvo (${goal.unit}):`, goal.current));
+  if (!isNaN(val) && val >= 0) {
+    goal.current = val;
+    recordMeasurement(goal.id, val);
+    save();
+    render();
+    showToast('Päivitetty!');
+  }
+}
+
+// ── BACKUP ────────────────────────────────────────────────────────────────────
+
+function backupPayload() {
+  return JSON.stringify({
+    version: 2,
+    exported: new Date().toISOString(),
+    currentWeek: state.currentWeek,
+    sessions: state.sessions,
+    goals: state.goals,
+    measurements: state.measurements,
+    runs: state.runs,
+  }, null, 2);
+}
+
+// Lataa varmuuskopio tiedostona (iOS: tallentuu Tiedostoihin)
+function downloadBackup() {
+  const data = backupPayload();
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `treenikirja-varmuuskopio-${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  state.lastBackup = new Date().toISOString();
+  save();
+  showToast('Varmuuskopio tallennettu!');
+  setTimeout(render, 300);
+}
+
+// Tuo varmuuskopio tiedostosta
+function triggerImport() {
+  const inp = document.getElementById('import-file');
+  if (inp) inp.click();
+}
+
+function handleImportFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const d = JSON.parse(ev.target.result);
+      if (!d.sessions && !d.goals) throw new Error('Virheellinen tiedosto');
+      if (!confirm('Korvataanko nykyiset tiedot varmuuskopiolla? Nykyiset tiedot katoavat.')) return;
+      state.currentWeek = d.currentWeek || 1;
+      state.sessions = d.sessions || [];
+      state.measurements = d.measurements || [];
+      state.runs = d.runs || [];
+      // merge goals (säilytä uudet kentät)
+      state.goals = JSON.parse(JSON.stringify(GOALS));
+      if (d.goals) {
+        ['rehab','strength'].forEach(cat => {
+          (state.goals[cat]||[]).forEach(g => {
+            const saved = (d.goals[cat]||[]).find(x => x.id === g.id);
+            if (saved) { if (typeof saved.current==='number') g.current = saved.current; if (Array.isArray(saved.targets)) g.targets = saved.targets; }
+          });
+        });
+      }
+      save();
+      render();
+      showToast('Varmuuskopio palautettu!');
+    } catch(err) {
+      alert('Tuonti epäonnistui: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function copyBackup() {
+  const data = backupPayload();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(data).then(() => showToast('Kopioitu leikepöydälle!')).catch(()=>showToast('Kopiointi epäonnistui'));
+  } else {
+    showToast('Kopiointi ei tuettu tällä laitteella');
+  }
+}
+
+function daysSinceBackup() {
+  if (!state.lastBackup) return null;
+  return Math.floor((Date.now() - new Date(state.lastBackup).getTime()) / 86400000);
+}
+
+function resetData() {
+  if (!confirm('Haluatko varmasti nollata kaikki tiedot? Tätä ei voi peruuttaa.')) return;
+  localStorage.removeItem('treenikirja_v2');
+  state.sessions = [];
+  state.measurements = [];
+  state.runs = [];
+  state.goals = JSON.parse(JSON.stringify(GOALS));
+  state.currentWeek = 1;
+  state.lastBackup = null;
+  save();
+  render();
+  showToast('Tiedot nollattu');
+}
+
+// ── RUNNING ───────────────────────────────────────────────────────────────────
+
+function formatPace(secPerKm) {
+  if (!isFinite(secPerKm) || secPerKm <= 0) return '–';
+  const m = Math.floor(secPerKm / 60);
+  const s = Math.round(secPerKm % 60);
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+function formatClock(sec) {
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+function formatTotalTime(sec) {
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  if (h > 0) return `${h} h ${m} min`;
+  return `${m} min`;
+}
+function runStats() {
+  const totalKm = state.runs.reduce((a, r) => a + r.distance, 0);
+  const totalSec = state.runs.reduce((a, r) => a + r.durationSec, 0);
+  const avgPace = totalKm > 0 ? totalSec / totalKm : 0;
+  const thisWeek = state.runs.filter(r => r.week === state.currentWeek);
+  const thisWeekKm = thisWeek.reduce((a, r) => a + r.distance, 0);
+  return { totalKm, totalSec, avgPace, thisWeekCount: thisWeek.length, thisWeekKm };
+}
+function weeklyKmSeries() {
+  const byWeek = {};
+  state.runs.forEach(r => { byWeek[r.week] = (byWeek[r.week] || 0) + r.distance; });
+  return Object.keys(byWeek).sort((a,b)=>a-b).map(w => ({ label: 'Vk' + w, value: Math.round(byWeek[w] * 10) / 10 }));
+}
+
+function adjustRunDistance(d) {
+  state.runDraft.distance = Math.max(0, Math.round((state.runDraft.distance + d) * 10) / 10);
+  render();
+}
+function adjustRunMin(d) {
+  state.runDraft.min = Math.max(0, state.runDraft.min + d);
+  render();
+}
+function adjustRunSec(d) {
+  let s = state.runDraft.sec + d;
+  if (s >= 60) { state.runDraft.min++; s -= 60; }
+  if (s < 0) { if (state.runDraft.min > 0) { state.runDraft.min--; s += 60; } else s = 0; }
+  state.runDraft.sec = s;
+  render();
+}
+function setRunType(t) { state.runDraft.type = t; render(); }
+
+function saveRun() {
+  const d = state.runDraft;
+  const durationSec = d.min * 60 + d.sec;
+  if (d.distance <= 0) { showToast('Aseta matka'); return; }
+  if (durationSec <= 0) { showToast('Aseta aika'); return; }
+  const now = new Date();
+  state.runs.push({
+    id: Date.now(),
+    date: now.toISOString().slice(0,10),
+    dateStr: now.toLocaleDateString('fi-FI', {weekday:'short',day:'numeric',month:'short'}),
+    week: state.currentWeek,
+    distance: d.distance,
+    durationSec,
+    type: d.type,
+  });
+  state.runDraft = { distance: 5, min: 30, sec: 0, type: 'Rauhallinen' };
+  save();
+  showToast('Lenkki tallennettu! 🏃');
+  render();
+}
+
+function deleteRun(id) {
+  if (!confirm('Poistetaanko tämä lenkki?')) return;
+  state.runs = state.runs.filter(r => r.id !== id);
+  save();
+  render();
+}
+
+function renderRuns() {
+  const st = runStats();
+  const d = state.runDraft;
+  const draftPace = d.distance > 0 ? (d.min * 60 + d.sec) / d.distance : 0;
+  const sorted = [...state.runs].reverse();
+  const kmSeries = weeklyKmSeries();
+
+  return `
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--accent2)">${(Math.round(st.totalKm*10)/10)}<span style="font-size:14px"> km</span></div>
+        <div class="stat-label">Kilometrejä yhteensä</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--green);font-size:22px">${formatTotalTime(st.totalSec)}</div>
+        <div class="stat-label">Kokonaisaika</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="font-size:22px">${formatPace(st.avgPace)}<span style="font-size:13px"> /km</span></div>
+        <div class="stat-label">Keskivauhti</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--orange);font-size:22px">${st.thisWeekCount}<span style="font-size:14px"> lenkkiä</span></div>
+        <div class="stat-label">Tällä viikolla (${Math.round(st.thisWeekKm*10)/10} km)</div>
+      </div>
+    </div>
+
+    <div class="section-header">KIRJAA LENKKI</div>
+    <div class="run-form">
+      <div class="run-field">
+        <div class="run-field-label">Matka</div>
+        <div class="run-stepper">
+          <button class="step-btn" onclick="adjustRunDistance(-0.5)">−</button>
+          <div class="run-val">${d.distance.toFixed(1)}<small> km</small></div>
+          <button class="step-btn" onclick="adjustRunDistance(0.5)">+</button>
+        </div>
+      </div>
+      <div class="run-field">
+        <div class="run-field-label">Minuutit</div>
+        <div class="run-stepper">
+          <button class="step-btn" onclick="adjustRunMin(-1)">−</button>
+          <div class="run-val">${d.min}<small> min</small></div>
+          <button class="step-btn" onclick="adjustRunMin(1)">+</button>
+        </div>
+      </div>
+      <div class="run-field">
+        <div class="run-field-label">Sekunnit</div>
+        <div class="run-stepper">
+          <button class="step-btn" onclick="adjustRunSec(-5)">−</button>
+          <div class="run-val">${String(d.sec).padStart(2,'0')}<small> s</small></div>
+          <button class="step-btn" onclick="adjustRunSec(5)">+</button>
+        </div>
+      </div>
+      <div class="run-pace-preview">Vauhti: <b>${formatPace(draftPace)} /km</b></div>
+      <div class="run-type-tabs">
+        <button class="run-type-tab ${d.type==='Rauhallinen'?'active':''}" onclick="setRunType('Rauhallinen')">🟢 Rauhallinen</button>
+        <button class="run-type-tab ${d.type==='Tempo'?'active':''}" onclick="setRunType('Tempo')">🟠 Tempo</button>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="saveRun()">Tallenna lenkki</button>
+    </div>
+
+    ${kmSeries.length ? `
+    <div class="section-header">📈 KILOMETRIT VIIKOITTAIN</div>
+    <div class="card chart-card" style="margin-top:0">
+      ${lineChart(kmSeries, { color:'var(--accent)', unit:' km' })}
+    </div>` : ''}
+
+    <div class="section-header">LENKIT (${state.runs.length})</div>
+    ${state.runs.length === 0 ? `
+    <div class="empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <p>Ei vielä kirjattuja lenkkejä</p>
+    </div>` : `
+    <div class="card" style="padding:0;overflow:hidden;margin-top:0">
+      ${sorted.map(r => {
+        const pace = r.durationSec / r.distance;
+        const easy = r.type === 'Rauhallinen';
+        return `<div class="run-row">
+          <div class="run-icon ${easy?'easy':'tempo'}">${easy?'🟢':'🟠'}</div>
+          <div class="run-info">
+            <div class="run-dist">${r.distance.toFixed(1)} km <span style="color:var(--text3);font-weight:400;font-size:13px">· ${formatClock(r.durationSec)}</span></div>
+            <div class="run-meta">${r.dateStr} · Vk ${r.week} · ${formatPace(pace)} /km</div>
+          </div>
+          <span class="run-type-badge ${easy?'easy':'tempo'}">${r.type}</span>
+          <div class="run-del" onclick="deleteRun(${r.id})">✕</div>
+        </div>`;
+      }).join('')}
+    </div>`}
+
+    <div class="card" style="background:var(--surface2);font-size:12px;color:var(--text2);line-height:1.5">
+      <b style="color:var(--text)">Muista takareisi:</b> Fysioterapeutti on sallinut vain rauhallisen juoksun. Pidä tempo-lenkit maltillisina ja varmista kovempi vauhti erikseen. Lämmittele aina ennen lenkkiä (lantionnostot + hallitut jalanheilautukset) ja nosta vauhtia asteittain.
+    </div>
+
+    <div style="height:20px"></div>
+  `;
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+
+load();
+render();
+updateHeaderSubtitle();
+</script>
+</body>
+</html>
