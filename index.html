@@ -71,6 +71,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .day-card.A .day-letter { color: #60a5fa; }
 .day-card.B .day-letter { color: var(--green); }
 .day-card.C .day-letter { color: var(--orange); }
+.day-card.D .day-letter { color: #c084fc; }
+.day-card.E .day-letter { color: #22d3ee; }
+.day-card.optional { border-style: dashed; opacity: 0.92; }
 .day-card .day-name { font-size: 11px; font-weight: 500; color: var(--text2); margin-top: 4px; line-height: 1.3; }
 
 /* Exercise row in workout */
@@ -114,6 +117,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .session-day-badge.A { background: rgba(96,165,250,0.15); color: #60a5fa; }
 .session-day-badge.B { background: rgba(74,222,128,0.15); color: var(--green); }
 .session-day-badge.C { background: rgba(251,146,60,0.15); color: var(--orange); }
+.session-day-badge.D { background: rgba(192,132,252,0.15); color: #c084fc; }
+.session-day-badge.E { background: rgba(34,211,238,0.15); color: #22d3ee; }
 .session-info { flex: 1; }
 .session-date { font-size: 15px; font-weight: 600; }
 .session-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
@@ -348,15 +353,15 @@ const PROGRAM = {
         { id:"bk", name:"Käsipainokääntö", sets:3, reps:12, defaultWeight:12, note:"kg / käsi" },
       ]
     },
-    C: { title: "Koko jalka + Core", day: "La/Su",
+    C: { title: "Jalat (kevyt) + Core", day: "La/Su",
       exercises: [
-        { id:"go", name:"Goblet squat kahvakuulalla", sets:3, reps:12, defaultWeight:20 },
-        { id:"ll", name:"Lantionnosto lattialla (yhd. jalka)", isRehab:true, sets:4, reps:15, bilateral:true, defaultWeight:{L:0,R:0}, note:"kehonpaino" },
+        { id:"oj", name:"Jalan ojennus laitteessa", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:35,R:35}, note:"kevyempi kuin päivä A" },
+        { id:"ko", name:"Jalan koukistus laitteessa", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:35,R:45}, note:"kevyempi kuin päivä A" },
+        { id:"fp", name:"Yhden jalan jalkaprässi", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:130,R:170}, note:"kevyempi kuin päivä A" },
         { id:"rt", name:"Rotary torso -laite", sets:3, reps:15, defaultWeight:81 },
         { id:"pl", name:"Plankki", sets:3, reps:"30s", defaultWeight:0, isTime:true },
         { id:"cr", name:"Kaapelicrunch", sets:3, reps:15, defaultWeight:25 },
         { id:"fp2", name:"Kasvosveto kaapelilla", sets:3, reps:15, defaultWeight:15 },
-        { id:"pd", name:"Pec deck", sets:3, reps:12, defaultWeight:30 },
       ]
     }
   },
@@ -383,15 +388,15 @@ const PROGRAM = {
         { id:"ks", name:"Kasvosveto kaapelilla", sets:3, reps:15, defaultWeight:17 },
       ]
     },
-    C: { title: "Koko jalka + Core", day: "La/Su",
+    C: { title: "Jalat (kevyt) + Core", day: "La/Su",
       exercises: [
-        { id:"bs", name:"Bulgarian split squat", sets:3, reps:"10/jalka", defaultWeight:0, note:"kehonpaino" },
-        { id:"nc", name:"Nordic curl / jalan koukistus lattialla", isRehab:true, sets:3, reps:8, defaultWeight:0, note:"kehonpaino" },
+        { id:"oj", name:"Jalan ojennus laitteessa", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:40,R:40}, note:"kevyempi kuin päivä A" },
+        { id:"ko", name:"Jalan koukistus laitteessa", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:40,R:50}, note:"kevyempi kuin päivä A" },
+        { id:"fp", name:"Yhden jalan jalkaprässi", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:145,R:185}, note:"kevyempi kuin päivä A" },
         { id:"rt", name:"Rotary torso -laite", sets:4, reps:15, defaultWeight:90 },
         { id:"ab", name:"Ab wheel / kaapelicrunch", sets:3, reps:12, defaultWeight:30 },
         { id:"sp", name:"Sivuplanki", sets:3, reps:"30s/puoli", defaultWeight:0, isTime:true },
         { id:"wc", name:"Woodchop kaapelilla", sets:3, reps:12, defaultWeight:15 },
-        { id:"ss", name:"Pec deck + kasvosveto (supersetti)", sets:3, reps:"12+15", defaultWeight:32 },
       ]
     }
   },
@@ -418,19 +423,48 @@ const PROGRAM = {
         { id:"ks3", name:"Kasvosveto kaapelilla", sets:4, reps:15, defaultWeight:20 },
       ]
     },
-    C: { title: "Koko jalka + Core", day: "La/Su",
+    C: { title: "Jalat (kevyt) + Core", day: "La/Su",
       exercises: [
-        { id:"bs2", name:"Bulgarian split squat käsipainoilla", sets:4, reps:"8/jalka", defaultWeight:10, note:"kg / käsi" },
-        { id:"nc2", name:"Nordic curl", isRehab:true, sets:3, reps:6, defaultWeight:0, note:"kehonpaino — hidas" },
+        { id:"oj", name:"Jalan ojennus laitteessa", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:45,R:50}, note:"kevyempi kuin päivä A" },
+        { id:"ko", name:"Jalan koukistus laitteessa", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:45,R:55}, note:"kevyempi kuin päivä A" },
+        { id:"fp", name:"Yhden jalan jalkaprässi", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:155,R:195}, note:"kevyempi kuin päivä A" },
         { id:"rt", name:"Rotary torso -laite", sets:4, reps:12, defaultWeight:99 },
         { id:"hl", name:"Kaapelicrunch / hanging leg raise", sets:3, reps:12, defaultWeight:35 },
         { id:"spr", name:"Sivuplanki + rotaatio", sets:3, reps:"10/puoli", defaultWeight:0, isTime:true },
         { id:"wc2", name:"Woodchop kaapelilla", sets:3, reps:12, defaultWeight:20 },
-        { id:"ss2", name:"Pec deck + kasvosveto (supersetti)", sets:4, reps:"12+15", defaultWeight:35 },
       ]
     }
   }
 };
+
+// ── VAPAAEHTOISET TREENIT (D ja E) ────────────────────────────────────────────
+// Identtiset kaikissa kolmessa vaiheessa — käyttäjä etenee kuormalla itse.
+// Eivät kuormita takareittä → turvallisia missä tahansa viikon kohdassa.
+
+const DAY_D = { title: "Yläkeho (vapaaehtoinen)", day: "Yläkeho", optional: true,
+  exercises: [
+    { id:"vi",  name:"Vinopenkkipunnerrus käsipainoilla", sets:4, reps:10, defaultWeight:18, note:"kg / käsi" },
+    { id:"sv",  name:"Soutuveto vapaaotteella / T-palkki", sets:4, reps:10, defaultWeight:50 },
+    { id:"pd",  name:"Pec deck", sets:3, reps:12, defaultWeight:32 },
+    { id:"ks",  name:"Kasvosveto kaapelilla", sets:3, reps:15, defaultWeight:17 },
+    { id:"bk",  name:"Käsipainokääntö", sets:3, reps:12, defaultWeight:12, note:"kg / käsi" },
+    { id:"tp",  name:"Triceps pushdown kaapelilla", sets:3, reps:12, defaultWeight:22 },
+  ]
+};
+
+const DAY_E = { title: "Pohkeet, kädet & Core (vapaaehtoinen)", day: "Pohkeet & kädet", optional: true,
+  exercises: [
+    { id:"poh", name:"Pohkeennostot", sets:4, reps:15, defaultWeight:60 },
+    { id:"bk",  name:"Käsipainokääntö", sets:3, reps:12, defaultWeight:14, note:"kg / käsi" },
+    { id:"to",  name:"Triceps overhead extension", sets:3, reps:12, defaultWeight:18 },
+    { id:"si",  name:"Sivunousu käsipainoilla", sets:3, reps:12, defaultWeight:8, note:"kg / käsi" },
+    { id:"rt",  name:"Rotary torso -laite", sets:3, reps:15, defaultWeight:85 },
+    { id:"pl",  name:"Plankki", sets:3, reps:"45s", defaultWeight:0, isTime:true },
+    { id:"cr",  name:"Kaapelicrunch", sets:3, reps:15, defaultWeight:30 },
+  ]
+};
+
+[1,2,3].forEach(p => { PROGRAM[p].D = DAY_D; PROGRAM[p].E = DAY_E; });
 
 // ── EXERCISE INSTRUCTIONS ──────────────────────────────────────────────────────
 // Keyed by exercise id. Variants (av/av2/av3 etc.) point to same base text.
@@ -469,6 +503,7 @@ const I = {
   woodchop: { laite:"Kaapelilaite, yksi kahva ylhäällä.", suoritus:"Vedä kahva diagonaalisesti ylhäältä alas vastakkaiselle lantiolle, käsivarret lähes suorina. Liike kiertää koko vartalon lantiosta. Tee molemmat suunnat." },
   pecdeck: { laite:"Pec deck / butterfly -laite.", suoritus:"Säädä istuin niin että kahvat rinnan korkeudella. Tuo käsivarret yhteen edessä, purista rintaa, laske hallitusti ilman yliojennusta." },
   pecsuperset: { laite:"Pec deck + kaapelilaite (kasvosveto).", suoritus:"Tee ensin pec deck, heti perään kasvosveto kaapelilla ilman taukoa. Supersetti rinta + takahartia." },
+  calves: { laite:"Pohjelaite (calf raise machine), pohjelaite Smith-koneessa, tai porras/koroke jolla kantapäät pääsevät vapaiksi.", suoritus:"Päkiät tukevasti alustalle, kantapäät vapaina. Nouse päkiöille mahdollisimman ylös ja purista pohkeet täyteen jännitykseen (1 s pito). Laske hallitusti syvälle venyttäen pohjetta. Tee molemmilla jaloilla yhtä aikaa tai vuorotellen yhdellä jalalla." },
 };
 
 const INSTRUCTIONS = {
@@ -479,6 +514,7 @@ const INSTRUCTIONS = {
   bs:I.bulgarian, nc:I.nordic, ab:I.abwheel, sp:I.sideplank, wc:I.woodchop, ss:I.pecsuperset,
   ts:I.tsuperset, av3:I.latpull, sv:I.tbarrow, ks2:I.curlsuperset, ks3:I.facepull,
   bs2:I.bulgarian, nc2:I.nordic, hl:I.hanging, spr:I.sideplank, wc2:I.woodchop, ss2:I.pecsuperset,
+  poh:I.calves,
 };
 
 function getInstr(id) { return INSTRUCTIONS[id] || null; }
@@ -538,9 +574,11 @@ function getPhase(week) {
 // ── PROGRESS HELPERS ────────────────────────────────────────────────────────────
 
 // Viimeisin suoritus annetulle liikkeelle (nimimatchilla). side: 'L'|'R'|null
-function getLastPerformance(exName, side) {
+// dayLetter: jos annettu, vain saman päivän sessioista (esim. 'A')
+function getLastPerformance(exName, side, dayLetter) {
   for (let i = state.sessions.length - 1; i >= 0; i--) {
     const s = state.sessions[i];
+    if (dayLetter && s.day !== dayLetter) continue;
     const ex = s.exercises.find(e => e.name === exName);
     if (!ex) continue;
     let sets = ex.bilateral ? (side === 'R' ? ex.setsR : ex.setsL) : ex.sets;
@@ -747,7 +785,7 @@ function renderHome() {
     { day:'Ti', act:'Rauhallinen juoksu', load:'low', txt:'Matala' },
     { day:'Ke', act:'Sali — Päivä B (takaketju + Pull)', load:'high', txt:'Korkea' },
     { day:'To', act:'Lepo', load:'rest', txt:'Lepo' },
-    { day:'Pe', act:'Sali — Päivä C (jalat + Core)', load:'mid', txt:'Keski' },
+    { day:'Pe', act:'Sali — Päivä C (jalat kevyt + Core)', load:'mid', txt:'Keski' },
     { day:'La', act:'Lepo', load:'rest', txt:'Lepo' },
     { day:'Su', act:'Pidempi rauhallinen lenkki', load:'low', txt:'Matala' },
   ];
@@ -798,7 +836,7 @@ function renderHome() {
           <div class="sched-act">${s.act}</div>
           <div class="sched-load ${s.load}">${s.txt}</div>
         </div>`).join('')}
-      <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5">Kovat takareisikuormat (Ke ja Pe) on eroteltu 48 h välein, juoksut osuvat matalan kuorman päiville. Voit siirtää päiviä, kunhan pidät tämän rytmin.</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5">Kovat takareisikuormat (Ke ja Pe) on eroteltu 48 h välein, juoksut osuvat matalan kuorman päiville. Voit siirtää päiviä, kunhan pidät tämän rytmin. Jos viikossa on aikaa 4–5 treenille, lisää Päivä D (yläkeho) tai E (pohkeet/kädet) lepopäivän tilalle — ne eivät kuormita takareittä.</div>
     </div>
 
     <div class="section-header">12 VIIKON EDISTYMINEN</div>
@@ -821,6 +859,19 @@ function renderHome() {
         const info = PROGRAM[phase][d];
         const done = state.sessions.some(s => s.week === state.currentWeek && s.day === d);
         return `<div class="day-card ${d} ${state.selectedDay===d?'selected':''}" onclick="selectDay('${d}')">
+          <div class="day-letter">${d}</div>
+          <div class="day-name">${info.day}</div>
+          ${done ? '<div style="color:var(--green);font-size:11px;margin-top:4px">✓ tehty</div>' : ''}
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div style="padding:14px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;font-weight:600">VAPAAEHTOISET (4–5 treeniä/vk)</div>
+    <div class="day-grid" style="grid-template-columns:1fr 1fr">
+      ${['D','E'].map(d => {
+        const info = PROGRAM[phase][d];
+        const done = state.sessions.some(s => s.week === state.currentWeek && s.day === d);
+        return `<div class="day-card optional ${d} ${state.selectedDay===d?'selected':''}" onclick="selectDay('${d}')">
           <div class="day-letter">${d}</div>
           <div class="day-name">${info.day}</div>
           ${done ? '<div style="color:var(--green);font-size:11px;margin-top:4px">✓ tehty</div>' : ''}
@@ -878,8 +929,8 @@ function startWorkout(day) {
     exercises: dayPlan.exercises.map(ex => {
       const baseReps = typeof ex.reps === 'number' ? ex.reps : 8;
       if (ex.bilateral) {
-        const lastL = getLastPerformance(ex.name, 'L');
-        const lastR = getLastPerformance(ex.name, 'R');
+        const lastL = getLastPerformance(ex.name, 'L', day);
+        const lastR = getLastPerformance(ex.name, 'R', day);
         const wL = lastL ? lastL.weight : ex.defaultWeight.L;
         const wR = lastR ? lastR.weight : ex.defaultWeight.R;
         return {
@@ -891,7 +942,7 @@ function startWorkout(day) {
           }
         };
       }
-      const last = getLastPerformance(ex.name, null);
+      const last = getLastPerformance(ex.name, null, day);
       const w0 = last ? last.weight : ex.defaultWeight;
       return {
         ...ex,
@@ -998,7 +1049,7 @@ function renderExerciseBlock(ex, ei) {
       </div>` : ''}
 
       ${(() => {
-        const last = getLastPerformance(ex.name, side);
+        const last = getLastPerformance(ex.name, side, state.activeWorkout?.day);
         if (!last) return `<div class="last-time">Ensimmäinen kerta — aseta sopiva paino</div>`;
         const pr = getPR(ex.name, side, null);
         return `<div class="last-time">
@@ -1089,33 +1140,52 @@ function toggleSet(ei, si, side) {
 }
 
 // ── REST TIMER ───────────────────────────────────────────────────────────────
+// Aikaleimaperustainen — toimii kun näyttö sammuu ja palaa.
 
 function startRestTimer(seconds) {
   stopRestTimer();
-  state.restTimer = { remaining: seconds, total: seconds };
+  ensureAudio();
+  const endAt = Date.now() + seconds * 1000;
+  state.restTimer = { endAt, total: seconds, remaining: seconds, ended: false };
   renderRestTimer();
-  state.restTimer.interval = setInterval(() => {
-    state.restTimer.remaining--;
-    if (state.restTimer.remaining <= 0) {
-      clearInterval(state.restTimer.interval);
-      beep();
-      renderRestTimer(true);
-      setTimeout(stopRestTimer, 4000);
-    } else {
-      renderRestTimer();
-    }
-  }, 1000);
+  state.restTimer.interval = setInterval(tickRestTimer, 1000);
+  state.restTimer.visHandler = () => { if (document.visibilityState === 'visible') tickRestTimer(); };
+  document.addEventListener('visibilitychange', state.restTimer.visHandler);
+}
+
+function tickRestTimer() {
+  if (!state.restTimer) return;
+  const rem = Math.max(0, Math.round((state.restTimer.endAt - Date.now()) / 1000));
+  state.restTimer.remaining = rem;
+  if (rem <= 0 && !state.restTimer.ended) {
+    state.restTimer.ended = true;
+    if (state.restTimer.interval) clearInterval(state.restTimer.interval);
+    beep();
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    renderRestTimer(true);
+    setTimeout(stopRestTimer, 6000);
+  } else if (!state.restTimer.ended) {
+    renderRestTimer();
+  }
 }
 
 function stopRestTimer() {
-  if (state.restTimer && state.restTimer.interval) clearInterval(state.restTimer.interval);
+  if (state.restTimer) {
+    if (state.restTimer.interval) clearInterval(state.restTimer.interval);
+    if (state.restTimer.visHandler) document.removeEventListener('visibilitychange', state.restTimer.visHandler);
+  }
   state.restTimer = null;
   const el = document.getElementById('rest-timer');
   if (el) el.remove();
 }
 
 function addRestTime(sec) {
-  if (state.restTimer) { state.restTimer.remaining += sec; renderRestTimer(); }
+  if (state.restTimer) {
+    state.restTimer.endAt += sec * 1000;
+    state.restTimer.ended = false;
+    if (!state.restTimer.interval) state.restTimer.interval = setInterval(tickRestTimer, 1000);
+    tickRestTimer();
+  }
 }
 
 function renderRestTimer(done) {
@@ -1139,9 +1209,19 @@ function renderRestTimer(done) {
     <button class="rt-btn" onclick="stopRestTimer()">Ohita</button>`;
 }
 
-function beep() {
+let audioCtx = null;
+function ensureAudio() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  } catch(e) {}
+  return audioCtx;
+}
+
+function beep() {
+  const ctx = ensureAudio();
+  if (!ctx) return;
+  try {
     const o = ctx.createOscillator(); const g = ctx.createGain();
     o.connect(g); g.connect(ctx.destination);
     o.frequency.value = 880; o.type = 'sine';
@@ -1320,7 +1400,7 @@ function renderHistory() {
     <div class="card" style="padding:0;overflow:hidden">
       ${sorted.map((s,i) => `
         <div>
-          <div class="session-row" onclick="toggleSessionDetail('${s.id}')">
+          <div class="session-row" onclick="toggleSessionDetail(${s.id})">
             <div class="session-day-badge ${s.day}">${s.day}</div>
             <div class="session-info">
               <div class="session-date">${s.dateStr}</div>
