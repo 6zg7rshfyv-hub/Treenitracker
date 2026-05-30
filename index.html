@@ -1862,8 +1862,15 @@ load();
 render();
 updateHeaderSubtitle();
 
-// Service worker — offline-tuki
+// Service worker — offline-tuki + automaattinen päivitys
 if ('serviceWorker' in navigator) {
+  const hadController = !!navigator.serviceWorker.controller;
+  let swRefreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (swRefreshing || !hadController) return;
+    swRefreshing = true;
+    window.location.reload();
+  });
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   });

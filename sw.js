@@ -1,6 +1,6 @@
 // Treenikirja — service worker (offline-tuki)
 // Päivitä versionumeroa aina kun sovellus muuttuu, jotta välimuisti uusiutuu.
-const CACHE = 'treenikirja-v3';
+const CACHE = 'treenikirja-v4';
 const ASSETS = ['./', './index.html'];
 
 // Asennus: tallenna sovelluksen pohja välimuistiin
@@ -26,10 +26,10 @@ self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
 
-  // Sivunavigointi: yritä verkkoa, kaadu välimuistiin (offline)
+  // Sivunavigointi: yritä verkkoa (ohittaen HTTP-välimuisti), kaadu välimuistiin (offline)
   if (req.mode === 'navigate') {
     event.respondWith(
-      fetch(req)
+      fetch(req, { cache: 'no-store' })
         .then(res => {
           const copy = res.clone();
           caches.open(CACHE).then(c => c.put('./index.html', copy));
