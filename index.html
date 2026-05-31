@@ -80,6 +80,12 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .ex-block { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin: 10px 16px; overflow: hidden; }
 .ex-header { padding: 14px 16px 10px; display: flex; align-items: flex-start; gap: 8px; }
 .ex-name { font-size: 15px; font-weight: 600; flex: 1; }
+.ex-name-en { font-size: 12px; color: var(--text3); font-weight: 500; font-style: italic; margin-top: 1px; }
+#coach-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; padding: 16px; }
+.coach-modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; width: 100%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; }
+.coach-modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.coach-close { font-size: 20px; color: var(--text3); cursor: pointer; padding: 0 4px; }
+#coach-text { flex: 1; min-height: 280px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; line-height: 1.5; padding: 12px; resize: none; white-space: pre; overflow: auto; }
 .rehab-badge { background: var(--rehab-dim); color: var(--rehab); font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; white-space: nowrap; margin-top: 2px; }
 .ex-meta { font-size: 12px; color: var(--text2); padding: 0 16px 10px; font-family: 'DM Mono', monospace; }
 
@@ -430,7 +436,7 @@ const PROGRAM = {
         { id:"fp", name:"Yhden jalan jalkaprässi", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:155,R:195}, note:"kevyempi kuin päivä A" },
         { id:"rt", name:"Rotary torso -laite", sets:4, reps:12, defaultWeight:99 },
         { id:"hl", name:"Kaapelicrunch / hanging leg raise", sets:3, reps:12, defaultWeight:35 },
-        { id:"spr", name:"Sivuplanki + rotaatio", sets:3, reps:"10/puoli", defaultWeight:0, isTime:true },
+        { id:"spr", name:"Sivuplanki + rotaatio", sets:3, reps:"10/puoli", defaultWeight:0 },
         { id:"wc2", name:"Woodchop kaapelilla", sets:3, reps:12, defaultWeight:20 },
       ]
     }
@@ -465,6 +471,66 @@ const DAY_E = { title: "Pohkeet, kädet & Core (vapaaehtoinen)", day: "Pohkeet &
 };
 
 [1,2,3].forEach(p => { PROGRAM[p].D = DAY_D; PROGRAM[p].E = DAY_E; });
+
+// ── LIIKKEIDEN NIMET (suomi + englanti) ───────────────────────────────────────
+// Keskitetty nimikartta id:n mukaan. Yhtenäistää nimet kaikissa vaiheissa ja
+// lisää englanninkielisen nimen. Tavoiteseurannan avainsanat (jalkaprässi,
+// takakyykky, maastaveto, alasvetolaite, soutu, punnerrus) säilytetään.
+const NAMES = {
+  oj:  { fi:"Jalan ojennus laitteessa",            en:"Leg extension" },
+  ko:  { fi:"Jalan koukistus laitteessa",          en:"Leg curl" },
+  fp:  { fi:"Yhden jalan jalkaprässi",             en:"Single-leg leg press" },
+  pu:  { fi:"Käsipainopunnerrus tasapenkillä",     en:"Flat dumbbell bench press" },
+  hp:  { fi:"Käsipainohartiaprässi (istuen)",      en:"Seated dumbbell shoulder press" },
+  tp:  { fi:"Ojentajan taljaveto",                 en:"Cable triceps pushdown" },
+  ky:  { fi:"Takakyykky",                          en:"Back squat" },
+  md:  { fi:"Maastaveto kahvakuulalla",            en:"Kettlebell deadlift" },
+  la:  { fi:"Yhden jalan lantionnosto korokkeella", en:"Single-leg hip thrust (elevated)" },
+  av:  { fi:"Alasvetolaite",                       en:"Lat pulldown" },
+  av2: { fi:"Alasvetolaite, leveä ote",            en:"Wide-grip lat pulldown" },
+  av3: { fi:"Alasvetolaite",                       en:"Lat pulldown" },
+  so:  { fi:"Soutuveto laitteessa",                en:"Seated cable row" },
+  bk:  { fi:"Hauiskääntö käsipainoilla",           en:"Dumbbell biceps curl" },
+  rt:  { fi:"Vartalon kierto (laite)",             en:"Rotary torso (machine)" },
+  pl:  { fi:"Lankku",                              en:"Plank" },
+  cr:  { fi:"Vatsarutistus taljassa",              en:"Cable crunch" },
+  fp2: { fi:"Kasvoveto taljassa",                  en:"Face pull" },
+  vi:  { fi:"Vinopenkkipunnerrus käsipainoilla",   en:"Incline dumbbell bench press" },
+  sh:  { fi:"Käsipainohartiaprässi (seisten)",     en:"Standing dumbbell shoulder press" },
+  si:  { fi:"Sivunostot käsipainoilla",            en:"Dumbbell lateral raise" },
+  to:  { fi:"Ojentajan ojennus pään yli",          en:"Overhead triceps extension" },
+  sk:  { fi:"Soutuveto kaapelilla, yksi käsi",     en:"Single-arm cable row" },
+  hk:  { fi:"Vasarakääntö käsipainoilla",          en:"Hammer curl" },
+  ks:  { fi:"Kasvoveto taljassa",                  en:"Face pull" },
+  ks3: { fi:"Kasvoveto taljassa",                  en:"Face pull" },
+  ab:  { fi:"Vatsarulla tai vatsarutistus",        en:"Ab wheel / cable crunch" },
+  sp:  { fi:"Kylkilankku",                         en:"Side plank" },
+  spr: { fi:"Kylkilankku + kierto",                en:"Side plank with rotation" },
+  wc:  { fi:"Vinottainen taljaveto",               en:"Cable woodchop" },
+  wc2: { fi:"Vinottainen taljaveto",               en:"Cable woodchop" },
+  ts:  { fi:"Ojentajan taljaveto + pään yli -ojennus (supersetti)", en:"Triceps pushdown + overhead (superset)" },
+  sv:  { fi:"Tankosoutu tai T-tankosoutu",         en:"Barbell / T-bar row" },
+  ks2: { fi:"Hauiskääntö + vasarakääntö (supersetti)", en:"Biceps + hammer curl (superset)" },
+  hl:  { fi:"Vatsarutistus tai riipuntajalannosto", en:"Cable crunch / hanging leg raise" },
+  pd:  { fi:"Rintojen lähennys (pec deck)",        en:"Pec deck" },
+  poh: { fi:"Pohkeennostot",                       en:"Calf raises" },
+  // legacy — ei aktiivisesti käytössä, mukana varalta
+  go:  { fi:"Goblet-kyykky kahvakuulalla",         en:"Goblet squat" },
+  ll:  { fi:"Yhden jalan lantionnosto lattialla",  en:"Single-leg hip thrust (floor)" },
+  bs:  { fi:"Bulgarian askelkyykky",               en:"Bulgarian split squat" },
+  bs2: { fi:"Bulgarian askelkyykky käsipainoilla", en:"Bulgarian split squat (dumbbells)" },
+  nc:  { fi:"Nordic curl tai koukistus lattialla", en:"Nordic curl" },
+  nc2: { fi:"Nordic curl",                         en:"Nordic curl" },
+  ss:  { fi:"Rintojen lähennys + kasvoveto (supersetti)", en:"Pec deck + face pull (superset)" },
+  ss2: { fi:"Rintojen lähennys + kasvoveto (supersetti)", en:"Pec deck + face pull (superset)" },
+};
+
+[1,2,3].forEach(p => ['A','B','C','D','E'].forEach(d => {
+  PROGRAM[p][d].exercises.forEach(ex => {
+    const n = NAMES[ex.id];
+    if (n) { ex.name = n.fi; ex.en = n.en; }
+  });
+}));
 
 // ── EXERCISE INSTRUCTIONS ──────────────────────────────────────────────────────
 // Keyed by exercise id. Variants (av/av2/av3 etc.) point to same base text.
@@ -544,7 +610,7 @@ const GOALS = {
     { id:"squat", name:"Takakyykky", start:90, targets:[100,110,120], unit:"kg", current:90, weeks:[4,8,12], auto:true, match:"takakyykky" },
     { id:"dead", name:"Maastaveto (kahvakuula)", start:32, targets:[36,40,44], unit:"kg", current:32, weeks:[4,8,12], auto:true, match:"maastaveto" },
     { id:"lat", name:"Alasvetolaite", start:70, targets:[80,90,100], unit:"kg", current:70, weeks:[4,8,12], auto:true, match:"alasvetolaite" },
-    { id:"row", name:"Soutuveto", start:40, targets:[50,57,65], unit:"kg", current:40, weeks:[4,8,12], auto:true, match:"soutuveto" },
+    { id:"row", name:"Soutuveto", start:40, targets:[50,57,65], unit:"kg", current:40, weeks:[4,8,12], auto:true, match:"soutu" },
     { id:"bench", name:"Punnerrus käsipainoilla (per käsi)", start:16, targets:[18,20,22], unit:"kg", current:16, weeks:[4,8,12], auto:true, match:"punnerrus" },
   ]
 };
@@ -573,13 +639,13 @@ function getPhase(week) {
 
 // ── PROGRESS HELPERS ────────────────────────────────────────────────────────────
 
-// Viimeisin suoritus annetulle liikkeelle (nimimatchilla). side: 'L'|'R'|null
-// dayLetter: jos annettu, vain saman päivän sessioista (esim. 'A')
-function getLastPerformance(exName, side, dayLetter) {
+// Viimeisin suoritus annetulle liikkeelle. side: 'L'|'R'|null
+// dayLetter: jos annettu, vain saman päivän sessioista. exId: ensisijainen tunnistus.
+function getLastPerformance(exName, side, dayLetter, exId) {
   for (let i = state.sessions.length - 1; i >= 0; i--) {
     const s = state.sessions[i];
     if (dayLetter && s.day !== dayLetter) continue;
-    const ex = s.exercises.find(e => e.name === exName);
+    const ex = s.exercises.find(e => (exId && e.id === exId) || e.name === exName);
     if (!ex) continue;
     let sets = ex.bilateral ? (side === 'R' ? ex.setsR : ex.setsL) : ex.sets;
     if (!sets || !sets.length) continue;
@@ -590,11 +656,11 @@ function getLastPerformance(exName, side, dayLetter) {
 }
 
 // Suurin koskaan kirjattu paino liikkeelle (ennen annettua sessiota jos beforeId annettu)
-function getPR(exName, side, beforeId) {
+function getPR(exName, side, beforeId, exId) {
   let pr = 0;
   for (const s of state.sessions) {
     if (beforeId && s.id >= beforeId) continue;
-    const ex = s.exercises.find(e => e.name === exName);
+    const ex = s.exercises.find(e => (exId && e.id === exId) || e.name === exName);
     if (!ex) continue;
     let sets = ex.bilateral ? (side === 'R' ? ex.setsR : ex.setsL) : ex.sets;
     if (!sets || !sets.length) continue;
@@ -927,26 +993,31 @@ function startWorkout(day) {
     phase, day,
     week: state.currentWeek,
     exercises: dayPlan.exercises.map(ex => {
-      const baseReps = typeof ex.reps === 'number' ? ex.reps : 8;
+      // Oletustoistot: numero sellaisenaan, muuten ensimmäinen luku merkkijonosta
+      // (esim. "30s"→30, "10/jalka"→10, "12+15"→12), viime kädessä 8.
+      const parsed = typeof ex.reps === 'number' ? ex.reps : (String(ex.reps).match(/\d+/) ? parseInt(String(ex.reps).match(/\d+/)[0]) : 8);
       if (ex.bilateral) {
-        const lastL = getLastPerformance(ex.name, 'L', day);
-        const lastR = getLastPerformance(ex.name, 'R', day);
+        const lastL = getLastPerformance(ex.name, 'L', day, ex.id);
+        const lastR = getLastPerformance(ex.name, 'R', day, ex.id);
         const wL = lastL ? lastL.weight : ex.defaultWeight.L;
         const wR = lastR ? lastR.weight : ex.defaultWeight.R;
+        const repsL = ex.isTime && lastL ? lastL.reps : parsed;
+        const repsR = ex.isTime && lastR ? lastR.reps : parsed;
         return {
           ...ex,
           activeSide: 'L',
           sets: {
-            L: Array.from({length:ex.sets},(_,i) => ({ weight: wL, reps: baseReps, done:false })),
-            R: Array.from({length:ex.sets},(_,i) => ({ weight: wR, reps: baseReps, done:false })),
+            L: Array.from({length:ex.sets},(_,i) => ({ weight: wL, reps: repsL, done:false })),
+            R: Array.from({length:ex.sets},(_,i) => ({ weight: wR, reps: repsR, done:false })),
           }
         };
       }
-      const last = getLastPerformance(ex.name, null, day);
+      const last = getLastPerformance(ex.name, null, day, ex.id);
       const w0 = last ? last.weight : ex.defaultWeight;
+      const reps0 = ex.isTime && last ? last.reps : parsed;
       return {
         ...ex,
-        sets: Array.from({length:ex.sets},(_,i) => ({ weight: w0, reps: baseReps, done:false }))
+        sets: Array.from({length:ex.sets},(_,i) => ({ weight: w0, reps: reps0, done:false }))
       };
     })
   };
@@ -1020,10 +1091,11 @@ function renderExerciseBlock(ex, ei) {
       <div class="ex-header">
         <div>
           <div class="ex-name">${ex.name}</div>
+          ${ex.en ? `<div class="ex-name-en">${ex.en}</div>` : ''}
           ${ex.isRehab ? '<div class="rehab-badge">KUNTOUTUS</div>' : ''}
         </div>
       </div>
-      <div class="ex-meta">${ex.sets.length || Object.values(ex.sets||{L:[]})[0]?.length || ex.sets} sarjaa × ${ex.reps} toistoa${ex.note ? ' · ' + ex.note : ''}</div>
+      <div class="ex-meta">${ex.sets.length || Object.values(ex.sets||{L:[]})[0]?.length || ex.sets} sarjaa × ${ex.reps}${ex.isTime ? '' : ' toistoa'}${ex.note ? ' · ' + ex.note : ''}</div>
 
       ${(() => {
         const instr = getInstr(ex.id);
@@ -1049,16 +1121,35 @@ function renderExerciseBlock(ex, ei) {
       </div>` : ''}
 
       ${(() => {
-        const last = getLastPerformance(ex.name, side, state.activeWorkout?.day);
-        if (!last) return `<div class="last-time">Ensimmäinen kerta — aseta sopiva paino</div>`;
-        const pr = getPR(ex.name, side, null);
+        const last = getLastPerformance(ex.name, side, state.activeWorkout?.day, ex.id);
+        if (!last) return `<div class="last-time">${ex.isTime ? 'Ensimmäinen kerta — pidä asentoa tavoiteajan verran' : 'Ensimmäinen kerta — aseta sopiva paino'}</div>`;
+        if (ex.isTime) {
+          return `<div class="last-time"><span>Viimeksi (${last.dateStr.split(' ').slice(-2).join(' ')}): <b>${last.reps} s pito</b></span></div>`;
+        }
+        const pr = getPR(ex.name, side, null, ex.id);
         return `<div class="last-time">
           <span>Viimeksi (${last.dateStr.split(' ').slice(-2).join(' ')}): <b>${last.weight} kg × ${last.reps}</b></span>
           ${pr ? `<span class="pr-tag">PR ${pr} kg</span>` : ''}
         </div>`;
       })()}
 
-      ${sets.map((s,si) => `
+      ${sets.map((s,si) => ex.isTime ? `
+      <div class="set-row" style="${s.done?'opacity:0.5':''}">
+        <div class="set-num">${si+1}</div>
+        <div class="set-field" style="flex:2">
+          <div class="set-label">PITOAIKA <span style="color:var(--text3);font-weight:400">±5 s</span></div>
+          <div class="stepper">
+            <button class="step-btn" onclick="adjustReps(${ei},${si},${isBilateral?`'${side}'`:'null'},-5)">−</button>
+            <div class="step-val" id="r-${ei}-${si}-${isBilateral?side:'x'}">${s.reps} s</div>
+            <button class="step-btn" onclick="adjustReps(${ei},${si},${isBilateral?`'${side}'`:'null'},5)">+</button>
+          </div>
+        </div>
+        <div class="set-check">
+          <button class="check-btn ${s.done?'done':''}" onclick="toggleSet(${ei},${si},${isBilateral?`'${side}'`:'null'})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
+      </div>` : `
       <div class="set-row" style="${s.done?'opacity:0.5':''}">
         <div class="set-num">${si+1}</div>
         <div class="set-field">
@@ -1115,14 +1206,19 @@ function adjustWeight(ei, si, side, delta) {
 
 function adjustReps(ei, si, side, delta) {
   const w = state.activeWorkout;
+  const isTime = w.exercises[ei].isTime;
+  const minVal = isTime ? 5 : 1;
   if (side) {
-    w.exercises[ei].sets[side][si].reps = Math.max(1, w.exercises[ei].sets[side][si].reps + delta);
+    w.exercises[ei].sets[side][si].reps = Math.max(minVal, w.exercises[ei].sets[side][si].reps + delta);
   } else {
-    w.exercises[ei].sets[si].reps = Math.max(1, w.exercises[ei].sets[si].reps + delta);
+    w.exercises[ei].sets[si].reps = Math.max(minVal, w.exercises[ei].sets[si].reps + delta);
   }
   const key = side ? `r-${ei}-${si}-${side}` : `r-${ei}-${si}-x`;
   const el = document.getElementById(key);
-  if (el) el.textContent = side ? w.exercises[ei].sets[side][si].reps : w.exercises[ei].sets[si].reps;
+  if (el) {
+    const val = side ? w.exercises[ei].sets[side][si].reps : w.exercises[ei].sets[si].reps;
+    el.textContent = isTime ? val + ' s' : val;
+  }
 }
 
 function toggleSet(ei, si, side) {
@@ -1258,10 +1354,10 @@ function finishWorkout() {
     totalSets,
     exercises: w.exercises.map(ex => {
       if (ex.bilateral) {
-        return { name: ex.name, bilateral: true, isRehab: ex.isRehab,
+        return { id: ex.id, name: ex.name, bilateral: true, isRehab: ex.isRehab, isTime: ex.isTime,
           setsL: ex.sets.L.filter(s=>s.done), setsR: ex.sets.R.filter(s=>s.done) };
       }
-      return { name: ex.name, isRehab: ex.isRehab, sets: ex.sets.filter(s=>s.done) };
+      return { id: ex.id, name: ex.name, isRehab: ex.isRehab, isTime: ex.isTime, sets: ex.sets.filter(s=>s.done) };
     })
   };
 
@@ -1273,14 +1369,14 @@ function finishWorkout() {
         const doneSets = ex.sets[sd].filter(s=>s.done);
         if (!doneSets.length) return;
         const maxW = Math.max(...doneSets.map(s=>s.weight));
-        const prevPR = getPR(ex.name, sd, null);
+        const prevPR = getPR(ex.name, sd, null, ex.id);
         if (maxW > prevPR && prevPR > 0 && maxW > 0) prs.push(`${ex.name} (${sd==='L'?'vasen':'oikea'}): ${maxW} kg`);
       });
     } else {
       const doneSets = ex.sets.filter(s=>s.done);
       if (!doneSets.length) return;
       const maxW = Math.max(...doneSets.map(s=>s.weight));
-      const prevPR = getPR(ex.name, null, null);
+      const prevPR = getPR(ex.name, null, null, ex.id);
       if (maxW > prevPR && prevPR > 0 && maxW > 0) prs.push(`${ex.name}: ${maxW} kg`);
     }
   });
@@ -1413,7 +1509,8 @@ function renderHistory() {
               <div class="detail-ex">
                 <div>${ex.isRehab?'🟢 ':''}${ex.name}</div>
                 ${ex.bilateral ? `<span>V:${ex.setsL.length} · O:${ex.setsR.length} sarjaa</span>` :
-                  `<span>${ex.sets.length} sarjaa${ex.sets.length>0?' · '+ex.sets[ex.sets.length-1].weight+'kg':''}</span>`}
+                  ex.isTime ? `<span>${ex.sets.length} × ${ex.sets[ex.sets.length-1]?.reps||''} s</span>` :
+                  `<span>${ex.sets.length} sarjaa${ex.sets.length>0 && ex.sets[ex.sets.length-1].weight>0?' · '+ex.sets[ex.sets.length-1].weight+'kg':''}</span>`}
               </div>`).join('')}
           </div>
           ${i < sorted.length-1 ? '<div class="divider"></div>' : ''}
@@ -1524,6 +1621,16 @@ function renderGoals() {
 
     <div class="card" style="background:var(--surface2);font-size:12px;color:var(--text2);line-height:1.5">
       <b style="color:var(--text)">Näin tavoitteet toimivat:</b> Voima- ja jalkaprässitavoitteet päivittyvät automaattisesti treeniesi perusteella. Fysioterapian testitulokset (puoliero, H:Q, polven koukistus) päivität itse "Päivitä"-napilla mittausten jälkeen. Kun saavutat välietapin etuajassa, voit nostaa tavoitetta — uusi tavoite säilyttää saman kehitysvauhdin.
+    </div>
+
+    <div class="section-header">📋 KOOSTE VALMENTAJALLE</div>
+    <div class="card" style="margin-top:0">
+      <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">
+        Luo tiivis tekstikooste edistymisestäsi (treenit, painot, ennätykset, juoksu, tavoitteet). Kopioi se ja liitä Claude-keskusteluun saadaksesi valmentajapalautetta. Suositus: vaiheen vaihtuessa (vk 4, 8, 12).
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="showCoachSummary()">
+        📋 Luo kooste
+      </button>
     </div>
 
     <div class="section-header">💾 VARMUUSKOPIOINTI</div>
@@ -1649,6 +1756,104 @@ function copyBackup() {
     navigator.clipboard.writeText(data).then(() => showToast('Kopioitu leikepöydälle!')).catch(()=>showToast('Kopiointi epäonnistui'));
   } else {
     showToast('Kopiointi ei tuettu tällä laitteella');
+  }
+}
+
+// ── KOOSTE VALMENTAJALLE ──────────────────────────────────────────────────────
+function buildCoachSummary() {
+  const phase = getPhase(state.currentWeek);
+  const phaseNames = {1:'Perusta',2:'Kehitys',3:'Teho'};
+  const today = new Date().toLocaleDateString('fi-FI');
+  const st = runStats();
+  const thisWeek = state.sessions.filter(s=>s.week===state.currentWeek).length;
+  const L = [];
+  L.push('TREENIKOOSTE VALMENTAJALLE');
+  L.push('Viikko ' + state.currentWeek + '/12 · Vaihe ' + phase + ': ' + phaseNames[phase]);
+  L.push('Päivä: ' + today);
+  L.push('');
+  L.push('YHTEENVETO');
+  L.push('- Salitreenejä yhteensä: ' + state.sessions.length + ' (tällä viikolla ' + thisWeek + '/3)');
+  if (state.runs.length) {
+    L.push('- Lenkkejä: ' + state.runs.length + ' (yht. ' + (Math.round(st.totalKm*10)/10) + ' km, ' + formatTotalTime(st.totalSec) + ', keskivauhti ' + formatPace(st.avgPace) + '/km)');
+  } else {
+    L.push('- Lenkkejä: ei vielä kirjattu');
+  }
+  L.push('- Putki: ' + getStreak() + ' päivää');
+  L.push('');
+  L.push('KUNTOUTUSTAVOITTEET (nyt → tavoitteet vk4/8/12)');
+  state.goals.rehab.forEach(g => {
+    L.push('- ' + g.name + ': ' + g.current + ' ' + g.unit + ' → ' + g.targets.join('/') + ' ' + g.unit);
+  });
+  L.push('');
+  L.push('VOIMATAVOITTEET (nyt → tavoitteet vk4/8/12)');
+  state.goals.strength.forEach(g => {
+    L.push('- ' + g.name + ': ' + g.current + ' ' + g.unit + ' → ' + g.targets.join('/') + ' ' + g.unit);
+  });
+  L.push('');
+  L.push('VIIMEISIMMÄT TREENIT');
+  if (!state.sessions.length) L.push('- ei vielä treenejä');
+  state.sessions.slice(-6).reverse().forEach(s => {
+    const key = s.exercises.map(ex => {
+      if (ex.bilateral) {
+        const wl = ex.setsL && ex.setsL.length ? Math.max(...ex.setsL.map(x=>x.weight)) : 0;
+        const wr = ex.setsR && ex.setsR.length ? Math.max(...ex.setsR.map(x=>x.weight)) : 0;
+        return ex.name + ' V' + wl + '/O' + wr + 'kg';
+      }
+      if (ex.isTime) {
+        const sec = ex.sets && ex.sets.length ? Math.max(...ex.sets.map(x=>x.reps)) : 0;
+        return ex.name + ' ' + sec + 's';
+      }
+      const w = ex.sets && ex.sets.length ? Math.max(...ex.sets.map(x=>x.weight)) : 0;
+      return ex.name + ' ' + w + 'kg';
+    }).join('; ');
+    L.push('- ' + s.dateStr + ' (Päivä ' + s.day + '): ' + key);
+  });
+  if (state.runs.length) {
+    L.push('');
+    L.push('VIIMEISIMMÄT LENKIT');
+    state.runs.slice(-5).reverse().forEach(r => {
+      L.push('- ' + r.dateStr + ': ' + r.distance.toFixed(1) + ' km, ' + formatClock(r.durationSec) + ', ' + formatPace(r.durationSec/r.distance) + '/km (' + r.type + ')');
+    });
+  }
+  L.push('');
+  L.push('TAUSTA: 37v mies, vasemman takareiden avulsiokorjaus 29.1.2026. Tavoitteet: kuntoutus (etusijalla), lihaskasvu, painonhallinta. Fysioterapeutti sallinut vain rauhallisen juoksun.');
+  L.push('Pyydän palautetta edistymisestä, kuormituksen tasapainosta ja seuraavista askelista.');
+  return L.join('\n');
+}
+
+function showCoachSummary() {
+  const text = buildCoachSummary();
+  let ov = document.getElementById('coach-overlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'coach-overlay';
+    document.body.appendChild(ov);
+  }
+  ov.innerHTML = `
+    <div class="coach-modal">
+      <div class="coach-modal-head">
+        <div style="font-weight:700;font-size:15px">📋 Kooste valmentajalle</div>
+        <div class="coach-close" onclick="closeCoachSummary()">✕</div>
+      </div>
+      <textarea id="coach-text" readonly>${text.replace(/</g,'&lt;')}</textarea>
+      <button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="copyCoachSummary()">Kopioi leikepöydälle</button>
+      <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px">Liitä teksti Claude-keskusteluun palautetta varten</div>
+    </div>`;
+  ov.style.display = 'flex';
+}
+
+function closeCoachSummary() {
+  const ov = document.getElementById('coach-overlay');
+  if (ov) ov.style.display = 'none';
+}
+
+function copyCoachSummary() {
+  const text = buildCoachSummary();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => showToast('Kooste kopioitu!')).catch(()=>showToast('Kopiointi epäonnistui'));
+  } else {
+    const ta = document.getElementById('coach-text');
+    if (ta) { ta.select(); try { document.execCommand('copy'); showToast('Kooste kopioitu!'); } catch(e) { showToast('Valitse teksti ja kopioi käsin'); } }
   }
 }
 
