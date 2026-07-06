@@ -74,6 +74,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .day-card.D .day-letter { color: #c084fc; }
 .day-card.E .day-letter { color: #22d3ee; }
 .day-card.optional { border-style: dashed; opacity: 0.92; }
+.day-card.teho { border-style: dashed; }
+.day-card.teho .day-letter { color: #f5b942; font-size: 22px; }
 .day-card .day-name { font-size: 11px; font-weight: 500; color: var(--text2); margin-top: 4px; line-height: 1.3; }
 
 /* Exercise row in workout */
@@ -125,6 +127,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .session-day-badge.C { background: rgba(251,146,60,0.15); color: var(--orange); }
 .session-day-badge.D { background: rgba(192,132,252,0.15); color: #c084fc; }
 .session-day-badge.E { background: rgba(34,211,238,0.15); color: #22d3ee; }
+.session-day-badge.T1, .session-day-badge.T2, .session-day-badge.T3, .session-day-badge.T4 { background: rgba(245,185,66,0.15); color: #f5b942; }
 .session-info { flex: 1; }
 .session-date { font-size: 15px; font-weight: 600; }
 .session-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
@@ -472,6 +475,56 @@ const DAY_E = { title: "Pohkeet, kädet & Core (vapaaehtoinen)", day: "Pohkeet &
 
 [1,2,3].forEach(p => { PROGRAM[p].D = DAY_D; PROGRAM[p].E = DAY_E; });
 
+// ── TEHOJAKSO (4 pv) ──────────────────────────────────────────────────────────
+// Erillinen nelipäiväinen tehojakso: takaketju + nopeus etusijalla, rinta & hartiat
+// painopisteinä, etureisi ylläpidolle. Nopeusliikkeet fysioterapeutin ohjaamia.
+// Aloituspainot johdettu toteutuneista treeneistä; nosta viikoittain, vk4 kevennys.
+
+const DAY_T1 = { title: "Takaketju + nopeus", day: "Takaketju", teho:true,
+  exercises: [
+    { id:"jt", name:"Yhden jalan käsipainotempaus", sets:4, reps:"4/puoli", defaultWeight:8, note:"kg/käsi · nopeusliike, tee tuoreena" },
+    { id:"kp", name:"Nopeat kuntopallopotkut", sets:3, reps:"8-10", defaultWeight:4, note:"kuntopallo 3–5 kg · nopeusliike" },
+    { id:"kl", name:"Yhden jalan lantionnosto kuntopallolla", sets:3, reps:"8/puoli", defaultWeight:4, note:"nopea eteen-taakse · nopeusliike" },
+    { id:"md", name:"Maastaveto kahvakuulalla", isRehab:true, sets:4, reps:8, defaultWeight:80 },
+    { id:"ko", name:"Jalan koukistus laitteessa", isRehab:true, sets:4, reps:8, bilateral:true, defaultWeight:{L:50,R:55}, note:"painota — takaketjun ydin" },
+    { id:"la", name:"Yhden jalan lantionnosto korokkeella", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:12.5,R:12.5}, note:"lisää kuormaa pienin askelin" },
+  ]
+};
+
+const DAY_T2 = { title: "Rinta + hartiat", day: "Rinta+hartiat", teho:true,
+  exercises: [
+    { id:"pu", name:"Käsipainopunnerrus tasapenkillä", sets:4, reps:8, defaultWeight:20, note:"kg/käsi · painopiste" },
+    { id:"hp", name:"Käsipainohartiaprässi (istuen)", sets:4, reps:8, defaultWeight:18, note:"kg/käsi" },
+    { id:"vi", name:"Vinopenkkipunnerrus käsipainoilla", sets:3, reps:10, defaultWeight:14, note:"kg/käsi" },
+    { id:"si", name:"Sivunostot käsipainoilla", sets:4, reps:12, defaultWeight:8, note:"kg/käsi" },
+    { id:"pd", name:"Rintojen lähennys (pec deck)", sets:3, reps:12, defaultWeight:35 },
+    { id:"tp", name:"Ojentajan taljaveto", sets:3, reps:12, defaultWeight:55 },
+  ]
+};
+
+const DAY_T3 = { title: "Etureisi (ylläpito) + core", day: "Etureisi+core", teho:true,
+  exercises: [
+    { id:"ky", name:"Takakyykky", sets:4, reps:8, defaultWeight:90 },
+    { id:"oj", name:"Jalan ojennus laitteessa", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:45,R:45}, note:"ylläpito, kevennetty" },
+    { id:"bs", name:"Bulgarian askelkyykky", sets:3, reps:"10/jalka", defaultWeight:10, note:"kg/käsi · symmetria" },
+    { id:"cr", name:"Vatsarutistus taljassa", sets:3, reps:15, defaultWeight:90 },
+    { id:"rt", name:"Vartalon kierto (laite)", sets:3, reps:15, defaultWeight:90 },
+    { id:"sp", name:"Kylkilankku", sets:3, reps:"30s/puoli", defaultWeight:0, isTime:true },
+  ]
+};
+
+const DAY_T4 = { title: "Selkä + rinta/hartiat vahvistus", day: "Selkä+vahvistus", teho:true,
+  exercises: [
+    { id:"av", name:"Alasvetolaite", sets:4, reps:10, defaultWeight:85 },
+    { id:"so", name:"Soutuveto laitteessa", sets:4, reps:10, defaultWeight:65 },
+    { id:"vi", name:"Vinopenkkipunnerrus käsipainoilla", sets:3, reps:10, defaultWeight:16, note:"kg/käsi · toinen rintaliike" },
+    { id:"ks", name:"Kasvoveto taljassa", sets:3, reps:15, defaultWeight:60 },
+    { id:"ks2", name:"Hauiskääntö + vasarakääntö (supersetti)", sets:3, reps:12, defaultWeight:14, note:"kg/käsi" },
+  ]
+};
+
+[1,2,3].forEach(p => { PROGRAM[p].T1 = DAY_T1; PROGRAM[p].T2 = DAY_T2; PROGRAM[p].T3 = DAY_T3; PROGRAM[p].T4 = DAY_T4; });
+
 // ── LIIKKEIDEN NIMET (suomi + englanti) ───────────────────────────────────────
 // Keskitetty nimikartta id:n mukaan. Yhtenäistää nimet kaikissa vaiheissa ja
 // lisää englanninkielisen nimen. Tavoiteseurannan avainsanat (jalkaprässi,
@@ -514,6 +567,9 @@ const NAMES = {
   hl:  { fi:"Vatsarutistus tai riipuntajalannosto", en:"Cable crunch / hanging leg raise" },
   pd:  { fi:"Rintojen lähennys (pec deck)",        en:"Pec deck" },
   poh: { fi:"Pohkeennostot",                       en:"Calf raises" },
+  jt:  { fi:"Yhden jalan käsipainotempaus",        en:"Single-leg dumbbell snatch" },
+  kp:  { fi:"Nopeat kuntopallopotkut",             en:"Explosive med-ball leg drives" },
+  kl:  { fi:"Yhden jalan lantionnosto kuntopallolla", en:"Single-leg med-ball hip thrust" },
   // legacy — ei aktiivisesti käytössä, mukana varalta
   go:  { fi:"Goblet-kyykky kahvakuulalla",         en:"Goblet squat" },
   ll:  { fi:"Yhden jalan lantionnosto lattialla",  en:"Single-leg hip thrust (floor)" },
@@ -525,7 +581,7 @@ const NAMES = {
   ss2: { fi:"Rintojen lähennys + kasvoveto (supersetti)", en:"Pec deck + face pull (superset)" },
 };
 
-[1,2,3].forEach(p => ['A','B','C','D','E'].forEach(d => {
+[1,2,3].forEach(p => ['A','B','C','D','E','T1','T2','T3','T4'].forEach(d => {
   PROGRAM[p][d].exercises.forEach(ex => {
     const n = NAMES[ex.id];
     if (n) { ex.name = n.fi; ex.en = n.en; }
@@ -570,6 +626,9 @@ const I = {
   pecdeck: { laite:"Pec deck / butterfly -laite.", suoritus:"Säädä istuin niin että kahvat rinnan korkeudella. Tuo käsivarret yhteen edessä, purista rintaa, laske hallitusti ilman yliojennusta." },
   pecsuperset: { laite:"Pec deck + kaapelilaite (kasvosveto).", suoritus:"Tee ensin pec deck, heti perään kasvosveto kaapelilla ilman taukoa. Supersetti rinta + takahartia." },
   calves: { laite:"Pohjelaite (calf raise machine), pohjelaite Smith-koneessa, tai porras/koroke jolla kantapäät pääsevät vapaiksi.", suoritus:"Päkiät tukevasti alustalle, kantapäät vapaina. Nouse päkiöille mahdollisimman ylös ja purista pohkeet täyteen jännitykseen (1 s pito). Laske hallitusti syvälle venyttäen pohjetta. Tee molemmilla jaloilla yhtä aikaa tai vuorotellen yhdellä jalalla." },
+  snatch: { laite:"Yksi käsipaino. Fysioterapeutin nopeusliike — tee tuoreena treenin alussa.", suoritus:"Seiso yhdellä jalalla, käsipaino toisessa kädessä alhaalla. Ojenna räjähtävästi lonkka ja polvi ja tempaa käsipaino yhdellä sulavalla liikkeellä suoralle kädelle pään yläpuolelle. Laske hallitusti. Terävä ja nopea veto, kevyt paino. Lämmittele huolella ennen. Vammakohdan kipu = lopeta." },
+  mbkick: { laite:"Kuntopallo (3–5 kg). Fysioterapeutin nopeusliike.", suoritus:"Tee nopeita, teräviä potkuja kuntopalloa vasten — sekä polvet koukistaen että jalat suorana, kuten fysioterapeutti ohjeisti. Nopea suoritus, hallittu keskivartalo. Aloita kevyellä pallolla ja maltillisella teholla, nosta progressiivisesti." },
+  mbhip: { laite:"Kuntopallo. Fysioterapeutin nopeusliike.", suoritus:"Yhden jalan lantionnosto: pidä lantio ylhäällä ja liikuta kuntopalloa nopeasti eteen ja taakse. Liike nopea mutta hallittu, keskivartalo tiukkana. Tee molemmille puolille." },
 };
 
 const INSTRUCTIONS = {
@@ -581,6 +640,7 @@ const INSTRUCTIONS = {
   ts:I.tsuperset, av3:I.latpull, sv:I.tbarrow, ks2:I.curlsuperset, ks3:I.facepull,
   bs2:I.bulgarian, nc2:I.nordic, hl:I.hanging, spr:I.sideplank, wc2:I.woodchop, ss2:I.pecsuperset,
   poh:I.calves,
+  jt:I.snatch, kp:I.mbkick, kl:I.mbhip,
 };
 
 function getInstr(id) { return INSTRUCTIONS[id] || null; }
@@ -944,6 +1004,20 @@ function renderHome() {
         </div>`;
       }).join('')}
     </div>
+
+    <div style="padding:14px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;font-weight:600">TEHOJAKSO (4 pv · takaketju + nopeus)</div>
+    <div class="day-grid" style="grid-template-columns:1fr 1fr">
+      ${['T1','T2','T3','T4'].map(d => {
+        const info = PROGRAM[phase][d];
+        const done = state.sessions.some(s => s.week === state.currentWeek && s.day === d);
+        return `<div class="day-card teho ${d} ${state.selectedDay===d?'selected':''}" onclick="selectDay('${d}')">
+          <div class="day-letter">${d}</div>
+          <div class="day-name">${info.day}</div>
+          ${done ? '<div style="color:var(--green);font-size:11px;margin-top:4px">✓ tehty</div>' : ''}
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="padding:2px 16px 6px;font-size:11px;color:var(--text3);line-height:1.5">Rytmi: T1 → kevyt → T2 → intervallit → T3 → lepo → T4. Nopeusliikkeet aina tuoreena alussa. Nosta painoa 3 vk, kevennä 4. vk. Pidä T1 ja kovat juoksuintervallit 48 h erillään.</div>
 
     ${state.selectedDay ? `
     <div style="padding:0 16px 16px">
