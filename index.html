@@ -80,7 +80,12 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 /* Exercise row in workout */
 .ex-block { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin: 10px 16px; overflow: hidden; }
-.ex-header { padding: 14px 16px 10px; display: flex; align-items: flex-start; gap: 8px; }
+.ex-header { padding: 14px 16px 10px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.swap-btn { flex-shrink: 0; background: var(--surface2); color: var(--accent2); border: 1px solid var(--border); border-radius: 8px; font-size: 12px; font-weight: 600; padding: 5px 10px; cursor: pointer; white-space: nowrap; font-family: 'DM Sans', sans-serif; }
+.swap-picker { margin: 0 16px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 8px; }
+.swap-title { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin: 2px 6px 6px; font-weight: 600; }
+.swap-opt { padding: 11px 12px; border-radius: 8px; font-size: 14px; cursor: pointer; color: var(--text); }
+.swap-opt.cur { color: var(--accent2); font-weight: 600; }
 .ex-name { font-size: 15px; font-weight: 600; flex: 1; }
 .ex-name-en { font-size: 12px; color: var(--text3); font-weight: 500; font-style: italic; margin-top: 1px; }
 #coach-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; padding: 16px; }
@@ -480,16 +485,17 @@ const DAY_E = { title: "Pohkeet, kädet & Core (vapaaehtoinen)", day: "Pohkeet &
 // painopisteinä, etureisi ylläpidolle. Nopeusliikkeet fysioterapeutin ohjaamia.
 // Aloituspainot johdettu toteutuneista treeneistä; nosta viikoittain, vk4 kevennys.
 
-const DAY_T1 = { title: "Takaketju + nopeus", day: "Takaketju", teho:true,
+const DAY_T1 = { title: "Takaketju + jalat", day: "Takaketju", teho:true,
   exercises: [
-    { id:"jt", name:"Yhden jalan käsipainotempaus", sets:4, reps:"4/puoli", defaultWeight:8, note:"kg/käsi · nopeusliike, tee tuoreena" },
-    { id:"kp", name:"Nopeat kuntopallopotkut", sets:3, reps:"8-10", defaultWeight:4, note:"kuntopallo 3–5 kg · nopeusliike" },
-    { id:"kl", name:"Yhden jalan lantionnosto kuntopallolla", sets:3, reps:"8/puoli", defaultWeight:4, note:"nopea eteen-taakse · nopeusliike" },
-    { id:"md", name:"Maastaveto kahvakuulalla", isRehab:true, sets:4, reps:8, defaultWeight:80 },
+    { id:"md", name:"Maastaveto trap-tangolla", isRehab:true, sets:4, reps:8, defaultWeight:80 },
     { id:"ko", name:"Jalan koukistus laitteessa", isRehab:true, sets:4, reps:8, bilateral:true, defaultWeight:{L:50,R:55}, note:"painota — takaketjun ydin" },
     { id:"la", name:"Yhden jalan lantionnosto korokkeella", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:12.5,R:12.5}, note:"lisää kuormaa pienin askelin" },
+    { id:"ak", name:"Askelkyykky käsipainoilla", sets:3, reps:"10/jalka", defaultWeight:12, note:"kg/käsi · symmetria" },
+    { id:"hab", name:"Lonkan loitonnus (abductor-laite)", sets:3, reps:15, defaultWeight:45, note:"lonkan hallinta, tukee juoksua" },
+    { id:"had", name:"Lonkan lähennys (adductor-laite)", sets:3, reps:15, defaultWeight:45 },
   ]
 };
+// Nopeusliikkeet (käsipainotempaus + kuntopalloliikkeet) tehdään kotona erikseen.
 
 const DAY_T2 = { title: "Rinta + hartiat", day: "Rinta+hartiat", teho:true,
   exercises: [
@@ -499,6 +505,7 @@ const DAY_T2 = { title: "Rinta + hartiat", day: "Rinta+hartiat", teho:true,
     { id:"si", name:"Sivunostot käsipainoilla", sets:4, reps:12, defaultWeight:8, note:"kg/käsi" },
     { id:"pd", name:"Rintojen lähennys (pec deck)", sets:3, reps:12, defaultWeight:35 },
     { id:"tp", name:"Ojentajan taljaveto", sets:3, reps:12, defaultWeight:55 },
+    { id:"ks", name:"Kasvoveto taljassa", sets:3, reps:15, defaultWeight:60, note:"veto-tasapaino + olkapään terveys" },
   ]
 };
 
@@ -506,7 +513,9 @@ const DAY_T3 = { title: "Etureisi (ylläpito) + core", day: "Etureisi+core", teh
   exercises: [
     { id:"ky", name:"Takakyykky", sets:4, reps:8, defaultWeight:90 },
     { id:"oj", name:"Jalan ojennus laitteessa", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:45,R:45}, note:"ylläpito, kevennetty" },
+    { id:"ko", name:"Jalan koukistus laitteessa", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:40,R:45}, note:"kevyt — takareisi 2×/vk" },
     { id:"bs", name:"Bulgarian askelkyykky", sets:3, reps:"10/jalka", defaultWeight:10, note:"kg/käsi · symmetria" },
+    { id:"poh", name:"Pohkeennostot", sets:3, reps:15, defaultWeight:60, note:"tukee juoksua" },
     { id:"cr", name:"Vatsarutistus taljassa", sets:3, reps:15, defaultWeight:90 },
     { id:"rt", name:"Vartalon kierto (laite)", sets:3, reps:15, defaultWeight:90 },
     { id:"sp", name:"Kylkilankku", sets:3, reps:"30s/puoli", defaultWeight:0, isTime:true },
@@ -537,7 +546,7 @@ const NAMES = {
   hp:  { fi:"Käsipainohartiaprässi (istuen)",      en:"Seated dumbbell shoulder press" },
   tp:  { fi:"Ojentajan taljaveto",                 en:"Cable triceps pushdown" },
   ky:  { fi:"Takakyykky",                          en:"Back squat" },
-  md:  { fi:"Maastaveto kahvakuulalla",            en:"Kettlebell deadlift" },
+  md:  { fi:"Maastaveto trap-tangolla",           en:"Trap bar deadlift" },
   la:  { fi:"Yhden jalan lantionnosto korokkeella", en:"Single-leg hip thrust (elevated)" },
   av:  { fi:"Alasvetolaite",                       en:"Lat pulldown" },
   av2: { fi:"Alasvetolaite, leveä ote",            en:"Wide-grip lat pulldown" },
@@ -570,6 +579,17 @@ const NAMES = {
   jt:  { fi:"Yhden jalan käsipainotempaus",        en:"Single-leg dumbbell snatch" },
   kp:  { fi:"Nopeat kuntopallopotkut",             en:"Explosive med-ball leg drives" },
   kl:  { fi:"Yhden jalan lantionnosto kuntopallolla", en:"Single-leg med-ball hip thrust" },
+  ak:  { fi:"Askelkyykky käsipainoilla",           en:"Dumbbell lunge" },
+  hab: { fi:"Lonkan loitonnus (abductor-laite)",   en:"Hip abduction (machine)" },
+  had: { fi:"Lonkan lähennys (adductor-laite)",    en:"Hip adduction (machine)" },
+  fpp: { fi:"Jalkaprässi (molemmat jalat)",        en:"Leg press" },
+  hs:  { fi:"Hack-kyykky",                          en:"Hack squat" },
+  rdl: { fi:"Romanialainen maastaveto",            en:"Romanian deadlift" },
+  htb: { fi:"Lantionnosto tangolla",               en:"Barbell hip thrust" },
+  sc:  { fi:"Liukukelkkakoukistus",                en:"Slider hamstring curl" },
+  tb:  { fi:"Tankopenkkipunnerrus",                en:"Barbell bench press" },
+  pushup: { fi:"Punnerrus (kehonpaino)",           en:"Push-up" },
+  bpp: { fi:"Tankopystypunnerrus",                 en:"Barbell overhead press" },
   // legacy — ei aktiivisesti käytössä, mukana varalta
   go:  { fi:"Goblet-kyykky kahvakuulalla",         en:"Goblet squat" },
   ll:  { fi:"Yhden jalan lantionnosto lattialla",  en:"Single-leg hip thrust (floor)" },
@@ -592,43 +612,54 @@ const NAMES = {
 // Keyed by exercise id. Variants (av/av2/av3 etc.) point to same base text.
 
 const I = {
-  legext: { laite:"Jalkojen ojennuslaite (leg extension). Tuoli jossa pehmustettu rulla nilkan edessä.", suoritus:"Istu selkä tukevasti, jalka rullan alle nilkan yläpuolelle. Ojenna polvi suoraksi hallitusti, pidä 1 s, laske rauhallisesti. Tee toistot yhdellä jalalla, sitten vaihda." },
-  legcurl: { laite:"Jalkojen koukistuslaite (leg curl) — makuu- tai istuva versio.", suoritus:"Aseta nilkka rullan alle/taakse. Koukista polvi tuomalla kantapää kohti pakaraa, laske hallitusti. Yksi jalka kerrallaan. Vasemmalla kevyempi paino — tärkeä kuntoutusliike." },
-  legpress: { laite:"Jalkaprässilaite. Iso laite jossa työnnetään alustaa jaloilla. Penkin asento lukitaan.", suoritus:"Jalka alustan keskelle hartianlevyisesti. Laske alusta hallitusti (~90° polvessa), ojenna — älä lukitse polvea. Yksi jalka kerrallaan. Pidä penkin asento samana (asento 11)." },
-  squat: { laite:"Olympiatanko + tangonpidike (squat/power rack).", suoritus:"Tanko hartioille (ei niskaan). Jalat hartianlevyisesti, varpaat hieman ulos. Laske lantio taakse ja alas vähintään reidet vaakatasoon, nouse ylös. Selkä suorana, kantapäät maassa." },
-  kbdl: { laite:"Kahvakuula.", suoritus:"Kahvakuula jalkojen väliin. Kumarra alas selkä suorana (lantio taakse, polvet hieman koukussa). Nouse ojentamalla lonkkaa ja polvia — lantio ohjaa, ei kädet. Saranaliike, ei kyykky." },
-  hipthrust: { laite:"Matala boksi / korotettu alusta (tai lattia aluksi).", suoritus:"Yksi jalka boksille kantapää kiinni, toinen ilmassa. Makaa selällesi, nosta lantio ylös suoraan linjaan, purista pakaraa 1–2 s, laske hallitusti. Molemmat jalat erikseen." },
-  dbbench: { laite:"Tasainen penkki + käsipainot.", suoritus:"Selällesi, käsipainot rinnan vieressä kyynärpäät ~45–60° vartalosta. Paina ylös kunnes kädet lähes suorana, laske hallitusti. Lavat yhdessä, rinta ylhäällä." },
-  inclinebench: { laite:"Vinopenkki (30–45°) + käsipainot.", suoritus:"Selällesi vinopenkille, käsipainot rinnan yläosan vieressä. Paina ylös, laske hallitusti. Kohdistuu rinnan yläosaan ja etuhartiaan." },
-  shoulderpress: { laite:"Penkki pystyssä (istuen) tai seisaaltaan + käsipainot.", suoritus:"Käsipainot olkapäiden korkeudelle, kyynärpäät 90°. Paina pään yläpuolelle, laske hallitusti. Jännitä vatsa, älä kaarra alaselkää." },
-  lateral: { laite:"Käsipainot (kevyet). Seisaaltaan.", suoritus:"Nosta käsipainot suoraan sivuille hartian tasolle, peukalot hieman alas. Ei vauhtia eikä heilautusta. Laske hallitusti. Kevyt paino + puhdas tekniikka." },
-  pushdown: { laite:"Kaapelilaite, suora tanko tai köysi yläkaapelissa.", suoritus:"Kyynärpäät kiinni kylkiin ja paikallaan. Ojenna kädet alas suoraksi, pidä 1 s, palaa hallitusti 90°:een. Kyynärpäät eivät liiku." },
-  overhead: { laite:"Yksi käsipaino molemmin käsin (tai kaksi).", suoritus:"Käsipaino pään yläpuolelle, kyynärpäät ylös lähellä korvia. Laske hallitusti pään taakse vain kyynärpäistä taivuttaen, ojenna takaisin." },
-  tsuperset: { laite:"Kaapelilaite (pushdown + overhead).", suoritus:"Tee ensin pushdown (kyynärpäät kiinni), heti perään overhead extension ilman taukoa. Supersetti — koko sarja kerralla." },
-  latpull: { laite:"Alasvetolaite (lat pulldown). Polvituki + tanko ylhäällä.", suoritus:"Polvet tuen alle. Ota tanko leveällä yliotteella, nojaa hieman taakse. Vedä rinnan yläosaan, lavat alas ja yhteen. Laske hallitusti täyteen ojennukseen." },
-  seatedrow: { laite:"Istuva soutuveto (seated cable row) tai soutulaite. V-kahva tai tanko.", suoritus:"Istu, jalat tuelle polvet hieman koukussa, selkä suorana. Vedä kahva kohti napaa, kyynärpäät lähellä kylkiä, purista lavat yhteen. Laske hallitusti." },
-  row1arm: { laite:"Kaapelilaite, yksi kahva.", suoritus:"Vedä kahva kohti kylkeä kyynärpää lähellä vartaloa, anna vartalon kiertyä hieman. Purista lapa yhteen. Tee toinen käsi erikseen." },
-  tbarrow: { laite:"Levytanko tai T-bar row -laite.", suoritus:"Seiso tangon päällä, etukumara ~45° selkä suorana. Vedä tanko kohti napaa, purista lavat yhteen, laske hallitusti. Polvet hieman koukussa." },
-  curl: { laite:"Käsipainot. Seisaaltaan tai istuen.", suoritus:"Kämmenet ylöspäin, kyynärpäät kiinni kyljissä (eivät liiku). Koukista käsipainot kohti olkapäitä, laske hallitusti. Ei heilautusta." },
-  hammer: { laite:"Käsipainot.", suoritus:"Kuten käsipainokääntö, mutta kämmenet sisäänpäin (peukalo ylös) koko ajan — kuin pitäisit vasaraa. Aktivoi brachialiksen." },
-  curlsuperset: { laite:"Käsipainot.", suoritus:"Tee ensin normaali kääntö (kämmenet ylös), heti perään haamarikääntö (peukalo ylös) ilman taukoa." },
-  facepull: { laite:"Kaapelilaite, köyskahva silmän korkeudella tai ylempänä.", suoritus:"Vedä köyttä kohti kasvoja hajottaen kädet sivuille, kyynärpäät hartiakorkeudella. Purista olkapäät taakse (ulkorotaatio). Laske hallitusti." },
-  goblet: { laite:"Kahvakuula. Seisaaltaan.", suoritus:"Pidä kahvakuulaa molemmin käsin rinnan edessä. Laske kyykkyyn kyynärpäät polvien sisäpuolelle, selkä suorana. Nouse ylös. Hyvä kyykyn perusliike." },
-  bulgarian: { laite:"Penkki/boksi takajalalle (+ käsipainot myöhemmin).", suoritus:"Takajalka penkille, etummainen jalka edessä. Laske molempia polvia, takapolvi kohti lattiaa. Nouse etummaisen jalan voimalla. Ylävartalo pystyssä." },
-  nordic: { laite:"Kiinteä tuki jalkaterille (laite/penkki/kaveri pitää nilkoista).", suoritus:"Polvet lattialla, keho pystyssä. Laske itsesi hitaasti (5 s) eteenpäin vain polvista taivuttaen — takareidet jarruttavat. Käytä käsiä apuna. Raskas liike!" },
-  rotary: { laite:"Rotary torso -laite. Istuva kiertolaite.", suoritus:"Rintakehä pehmustetta vasten, ota kahvoista. Kierrä vartaloa rauhallisesti sivulle (liike ylävartalosta), palaa keskelle. Tee toistot ensin yhteen suuntaan." },
-  plank: { laite:"Ei välineitä.", suoritus:"Kyynärpäät hartioiden alla, keho suorassa linjassa kantapäistä hartioihin. Älä anna lantion vajota. Jännitä vatsa ja pakara. Hengitä rauhallisesti." },
-  sideplank: { laite:"Ei välineitä.", suoritus:"Kyljelläsi alemman kyynärpään varassa. Nosta lantio niin että keho on suorassa. Pidä asento. Kehittyneempi: lisää rotaatio yläkädellä lattian kautta." },
-  cablecrunch: { laite:"Kaapelilaite, köysi yläkaapelissa. Polvillaan.", suoritus:"Köysi korvien viereen. Koukista ylävartaloa alas kohti polvia vatsalihaksilla (ei käsillä). Pylly ylhäällä. Palaa hallitusti." },
-  abwheel: { laite:"Vatsapyörä (ab wheel) tai kaapelicrunch.", suoritus:"Polvillaan, rullauta pyörää hitaasti eteen keho suorana (lantio ei vajoa), vedä takaisin vatsalihaksilla. Aloita lyhyellä matkalla." },
-  hanging: { laite:"Leuanvetotanko tai dippiteline käsinojilla.", suoritus:"Roiku tangosta. Tuo jalat ylös ~90° vatsalla (ei vauhdilla), laske hallitusti. Aloita polvet koukussa, etene suoriin jalkoihin." },
-  woodchop: { laite:"Kaapelilaite, yksi kahva ylhäällä.", suoritus:"Vedä kahva diagonaalisesti ylhäältä alas vastakkaiselle lantiolle, käsivarret lähes suorina. Liike kiertää koko vartalon lantiosta. Tee molemmat suunnat." },
-  pecdeck: { laite:"Pec deck / butterfly -laite.", suoritus:"Säädä istuin niin että kahvat rinnan korkeudella. Tuo käsivarret yhteen edessä, purista rintaa, laske hallitusti ilman yliojennusta." },
-  pecsuperset: { laite:"Pec deck + kaapelilaite (kasvosveto).", suoritus:"Tee ensin pec deck, heti perään kasvosveto kaapelilla ilman taukoa. Supersetti rinta + takahartia." },
-  calves: { laite:"Pohjelaite (calf raise machine), pohjelaite Smith-koneessa, tai porras/koroke jolla kantapäät pääsevät vapaiksi.", suoritus:"Päkiät tukevasti alustalle, kantapäät vapaina. Nouse päkiöille mahdollisimman ylös ja purista pohkeet täyteen jännitykseen (1 s pito). Laske hallitusti syvälle venyttäen pohjetta. Tee molemmilla jaloilla yhtä aikaa tai vuorotellen yhdellä jalalla." },
-  snatch: { laite:"Yksi käsipaino. Fysioterapeutin nopeusliike — tee tuoreena treenin alussa.", suoritus:"Seiso yhdellä jalalla, käsipaino toisessa kädessä alhaalla. Ojenna räjähtävästi lonkka ja polvi ja tempaa käsipaino yhdellä sulavalla liikkeellä suoralle kädelle pään yläpuolelle. Laske hallitusti. Terävä ja nopea veto, kevyt paino. Lämmittele huolella ennen. Vammakohdan kipu = lopeta." },
-  mbkick: { laite:"Kuntopallo (3–5 kg). Fysioterapeutin nopeusliike.", suoritus:"Tee nopeita, teräviä potkuja kuntopalloa vasten — sekä polvet koukistaen että jalat suorana, kuten fysioterapeutti ohjeisti. Nopea suoritus, hallittu keskivartalo. Aloita kevyellä pallolla ja maltillisella teholla, nosta progressiivisesti." },
-  mbhip: { laite:"Kuntopallo. Fysioterapeutin nopeusliike.", suoritus:"Yhden jalan lantionnosto: pidä lantio ylhäällä ja liikuta kuntopalloa nopeasti eteen ja taakse. Liike nopea mutta hallittu, keskivartalo tiukkana. Tee molemmille puolille." },
+  legext: { laite:"Jalkojen ojennuslaite (leg extension). Tuoli jossa pehmustettu rulla nilkan edessä.", suoritus:"Istu selkä tukevasti, jalka rullan alle nilkan yläpuolelle. Ojenna polvi suoraksi hallitusti, pidä 1 s, laske rauhallisesti. Tee toistot yhdellä jalalla, sitten vaihda.", virhe:"Heilautat painon ylös vauhdilla tai lukitset polven rajusti ääriasennossa.", tuntuu:"Tuntuu etureidessä. Ei saa tuntua polvinivelessä terävänä." },
+  legcurl: { laite:"Jalkojen koukistuslaite (leg curl) — makuu- tai istuva versio.", suoritus:"Aseta nilkka rullan alle/taakse. Koukista polvi tuomalla kantapää kohti pakaraa, laske hallitusti. Yksi jalka kerrallaan. Vasemmalla kevyempi paino — tärkeä kuntoutusliike.", virhe:"Nostat lantiota irti penkistä saadaksesi lisävoimaa.", tuntuu:"Tuntuu takareidessä. Ei terävänä kiinnityskohdassa (istuinluun seutu) — silloin lopeta." },
+  legpress: { laite:"Jalkaprässilaite. Iso laite jossa työnnetään alustaa jaloilla. Penkin asento lukitaan.", suoritus:"Jalka alustan keskelle hartianlevyisesti. Laske alusta hallitusti (~90° polvessa), ojenna — älä lukitse polvea. Yksi jalka kerrallaan. Pidä penkin asento samana (asento 11).", virhe:"Päästät polven painumaan sisään tai alaselän irtoamaan tuesta syvällä.", tuntuu:"Tuntuu etureidessä ja pakarassa. Ei alaselässä." },
+  squat: { laite:"Olympiatanko + tangonpidike (squat/power rack).", suoritus:"Tanko hartioille (ei niskaan). Jalat hartianlevyisesti, varpaat hieman ulos. Laske lantio taakse ja alas vähintään reidet vaakatasoon, nouse ylös. Selkä suorana, kantapäät maassa.", virhe:"Polvet painuvat sisään, kantapäät nousevat tai selkä pyöristyy alhaalla.", tuntuu:"Tuntuu etureisissä ja pakaroissa. Ei alaselässä terävänä." },
+  kbdl: { laite:"Trap-tanko (heksatanko).", suoritus:"Seiso trap-tangon sisällä, tartu kahvoista. Saranoi lantiosta taakse, selkä suorana, polvet hieman koukussa. Nouse ojentamalla lonkka ja polvet yhtä aikaa — lantio ohjaa. Pystympi asento kuin tavallisessa maastavedossa, vähemmän selkäkuormaa. Pidä liike hallittuna ja kivuttomana. (Kevyempi vaihtoehto: sama liike kahvakuulalla.)", virhe:"Selkä pyöristyy tai vedät käsillä lantion ojennuksen sijaan.", tuntuu:"Tuntuu takareisissä ja pakaroissa. Ei alaselässä." },
+  hipthrust: { laite:"Matala boksi / korotettu alusta (tai lattia aluksi).", suoritus:"Yksi jalka boksille kantapää kiinni, toinen ilmassa. Makaa selällesi, nosta lantio ylös suoraan linjaan, purista pakaraa 1–2 s, laske hallitusti. Molemmat jalat erikseen.", virhe:"Yliojennat alaselkää ylhäällä pakaran puristuksen sijaan.", tuntuu:"Tuntuu pakarassa. Ei alaselässä." },
+  dbbench: { laite:"Tasainen penkki + käsipainot.", suoritus:"Selällesi, käsipainot rinnan vieressä kyynärpäät ~45–60° vartalosta. Paina ylös kunnes kädet lähes suorana, laske hallitusti. Lavat yhdessä, rinta ylhäällä.", virhe:"Kyynärpäät leviävät suoraan sivulle (90°) olkapäitä rasittaen.", tuntuu:"Tuntuu rinnassa ja ojentajissa. Ei olkapään etuosassa terävänä." },
+  inclinebench: { laite:"Vinopenkki (30–45°) + käsipainot.", suoritus:"Selällesi vinopenkille, käsipainot rinnan yläosan vieressä. Paina ylös, laske hallitusti. Kohdistuu rinnan yläosaan ja etuhartiaan.", virhe:"Penkki liian pystyssä, jolloin liike muuttuu olkapääliikkeeksi.", tuntuu:"Tuntuu ylärinnassa. Ei niskassa tai olkapäässä." },
+  shoulderpress: { laite:"Penkki pystyssä (istuen) tai seisaaltaan + käsipainot.", suoritus:"Käsipainot olkapäiden korkeudelle, kyynärpäät 90°. Paina pään yläpuolelle, laske hallitusti. Jännitä vatsa, älä kaarra alaselkää.", virhe:"Notkistat alaselkää työntäessä ylös.", tuntuu:"Tuntuu olkapäissä ja ojentajissa. Ei alaselässä." },
+  lateral: { laite:"Käsipainot (kevyet). Seisaaltaan.", suoritus:"Nosta käsipainot suoraan sivuille hartian tasolle, peukalot hieman alas. Ei vauhtia eikä heilautusta. Laske hallitusti. Kevyt paino + puhdas tekniikka.", virhe:"Heilautat painot ylös vauhdilla ja nostat olkapäät korviin.", tuntuu:"Tuntuu olkapään sivuosassa. Ei niskassa tai lapaseudussa." },
+  pushdown: { laite:"Kaapelilaite, suora tanko tai köysi yläkaapelissa.", suoritus:"Kyynärpäät kiinni kylkiin ja paikallaan. Ojenna kädet alas suoraksi, pidä 1 s, palaa hallitusti 90°:een. Kyynärpäät eivät liiku.", virhe:"Kyynärpäät liikkuvat eteen-taakse; autat koko vartalolla.", tuntuu:"Tuntuu ojentajissa (takaolkavarsi). Ei kyynärnivelessä terävänä." },
+  overhead: { laite:"Yksi käsipaino molemmin käsin (tai kaksi).", suoritus:"Käsipaino pään yläpuolelle, kyynärpäät ylös lähellä korvia. Laske hallitusti pään taakse vain kyynärpäistä taivuttaen, ojenna takaisin.", virhe:"Kyynärpäät leviävät ulos ja liikkuvat suorituksen aikana.", tuntuu:"Tuntuu ojentajissa. Ei kyynärnivelessä." },
+  tsuperset: { laite:"Kaapelilaite (pushdown + overhead).", suoritus:"Tee ensin pushdown (kyynärpäät kiinni), heti perään overhead extension ilman taukoa. Supersetti — koko sarja kerralla.", virhe:"Kiirehdit toisen liikkeen tekniikan kustannuksella.", tuntuu:"Tuntuu ojentajissa." },
+  latpull: { laite:"Alasvetolaite (lat pulldown). Polvituki + tanko ylhäällä.", suoritus:"Polvet tuen alle. Ota tanko leveällä yliotteella, nojaa hieman taakse. Vedä rinnan yläosaan, lavat alas ja yhteen. Laske hallitusti täyteen ojennukseen.", virhe:"Nojaat liikaa taakse ja vedät vauhdilla; hartiat nousevat korviin.", tuntuu:"Tuntuu leveässä selkälihaksessa. Ei pääasiassa niskassa tai kyynärvarsissa." },
+  seatedrow: { laite:"Istuva soutuveto (seated cable row) tai soutulaite. V-kahva tai tanko.", suoritus:"Istu, jalat tuelle polvet hieman koukussa, selkä suorana. Vedä kahva kohti napaa, kyynärpäät lähellä kylkiä, purista lavat yhteen. Laske hallitusti.", virhe:"Pyöristät selän tai heilautat koko vartalolla.", tuntuu:"Tuntuu keskiselässä ja lapojen välissä. Ei alaselässä." },
+  row1arm: { laite:"Kaapelilaite, yksi kahva.", suoritus:"Vedä kahva kohti kylkeä kyynärpää lähellä vartaloa, anna vartalon kiertyä hieman. Purista lapa yhteen. Tee toinen käsi erikseen.", virhe:"Kierrät vartaloa vetäessä.", tuntuu:"Tuntuu selän sivussa ja lavassa. Ei alaselässä." },
+  tbarrow: { laite:"Levytanko tai T-bar row -laite.", suoritus:"Seiso tangon päällä, etukumara ~45° selkä suorana. Vedä tanko kohti napaa, purista lavat yhteen, laske hallitusti. Polvet hieman koukussa.", virhe:"Pyöristät alaselän vetäessä.", tuntuu:"Tuntuu keskiselässä. Ei alaselässä." },
+  curl: { laite:"Käsipainot. Seisaaltaan tai istuen.", suoritus:"Kämmenet ylöspäin, kyynärpäät kiinni kyljissä (eivät liiku). Koukista käsipainot kohti olkapäitä, laske hallitusti. Ei heilautusta.", virhe:"Heilautat vartalolla ja käytät vauhtia.", tuntuu:"Tuntuu hauiksessa. Ei ranteessa tai kyynärpäässä terävänä." },
+  hammer: { laite:"Käsipainot.", suoritus:"Kuten käsipainokääntö, mutta kämmenet sisäänpäin (peukalo ylös) koko ajan — kuin pitäisit vasaraa. Aktivoi brachialiksen.", virhe:"Heilautat painoja vauhdilla.", tuntuu:"Tuntuu hauiksessa ja kyynärvarren yläosassa." },
+  curlsuperset: { laite:"Käsipainot.", suoritus:"Tee ensin normaali kääntö (kämmenet ylös), heti perään haamarikääntö (peukalo ylös) ilman taukoa.", virhe:"Käytät vauhtia hallitun suorituksen sijaan.", tuntuu:"Tuntuu hauiksessa." },
+  facepull: { laite:"Kaapelilaite, köyskahva silmän korkeudella tai ylempänä.", suoritus:"Vedä köyttä kohti kasvoja hajottaen kädet sivuille, kyynärpäät hartiakorkeudella. Purista olkapäät taakse (ulkorotaatio). Laske hallitusti.", virhe:"Vedät liian raskaalla, jolloin isot lihakset ottavat vallan.", tuntuu:"Tuntuu takaolkapäässä ja yläselässä. Ei niskassa." },
+  goblet: { laite:"Kahvakuula. Seisaaltaan.", suoritus:"Pidä kahvakuulaa molemmin käsin rinnan edessä. Laske kyykkyyn kyynärpäät polvien sisäpuolelle, selkä suorana. Nouse ylös. Hyvä kyykyn perusliike.", virhe:"Kallistut eteen ja kantapäät nousevat.", tuntuu:"Tuntuu etureisissä ja pakaroissa. Ei alaselässä." },
+  bulgarian: { laite:"Penkki/boksi takajalalle (+ käsipainot myöhemmin).", suoritus:"Takajalka penkille, etummainen jalka edessä. Laske molempia polvia, takapolvi kohti lattiaa. Nouse etummaisen jalan voimalla. Ylävartalo pystyssä.", virhe:"Etupolvi painuu sisään tai nojaat liikaa eteen.", tuntuu:"Tuntuu etujalan etureidessä ja pakarassa." },
+  nordic: { laite:"Kiinteä tuki jalkaterille (laite/penkki/kaveri pitää nilkoista).", suoritus:"Polvet lattialla, keho pystyssä. Laske itsesi hitaasti (5 s) eteenpäin vain polvista taivuttaen — takareidet jarruttavat. Käytä käsiä apuna. Raskas liike!", virhe:"Taivut lonkasta etkä pidä kehoa suorana; lasket liian nopeasti.", tuntuu:"Tuntuu takareidessä voimakkaasti. Lopeta heti jos terävä kipu kiinnityskohdassa." },
+  rotary: { laite:"Rotary torso -laite. Istuva kiertolaite.", suoritus:"Rintakehä pehmustetta vasten, ota kahvoista. Kierrä vartaloa rauhallisesti sivulle (liike ylävartalosta), palaa keskelle. Tee toistot ensin yhteen suuntaan.", virhe:"Kierrät lantiosta etkä keskivartalosta; käytät vauhtia.", tuntuu:"Tuntuu vinoissa vatsalihaksissa. Ei alaselässä." },
+  plank: { laite:"Ei välineitä.", suoritus:"Kyynärpäät hartioiden alla, keho suorassa linjassa kantapäistä hartioihin. Älä anna lantion vajota. Jännitä vatsa ja pakara. Hengitä rauhallisesti.", virhe:"Lantio roikkuu alas tai nousee liian ylös.", tuntuu:"Tuntuu keskivartalossa (vatsa). Ei alaselässä." },
+  sideplank: { laite:"Ei välineitä.", suoritus:"Kyljelläsi alemman kyynärpään varassa. Nosta lantio niin että keho on suorassa. Pidä asento. Kehittyneempi: lisää rotaatio yläkädellä lattian kautta.", virhe:"Lantio valuu alas.", tuntuu:"Tuntuu kyljessä ja keskivartalossa." },
+  cablecrunch: { laite:"Kaapelilaite, köysi yläkaapelissa. Polvillaan.", suoritus:"Köysi korvien viereen. Koukista ylävartaloa alas kohti polvia vatsalihaksilla (ei käsillä). Pylly ylhäällä. Palaa hallitusti.", virhe:"Vedät käsillä tai lantiosta etkä rutista vatsalihaksilla.", tuntuu:"Tuntuu vatsalihaksissa. Ei niskassa tai lonkankoukistajissa." },
+  abwheel: { laite:"Vatsapyörä (ab wheel) tai kaapelicrunch.", suoritus:"Polvillaan, rullauta pyörää hitaasti eteen keho suorana (lantio ei vajoa), vedä takaisin vatsalihaksilla. Aloita lyhyellä matkalla.", virhe:"Alaselkä notkolle rullatessa eteen.", tuntuu:"Tuntuu vatsalihaksissa. Ei alaselässä." },
+  hanging: { laite:"Leuanvetotanko tai dippiteline käsinojilla.", suoritus:"Roiku tangosta. Tuo jalat ylös ~90° vatsalla (ei vauhdilla), laske hallitusti. Aloita polvet koukussa, etene suoriin jalkoihin.", virhe:"Heilut ja käytät vauhtia noston sijaan.", tuntuu:"Tuntuu alavatsassa." },
+  woodchop: { laite:"Kaapelilaite, yksi kahva ylhäällä.", suoritus:"Vedä kahva diagonaalisesti ylhäältä alas vastakkaiselle lantiolle, käsivarret lähes suorina. Liike kiertää koko vartalon lantiosta. Tee molemmat suunnat.", virhe:"Käytät pelkkiä käsiä etkä keskivartalon kiertoa.", tuntuu:"Tuntuu vinoissa vatsalihaksissa." },
+  pecdeck: { laite:"Pec deck / butterfly -laite.", suoritus:"Säädä istuin niin että kahvat rinnan korkeudella. Tuo käsivarret yhteen edessä, purista rintaa, laske hallitusti ilman yliojennusta.", virhe:"Yliojennat olkapäät taakse alkuasennossa.", tuntuu:"Tuntuu rinnassa. Ei olkapään etuosassa terävänä." },
+  pecsuperset: { laite:"Pec deck + kaapelilaite (kasvosveto).", suoritus:"Tee ensin pec deck, heti perään kasvosveto kaapelilla ilman taukoa. Supersetti rinta + takahartia.", virhe:"Kiirehdit supersetin läpi.", tuntuu:"Tuntuu rinnassa ja takaolkapäässä." },
+  calves: { laite:"Pohjelaite (calf raise machine), pohjelaite Smith-koneessa, tai porras/koroke jolla kantapäät pääsevät vapaiksi.", suoritus:"Päkiät tukevasti alustalle, kantapäät vapaina. Nouse päkiöille mahdollisimman ylös ja purista pohkeet täyteen jännitykseen (1 s pito). Laske hallitusti syvälle venyttäen pohjetta. Tee molemmilla jaloilla yhtä aikaa tai vuorotellen yhdellä jalalla.", virhe:"Lyhyt liikerata ja pomppiminen.", tuntuu:"Tuntuu pohkeissa. Täysi venytys alhaalla, purista ylhäällä." },
+  snatch: { laite:"Yksi käsipaino. Fysioterapeutin nopeusliike — tee tuoreena treenin alussa.", suoritus:"Seiso yhdellä jalalla, käsipaino toisessa kädessä alhaalla. Ojenna räjähtävästi lonkka ja polvi ja tempaa käsipaino yhdellä sulavalla liikkeellä suoralle kädelle pään yläpuolelle. Laske hallitusti. Terävä ja nopea veto, kevyt paino. Lämmittele huolella ennen. Vammakohdan kipu = lopeta.", virhe:"Vedät pelkillä käsillä räjähtävän lonkan ojennuksen sijaan.", tuntuu:"Tuntuu koko takaketjussa ja hartiassa. Terävä kipu vammakohdassa = lopeta." },
+  mbkick: { laite:"Kuntopallo (3–5 kg). Fysioterapeutin nopeusliike.", suoritus:"Tee nopeita, teräviä potkuja kuntopalloa vasten — sekä polvet koukistaen että jalat suorana, kuten fysioterapeutti ohjeisti. Nopea suoritus, hallittu keskivartalo. Aloita kevyellä pallolla ja maltillisella teholla, nosta progressiivisesti.", virhe:"Suoritus on hidas ja hallitsematon.", tuntuu:"Tuntuu takareidessä ja lonkassa. Nopea mutta hallittu." },
+  mbhip: { laite:"Kuntopallo. Fysioterapeutin nopeusliike.", suoritus:"Yhden jalan lantionnosto: pidä lantio ylhäällä ja liikuta kuntopalloa nopeasti eteen ja taakse. Liike nopea mutta hallittu, keskivartalo tiukkana. Tee molemmille puolille.", virhe:"Lantio putoaa kesken liikkeen.", tuntuu:"Tuntuu pakarassa ja takareidessä." },
+  lunge: { laite:"Käsipainot kyljillä.", suoritus:"Ota askel eteen (tai kävele eteenpäin), laskeudu kunnes takapolvi lähes koskettaa lattiaa ja etureisi on vaakatasossa. Nouse työntäen etujalan kantapäästä. Pidä ylävartalo pystyssä, etupolvi varpaiden suunnassa (ei sisään). Tee molemmille jaloille.", virhe:"Etupolvi painuu sisään tai askel jää liian lyhyeksi.", tuntuu:"Tuntuu etujalan etureidessä ja pakarassa. Ei polvinivelessä terävänä." },
+  abductor: { laite:"Lonkan loitonnuslaite (hip abductor). Istuen, pehmusteet reisien ulkosivuilla.", suoritus:"Istu tukevasti, työnnä polvia ulospäin auki jännittäen pakaran sivuja. Purista ääriasennossa, palauta hallitusti. Vahvistaa lonkan sivustabilaatiota — tukee juoksua, hallintaa ja polven linjausta.", virhe:"Käytät vauhtia ja nojaat taakse.", tuntuu:"Tuntuu pakaran sivussa (ulkoreisi)." },
+  adductor: { laite:"Lonkan lähennyslaite (hip adductor). Istuen, pehmusteet reisien sisäsivuilla.", suoritus:"Istu tukevasti, purista polvia yhteen jännittäen sisäreisiä. Purista ääriasennossa, palauta hallitusti äläkä päästä nykäisemään auki. Vahvistaa sisäreittä ja lonkan tasapainoa.", virhe:"Päästät jalat nykäisemään auki hallitsematta.", tuntuu:"Tuntuu sisäreidessä." },
+  legpress2: { laite:"Jalkaprässi (molemmat jalat).", suoritus:"Molemmat jalat alustalle hartioiden leveydelle. Laske hallitusti kunnes polvet noin 90°, työnnä ylös lukitsematta polvia. Pidä alaselkä tuessa. Molemmilla jaloilla yhtä aikaa.", virhe:"Alaselkä irtoaa tuesta liian syvällä; lukitset polvet.", tuntuu:"Tuntuu etureisissä ja pakaroissa. Ei alaselässä." },
+  hacksquat: { laite:"Hack-kyykkylaite.", suoritus:"Hartiat pehmusteita vasten, jalat alustalle. Kyykkää hallitusti alas, työnnä kantapäistä ylös. Etureisipainotteinen, vakaa liikerata.", virhe:"Kantapäät nousevat tai polvet painuvat sisään.", tuntuu:"Tuntuu etureisissä. Ei polvinivelessä terävänä." },
+  rdl: { laite:"Levytanko.", suoritus:"Saranoi lantiosta taakse, polvet hieman koukussa. Laske kunnes tunnet takareiden venytyksen, selkä neutraalina. Nouse pakaroita jännittäen. Älä pakota syvemmälle kuin kivuton liikerata sallii — takareisi kuormittuu venytyksessä. (Voi tehdä myös käsipainoparilla.)", virhe:"Pyöristät selän tai teet kyykyn saranaliikkeen sijaan.", tuntuu:"Tuntuu takareisien venytyksenä ja pakarassa. Ei alaselässä." },
+  hipthrustbar: { laite:"Tanko + penkki (pehmuste lantiolle).", suoritus:"Yläselkä penkkiä vasten, tanko lantiolla. Työnnä lantio ylös kantapäistä, purista pakarat ääriasennossa, laske hallitusti. Leuka rintaan, ei alaselän yliojennusta.", virhe:"Yliojennat alaselkää ja leuka nousee ylös.", tuntuu:"Tuntuu pakaroissa. Ei alaselässä." },
+  slidercurl: { laite:"Liukukiekot, pyyhe sileällä lattialla tai jumppapallo.", suoritus:"Selinmakuu, kantapäät liukuvalla alustalla. Nosta lantio siltaan, vedä kantapäät kohti pakaroita, ojenna hitaasti jarruttaen. Pidä lantio ylhäällä. Aloita kahdella jalalla.", virhe:"Lantio putoaa ojennusvaiheessa tai ojennat liian nopeasti.", tuntuu:"Tuntuu takareidessä. Jarruta ojennus hitaasti." },
+  bbbench: { laite:"Levytanko + penkki.", suoritus:"Selkä penkissä, lavat yhteen, jalat maassa. Laske tanko rinnalle hallitusti, työnnä ylös. Käytä varmistajaa tai turvatankoja raskaalla painolla.", virhe:"Kyynärpäät leviävät 90°; selkäkaari kasvaa liian suureksi.", tuntuu:"Tuntuu rinnassa ja ojentajissa. Ei olkapäässä terävänä." },
+  pushup2: { laite:"Kehonpaino.", suoritus:"Kädet hartioita leveämmällä, keho suorana kantapäistä päähän. Laske rinta lähelle lattiaa, työnnä ylös. Skaalaa polvilta jos tarpeen.", virhe:"Lantio roikkuu tai kyynärpäät leviävät suoraan sivulle.", tuntuu:"Tuntuu rinnassa, ojentajissa ja keskivartalossa." },
+  bbohp: { laite:"Levytanko.", suoritus:"Seisten, tanko olkapäiltä. Työnnä suoraan ylös pään yli, keskivartalo tiukkana. Älä notkista alaselkää. Laske hallitusti olkapäille.", virhe:"Notkistat alaselkää ja työnnät tangon liian eteen.", tuntuu:"Tuntuu olkapäissä ja ojentajissa. Ei alaselässä." },
 };
 
 const INSTRUCTIONS = {
@@ -641,6 +672,31 @@ const INSTRUCTIONS = {
   bs2:I.bulgarian, nc2:I.nordic, hl:I.hanging, spr:I.sideplank, wc2:I.woodchop, ss2:I.pecsuperset,
   poh:I.calves,
   jt:I.snatch, kp:I.mbkick, kl:I.mbhip,
+  ak:I.lunge, hab:I.abductor, had:I.adductor,
+  fpp:I.legpress2, hs:I.hacksquat, rdl:I.rdl, htb:I.hipthrustbar, sc:I.slidercurl, tb:I.bbbench, pushup:I.pushup2, bpp:I.bbohp,
+};
+
+// ── VAIHTOEHTOISET LIIKKEET ───────────────────────────────────────────────────
+// Kullekin liikkeelle korvaavia liikkeitä (kertavaihto treenin aikana; ei muuta
+// ohjelmaa pysyvästi). w = aloituspaino jos liikkeellä ei ole omaa historiaa.
+const ALTERNATIVES = {
+  ky:  [{id:'fpp',w:150},{id:'hs',w:60},{id:'go',w:24}],
+  fp:  [{id:'fpp',w:150},{id:'bs',w:12},{id:'ak',w:12}],
+  fpp: [{id:'ky',w:80},{id:'hs',w:60}],
+  ko:  [{id:'sc',w:0},{id:'nc',w:0}],
+  md:  [{id:'rdl',w:60},{id:'htb',w:60}],
+  la:  [{id:'htb',w:60},{id:'ll',w:0}],
+  ak:  [{id:'bs',w:12},{id:'fpp',w:150}],
+  bs:  [{id:'ak',w:12},{id:'fpp',w:150}],
+  pu:  [{id:'tb',w:50},{id:'vi',w:16},{id:'pd',w:35},{id:'pushup',w:0}],
+  vi:  [{id:'pu',w:20},{id:'pd',w:35}],
+  pd:  [{id:'pu',w:20},{id:'vi',w:16}],
+  hp:  [{id:'sh',w:16},{id:'bpp',w:30}],
+  sh:  [{id:'hp',w:18},{id:'bpp',w:30}],
+  av:  [{id:'av2',w:80}],
+  so:  [{id:'sv',w:50},{id:'sk',w:20}],
+  hab: [{id:'had',w:45}],
+  had: [{id:'hab',w:45}],
 };
 
 function getInstr(id) { return INSTRUCTIONS[id] || null; }
@@ -1059,43 +1115,86 @@ function selectDay(d) {
 
 // ── WORKOUT ───────────────────────────────────────────────────────────────────
 
+// Rakentaa yhden liikkeen "elävän" olion (sarjat + esitäytetyt painot).
+// ex: meta jossa sets = sarjojen LUKUMÄÄRÄ (numero), reps = ohjelman toistot.
+function buildExercise(ex, day) {
+  const parsed = typeof ex.reps === 'number' ? ex.reps : (String(ex.reps).match(/\d+/) ? parseInt(String(ex.reps).match(/\d+/)[0]) : 8);
+  if (ex.bilateral) {
+    const lastL = getLastPerformance(ex.name, 'L', day, ex.id);
+    const lastR = getLastPerformance(ex.name, 'R', day, ex.id);
+    const dw = ex.defaultWeight || {};
+    const wL = lastL ? lastL.weight : (dw.L ?? 0);
+    const wR = lastR ? lastR.weight : (dw.R ?? 0);
+    const repsL = ex.isTime && lastL ? lastL.reps : parsed;
+    const repsR = ex.isTime && lastR ? lastR.reps : parsed;
+    return { ...ex, activeSide:'L', sets: {
+      L: Array.from({length:ex.sets},() => ({ weight:wL, reps:repsL, done:false })),
+      R: Array.from({length:ex.sets},() => ({ weight:wR, reps:repsR, done:false })),
+    }};
+  }
+  const last = getLastPerformance(ex.name, null, day, ex.id);
+  const w0 = last ? last.weight : (typeof ex.defaultWeight === 'number' ? ex.defaultWeight : 0);
+  const reps0 = ex.isTime && last ? last.reps : parsed;
+  return { ...ex, sets: Array.from({length:ex.sets},() => ({ weight:w0, reps:reps0, done:false })) };
+}
+
 function startWorkout(day) {
   const phase = getPhase(state.currentWeek);
   const dayPlan = PROGRAM[phase][day];
   state.instrOpen = {};
+  state.swapOpen = null;
   state.activeWorkout = {
     phase, day,
     week: state.currentWeek,
-    exercises: dayPlan.exercises.map(ex => {
-      // Oletustoistot: numero sellaisenaan, muuten ensimmäinen luku merkkijonosta
-      // (esim. "30s"→30, "10/jalka"→10, "12+15"→12), viime kädessä 8.
-      const parsed = typeof ex.reps === 'number' ? ex.reps : (String(ex.reps).match(/\d+/) ? parseInt(String(ex.reps).match(/\d+/)[0]) : 8);
-      if (ex.bilateral) {
-        const lastL = getLastPerformance(ex.name, 'L', day, ex.id);
-        const lastR = getLastPerformance(ex.name, 'R', day, ex.id);
-        const wL = lastL ? lastL.weight : ex.defaultWeight.L;
-        const wR = lastR ? lastR.weight : ex.defaultWeight.R;
-        const repsL = ex.isTime && lastL ? lastL.reps : parsed;
-        const repsR = ex.isTime && lastR ? lastR.reps : parsed;
-        return {
-          ...ex,
-          activeSide: 'L',
-          sets: {
-            L: Array.from({length:ex.sets},(_,i) => ({ weight: wL, reps: repsL, done:false })),
-            R: Array.from({length:ex.sets},(_,i) => ({ weight: wR, reps: repsR, done:false })),
-          }
-        };
-      }
-      const last = getLastPerformance(ex.name, null, day, ex.id);
-      const w0 = last ? last.weight : ex.defaultWeight;
-      const reps0 = ex.isTime && last ? last.reps : parsed;
-      return {
-        ...ex,
-        sets: Array.from({length:ex.sets},(_,i) => ({ weight: w0, reps: reps0, done:false }))
-      };
-    })
+    exercises: dayPlan.exercises.map(ex => buildExercise(ex, day)),
   };
   showTab('workout');
+}
+
+// Vaihda liike toiseen kesken treenin (vain tälle kerralle).
+function toggleSwap(ei) {
+  state.swapOpen = state.swapOpen === ei ? null : ei;
+  render();
+}
+
+function swapExercise(ei, altId) {
+  const w = state.activeWorkout;
+  const cur = w.exercises[ei];
+  const origId = cur.origId || cur.id;
+  const setCount = cur.bilateral ? cur.sets.L.length : cur.sets.length;
+  let meta;
+  if (altId === origId) {
+    // Palauta alkuperäinen ohjelman määrittelystä
+    const src = PROGRAM[w.phase][w.day].exercises.find(e => e.id === origId);
+    meta = { ...src, sets: setCount };
+  } else {
+    const a = (ALTERNATIVES[origId] || []).find(x => x.id === altId);
+    if (!a) return;
+    const nm = NAMES[altId] || { fi: altId, en: '' };
+    meta = {
+      id: altId, name: nm.fi, en: nm.en,
+      bilateral: !!a.bilateral, isTime: !!a.isTime, isRehab: cur.isRehab,
+      defaultWeight: a.w, note: a.note,
+      sets: setCount, reps: cur.reps,
+    };
+  }
+  const built = buildExercise(meta, w.day);
+  built.origId = origId;
+  w.exercises[ei] = built;
+  state.swapOpen = null;
+  render();
+}
+
+function renderSwapPicker(ex, ei) {
+  const origId = ex.origId || ex.id;
+  const alts = ALTERNATIVES[origId] || [];
+  const origName = (NAMES[origId] || {}).fi || origId;
+  const rows = [`<div class="swap-opt ${ex.id===origId?'cur':''}" onclick="swapExercise(${ei},'${origId}')">${origName} <span style="color:var(--text3)">(alkuperäinen)</span>${ex.id===origId?' ✓':''}</div>`];
+  alts.forEach(a => {
+    const nm = (NAMES[a.id] || {}).fi || a.id;
+    rows.push(`<div class="swap-opt ${ex.id===a.id?'cur':''}" onclick="swapExercise(${ei},'${a.id}')">${nm}${ex.id===a.id?' ✓':''}</div>`);
+  });
+  return `<div class="swap-picker"><div class="swap-title">Vaihda liike (vain tämä treeni)</div>${rows.join('')}</div>`;
 }
 
 function renderWorkout() {
@@ -1168,7 +1267,9 @@ function renderExerciseBlock(ex, ei) {
           ${ex.en ? `<div class="ex-name-en">${ex.en}</div>` : ''}
           ${ex.isRehab ? '<div class="rehab-badge">KUNTOUTUS</div>' : ''}
         </div>
+        ${(ALTERNATIVES[ex.origId || ex.id] || []).length ? `<button class="swap-btn" onclick="toggleSwap(${ei})">⇄ Vaihda</button>` : ''}
       </div>
+      ${state.swapOpen===ei ? renderSwapPicker(ex, ei) : ''}
       <div class="ex-meta">${ex.sets.length || Object.values(ex.sets||{L:[]})[0]?.length || ex.sets} sarjaa × ${ex.reps}${ex.isTime ? '' : ' toistoa'}${ex.note ? ' · ' + ex.note : ''}</div>
 
       ${(() => {
@@ -1185,6 +1286,8 @@ function renderExerciseBlock(ex, ei) {
           <span class="instr-text">${instr.laite}</span>
           <span class="instr-label">Suoritus</span>
           <span class="instr-text">${instr.suoritus}</span>
+          ${instr.virhe ? `<span class="instr-label">⚠️ Yleisin virhe</span><span class="instr-text">${instr.virhe}</span>` : ''}
+          ${instr.tuntuu ? `<span class="instr-label">📍 Missä tuntuu</span><span class="instr-text">${instr.tuntuu}</span>` : ''}
         </div>`;
       })()}
 

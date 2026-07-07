@@ -1,6 +1,6 @@
 // Treenikirja — service worker (offline-tuki)
 // Päivitä versionumeroa aina kun sovellus muuttuu, jotta välimuisti uusiutuu.
-const CACHE = 'treenikirja-v8';
+const CACHE = 'treenikirja-v12';
 const ASSETS = ['./', './index.html'];
 
 // Asennus: tallenna sovelluksen pohja välimuistiin
