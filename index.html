@@ -17,7 +17,7 @@
   --border: #2a2a38;
   --text: #f0f0f5;
   --text2: #8888a0;
-  --text3: #55556a;
+  --text3: #6f6f88;
   --accent: #7c6af0;
   --accent2: #9b8df5;
   --green: #4ade80;
@@ -235,12 +235,31 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 /* Rest timer */
 .rest-timer { position: fixed; bottom: 78px; left: 16px; right: 16px; background: var(--accent); color: white; border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; z-index: 150; box-shadow: 0 6px 24px rgba(124,106,240,0.4); }
+.wo-sticky { position: sticky; top: 0; z-index: 60; background: var(--bg); padding: 12px 16px 10px; border-bottom: 1px solid var(--border); }
+.wo-sticky-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.wo-actions { display: flex; gap: 8px; }
+.wo-save { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.wo-save-ready { background: var(--green); color: #000; border-color: var(--green); font-weight: 700; }
+.wo-progress-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.wo-progress-label { font-size: 11px; color: var(--text2); white-space: nowrap; font-family: 'DM Mono', monospace; }
+.ex-collapsed { cursor: pointer; }
+.ex-collapsed-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+.ex-done-check { width: 26px; height: 26px; border-radius: 50%; background: var(--green); color: #000; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ex-collapsed-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.ex-collapsed-chev { width: 20px; height: 20px; color: var(--text3); flex-shrink: 0; }
 .rest-timer.done { background: var(--green); color: #000; }
 .rest-timer .rt-time { font-family: 'DM Mono', monospace; font-size: 24px; font-weight: 700; }
 .rest-timer .rt-label { flex: 1; font-size: 13px; font-weight: 600; }
 .rest-timer .rt-btn { background: rgba(255,255,255,0.2); border: none; color: inherit; border-radius: 8px; padding: 8px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
 
 /* Streak / weekly grid */
+.hero { margin: 14px 16px; border-radius: 16px; padding: 18px; background: linear-gradient(135deg, rgba(124,106,240,0.22), rgba(124,106,240,0.05)); border: 1px solid var(--accent); }
+.hero-resume { background: linear-gradient(135deg, rgba(240,160,80,0.20), rgba(240,160,80,0.04)); border-color: var(--orange); }
+.hero-rest { background: linear-gradient(135deg, rgba(74,222,128,0.16), rgba(74,222,128,0.03)); border-color: var(--green); }
+.hero-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent2); font-weight: 700; }
+.hero-title { font-size: 21px; font-weight: 700; margin: 6px 0 3px; line-height: 1.2; }
+.hero-sub { font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.4; }
+.hero-btn { width: 100%; }
 .streak-banner { display: flex; align-items: center; gap: 14px; margin: 12px 16px; background: linear-gradient(135deg, rgba(124,106,240,0.15), rgba(155,141,245,0.05)); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
 .streak-flame { font-size: 36px; }
 .streak-num { font-size: 28px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--accent2); }
@@ -689,14 +708,27 @@ const ALTERNATIVES = {
   ak:  [{id:'bs',w:12},{id:'fpp',w:150}],
   bs:  [{id:'ak',w:12},{id:'fpp',w:150}],
   pu:  [{id:'tb',w:50},{id:'vi',w:16},{id:'pd',w:35},{id:'pushup',w:0}],
-  vi:  [{id:'pu',w:20},{id:'pd',w:35}],
-  pd:  [{id:'pu',w:20},{id:'vi',w:16}],
+  vi:  [{id:'pu',w:20},{id:'pd',w:35},{id:'pushup',w:0}],
+  pd:  [{id:'pu',w:20},{id:'vi',w:16},{id:'pushup',w:0}],
   hp:  [{id:'sh',w:16},{id:'bpp',w:30}],
   sh:  [{id:'hp',w:18},{id:'bpp',w:30}],
   av:  [{id:'av2',w:80}],
   so:  [{id:'sv',w:50},{id:'sk',w:20}],
   hab: [{id:'had',w:45}],
   had: [{id:'hab',w:45}],
+  oj:  [{id:'go',w:24},{id:'fpp',w:150},{id:'hs',w:60}],
+  tp:  [{id:'to',w:12},{id:'pushup',w:0}],
+  to:  [{id:'tp',w:55}],
+  bk:  [{id:'hk',w:14}],
+  hk:  [{id:'bk',w:14}],
+  ks2: [{id:'bk',w:14},{id:'hk',w:14}],
+  rt:  [{id:'wc',w:20}],
+  wc:  [{id:'rt',w:90}],
+  pl:  [{id:'sp',w:0,isTime:true}],
+  sp:  [{id:'pl',w:0,isTime:true}],
+  cr:  [{id:'hl',w:0}],
+  hl:  [{id:'cr',w:90}],
+  sv:  [{id:'so',w:65},{id:'sk',w:20}],
 };
 
 function getInstr(id) { return INSTRUCTIONS[id] || null; }
@@ -951,6 +983,45 @@ function updateHeaderSubtitle() {
 
 // ── HOME ──────────────────────────────────────────────────────────────────────
 
+function todaysWorkout() {
+  if (state.activeWorkout) return { type:'resume', day: state.activeWorkout.day };
+  const phase = getPhase(state.currentWeek);
+  const rotation = ['T1','T2','T3','T4'];
+  const doneThisWeek = new Set(state.sessions.filter(s => s.week === state.currentWeek).map(s => s.day));
+  const next = rotation.find(d => !doneThisWeek.has(d));
+  if (!next) return { type:'rest' };
+  return { type:'workout', day: next, info: PROGRAM[phase][next] };
+}
+
+function renderHero() {
+  const t = todaysWorkout();
+  if (t.type === 'resume') {
+    return `<div class="hero hero-resume">
+      <div class="hero-label" style="color:var(--orange)">Kesken</div>
+      <div class="hero-title">Jatka treeniä · ${t.day}</div>
+      <div class="hero-sub">Sinulla on treeni käynnissä.</div>
+      <button class="btn btn-primary hero-btn" onclick="showTab('workout')">Jatka treeniä</button>
+    </div>`;
+  }
+  if (t.type === 'rest') {
+    return `<div class="hero hero-rest">
+      <div class="hero-label" style="color:var(--green)">Tänään</div>
+      <div class="hero-title">Tehotreenit tehty 💪</div>
+      <div class="hero-sub">Tämän viikon T1–T4 on kirjattu. Lepo tai rauhallinen juoksu palauttaa parhaiten.</div>
+    </div>`;
+  }
+  const n = t.info.exercises.length;
+  return `<div class="hero">
+    <div class="hero-label">Tänään · suositus</div>
+    <div class="hero-title">${t.day} · ${t.info.title}</div>
+    <div class="hero-sub">${n} liikettä · nopeusliikkeet tuoreena alussa</div>
+    <button class="btn btn-primary hero-btn" onclick="startWorkout('${t.day}')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Aloita treeni
+    </button>
+  </div>`;
+}
+
 function renderHome() {
   const phase = getPhase(state.currentWeek);
   const phaseNames = {1:'Perusta',2:'Kehitys',3:'Teho'};
@@ -973,6 +1044,8 @@ function renderHome() {
   ];
 
   return `
+    ${renderHero()}
+
     ${streak > 0 ? `
     <div class="streak-banner">
       <div class="streak-flame">🔥</div>
@@ -1035,7 +1108,7 @@ function renderHome() {
       }).join('')}
     </div>
 
-    <div class="section-header">TÄNÄÄN</div>
+    <div class="section-header">VALITSE TREENI</div>
     <div class="day-grid">
       ${['A','B','C'].map(d => {
         const info = PROGRAM[phase][d];
@@ -1143,12 +1216,26 @@ function startWorkout(day) {
   const dayPlan = PROGRAM[phase][day];
   state.instrOpen = {};
   state.swapOpen = null;
+  state.exExpanded = {};
   state.activeWorkout = {
     phase, day,
     week: state.currentWeek,
     exercises: dayPlan.exercises.map(ex => buildExercise(ex, day)),
   };
   showTab('workout');
+}
+
+// Onko liikkeen kaikki sarjat merkitty valmiiksi?
+function isExDone(ex) {
+  if (ex.bilateral) return ex.sets.L.every(s=>s.done) && ex.sets.R.every(s=>s.done);
+  return ex.sets.every(s=>s.done);
+}
+
+// Avaa valmiiksi merkitty (tiivistetty) liike takaisin muokattavaksi.
+function expandEx(ei) {
+  if (!state.exExpanded) state.exExpanded = {};
+  state.exExpanded[ei] = true;
+  render();
 }
 
 // Vaihda liike toiseen kesken treenin (vain tälle kerralle).
@@ -1185,9 +1272,20 @@ function swapExercise(ei, altId) {
   render();
 }
 
+// Vaihtoehdot, jotka eivät ole jo mukana samassa treenissä (estää päällekkäisyyden).
+function availableAlternatives(ex, ei) {
+  const origId = ex.origId || ex.id;
+  const list = ALTERNATIVES[origId] || [];
+  const w = state.activeWorkout;
+  if (!w) return list;
+  const other = new Set();
+  w.exercises.forEach((e, i) => { if (i !== ei) { other.add(e.id); if (e.origId) other.add(e.origId); } });
+  return list.filter(a => !other.has(a.id));
+}
+
 function renderSwapPicker(ex, ei) {
   const origId = ex.origId || ex.id;
-  const alts = ALTERNATIVES[origId] || [];
+  const alts = availableAlternatives(ex, ei);
   const origName = (NAMES[origId] || {}).fi || origId;
   const rows = [`<div class="swap-opt ${ex.id===origId?'cur':''}" onclick="swapExercise(${ei},'${origId}')">${origName} <span style="color:var(--text3)">(alkuperäinen)</span>${ex.id===origId?' ✓':''}</div>`];
   alts.forEach(a => {
@@ -1217,19 +1315,21 @@ function renderWorkout() {
     return sum + ex.sets.filter(s=>s.done).length;
   }, 0);
   const allDone = doneSets === totalSets;
+  const exDone = w.exercises.filter(isExDone).length;
+  const pct = totalSets ? Math.round(doneSets/totalSets*100) : 0;
 
   return `
-    <div style="padding:14px 16px 6px;display:flex;align-items:center;justify-content:space-between">
-      <div>
+    <div class="wo-sticky">
+      <div class="wo-sticky-top">
         <div class="phase-badge">Päivä ${w.day} · Vaihe ${w.phase}</div>
-        <div style="font-size:13px;color:var(--text2);margin-top:6px">${doneSets}/${totalSets} sarjaa valmis</div>
+        <div class="wo-actions">
+          <button class="btn btn-sm btn-secondary" onclick="cancelWorkout()">Peruuta</button>
+          <button class="btn btn-sm wo-save ${allDone?'wo-save-ready':''}" onclick="finishWorkout()">${allDone?'Tallenna ✓':'Tallenna'}</button>
+        </div>
       </div>
-      <button class="btn btn-sm btn-secondary" onclick="cancelWorkout()">Peruuta</button>
-    </div>
-
-    <div style="padding:4px 16px 12px">
-      <div class="progress-bar" style="height:8px">
-        <div class="progress-fill" style="width:${totalSets?Math.round(doneSets/totalSets*100):0}%;background:var(--accent)"></div>
+      <div class="wo-progress-row">
+        <div class="progress-bar" style="height:6px;flex:1"><div class="progress-fill" style="width:${pct}%;background:var(--accent)"></div></div>
+        <div class="wo-progress-label">${doneSets}/${totalSets} sarjaa · ${exDone}/${w.exercises.length} liikettä</div>
       </div>
     </div>
 
@@ -1238,18 +1338,13 @@ function renderWorkout() {
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
       <div>
         <div class="done-text">Treeni valmis! 🎉</div>
-        <div class="done-sub">Tallenna tulokset klikkaamalla</div>
+        <div class="done-sub">Tallenna tulokset ylhäältä</div>
       </div>
-    </div>
-    <div style="padding:0 16px 12px">
-      <button class="btn btn-primary" style="width:100%;background:var(--green);color:#000" onclick="finishWorkout()">
-        Tallenna treeni
-      </button>
     </div>` : ''}
 
     ${w.exercises.map((ex,ei) => renderExerciseBlock(ex,ei)).join('')}
 
-    <div style="height:20px"></div>
+    <div style="height:24px"></div>
   `;
 }
 
@@ -1259,6 +1354,23 @@ function renderExerciseBlock(ex, ei) {
   const sets = isBilateral ? ex.sets[side] : ex.sets;
   const step = getStep(ex);
 
+  // Valmis liike näytetään tiivistettynä, ellei käyttäjä ole avannut sitä.
+  if (isExDone(ex) && !(state.exExpanded && state.exExpanded[ei])) {
+    const setCount = isBilateral ? ex.sets.L.length : ex.sets.length;
+    const summary = ex.isTime ? 'pito valmis' : `${setCount} sarjaa${isBilateral?' · V+O':''}`;
+    return `
+      <div class="ex-block ex-collapsed" onclick="expandEx(${ei})">
+        <div class="ex-collapsed-row">
+          <div class="ex-done-check"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div style="flex:1;min-width:0">
+            <div class="ex-name" style="font-size:15px">${ex.name}</div>
+            <div class="ex-collapsed-meta">${summary} · valmis</div>
+          </div>
+          <svg class="ex-collapsed-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>`;
+  }
+
   return `
     <div class="ex-block" id="ex-${ei}">
       <div class="ex-header">
@@ -1267,7 +1379,7 @@ function renderExerciseBlock(ex, ei) {
           ${ex.en ? `<div class="ex-name-en">${ex.en}</div>` : ''}
           ${ex.isRehab ? '<div class="rehab-badge">KUNTOUTUS</div>' : ''}
         </div>
-        ${(ALTERNATIVES[ex.origId || ex.id] || []).length ? `<button class="swap-btn" onclick="toggleSwap(${ei})">⇄ Vaihda</button>` : ''}
+        ${availableAlternatives(ex, ei).length ? `<button class="swap-btn" onclick="toggleSwap(${ei})">⇄ Vaihda</button>` : ''}
       </div>
       ${state.swapOpen===ei ? renderSwapPicker(ex, ei) : ''}
       <div class="ex-meta">${ex.sets.length || Object.values(ex.sets||{L:[]})[0]?.length || ex.sets} sarjaa × ${ex.reps}${ex.isTime ? '' : ' toistoa'}${ex.note ? ' · ' + ex.note : ''}</div>
@@ -1513,6 +1625,11 @@ function cancelWorkout() {
 
 function finishWorkout() {
   const w = state.activeWorkout;
+  if (!w) return;
+  const _tot = w.exercises.reduce((s,ex)=> s + (ex.bilateral ? ex.sets.L.length+ex.sets.R.length : ex.sets.length), 0);
+  const _done = w.exercises.reduce((s,ex)=> s + (ex.bilateral ? ex.sets.L.filter(x=>x.done).length+ex.sets.R.filter(x=>x.done).length : ex.sets.filter(x=>x.done).length), 0);
+  if (_done === 0) { alert('Merkitse vähintään yksi sarja valmiiksi ennen tallennusta.'); return; }
+  if (_done < _tot && !confirm(`${_tot-_done} sarjaa on vielä merkitsemättä. Tallennetaanko treeni silti? Vain valmiiksi merkityt sarjat kirjataan.`)) return;
   const now = new Date();
   const dateStr = now.toLocaleDateString('fi-FI', {weekday:'long',day:'numeric',month:'long'});
 
