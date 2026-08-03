@@ -247,6 +247,33 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .ex-done-check { width: 26px; height: 26px; border-radius: 50%; background: var(--green); color: #000; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .ex-collapsed-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
 .ex-collapsed-chev { width: 20px; height: 20px; color: var(--text3); flex-shrink: 0; }
+.prog-hint { margin: 0 16px 8px; background: rgba(124,106,240,0.12); border: 1px solid rgba(124,106,240,0.35); border-radius: 8px; padding: 8px 10px; font-size: 12px; color: var(--text); line-height: 1.4; }
+.add-ex-row { padding: 4px 16px 0; }
+.add-ex-btn { width: 100%; border-style: dashed; }
+.lib-panel { margin: 0 16px 12px; background: var(--surface); border: 1px solid var(--accent); border-radius: 14px; overflow: hidden; }
+.lib-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 12px 8px; }
+.lib-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 10px; }
+.lib-chip { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); border-radius: 20px; padding: 6px 11px; font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+.lib-chip.on { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+.lib-list { max-height: 340px; overflow-y: auto; }
+.lib-group { padding: 8px 14px 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); font-weight: 700; }
+.lib-item { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-top: 1px solid var(--border); cursor: pointer; }
+.lib-name { font-size: 14px; }
+.lib-meta { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: 'DM Mono', monospace; }
+.lib-add { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.rpe-card { margin: 14px 16px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+.rpe-title { font-size: 12px; color: var(--text2); margin-bottom: 10px; font-weight: 600; }
+.rpe-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rpe-btn { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+.rpe-btn.on { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+.vol-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.vol-label { font-size: 12px; color: var(--text2); width: 92px; flex-shrink: 0; }
+.vol-bar { flex: 1; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+.vol-fill { height: 100%; background: var(--accent); border-radius: 4px; }
+.vol-num { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; width: 26px; text-align: right; }
+.spd-item { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+.input { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 16px; padding: 10px; text-align: center; -webkit-appearance: none; }
+.input:focus { outline: none; border-color: var(--accent); }
 .rest-timer.done { background: var(--green); color: #000; }
 .rest-timer .rt-time { font-family: 'DM Mono', monospace; font-size: 24px; font-weight: 700; }
 .rest-timer .rt-label { flex: 1; font-size: 13px; font-weight: 600; }
@@ -508,7 +535,7 @@ const DAY_T1 = { title: "Takaketju + jalat", day: "Takaketju", teho:true,
   exercises: [
     { id:"md", name:"Maastaveto trap-tangolla", isRehab:true, sets:4, reps:8, defaultWeight:80 },
     { id:"ko", name:"Jalan koukistus laitteessa", isRehab:true, sets:4, reps:8, bilateral:true, defaultWeight:{L:50,R:55}, note:"painota — takaketjun ydin" },
-    { id:"la", name:"Yhden jalan lantionnosto korokkeella", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:12.5,R:12.5}, note:"lisää kuormaa pienin askelin" },
+    { id:"htb1", name:"Yhden jalan lantionnosto tangolla", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:20,R:20}, note:"fysion päivitys — tanko korokkeen tilalle" },
     { id:"ak", name:"Askelkyykky käsipainoilla", sets:3, reps:"10/jalka", defaultWeight:12, note:"kg/käsi · symmetria" },
     { id:"hab", name:"Lonkan loitonnus (abductor-laite)", sets:3, reps:15, defaultWeight:45, note:"lonkan hallinta, tukee juoksua" },
     { id:"had", name:"Lonkan lähennys (adductor-laite)", sets:3, reps:15, defaultWeight:45 },
@@ -605,6 +632,7 @@ const NAMES = {
   hs:  { fi:"Hack-kyykky",                          en:"Hack squat" },
   rdl: { fi:"Romanialainen maastaveto",            en:"Romanian deadlift" },
   htb: { fi:"Lantionnosto tangolla",               en:"Barbell hip thrust" },
+  htb1:{ fi:"Yhden jalan lantionnosto tangolla",   en:"Single-leg barbell hip thrust" },
   sc:  { fi:"Liukukelkkakoukistus",                en:"Slider hamstring curl" },
   tb:  { fi:"Tankopenkkipunnerrus",                en:"Barbell bench press" },
   pushup: { fi:"Punnerrus (kehonpaino)",           en:"Push-up" },
@@ -674,7 +702,8 @@ const I = {
   legpress2: { laite:"Jalkaprässi (molemmat jalat).", suoritus:"Molemmat jalat alustalle hartioiden leveydelle. Laske hallitusti kunnes polvet noin 90°, työnnä ylös lukitsematta polvia. Pidä alaselkä tuessa. Molemmilla jaloilla yhtä aikaa.", virhe:"Alaselkä irtoaa tuesta liian syvällä; lukitset polvet.", tuntuu:"Tuntuu etureisissä ja pakaroissa. Ei alaselässä." },
   hacksquat: { laite:"Hack-kyykkylaite.", suoritus:"Hartiat pehmusteita vasten, jalat alustalle. Kyykkää hallitusti alas, työnnä kantapäistä ylös. Etureisipainotteinen, vakaa liikerata.", virhe:"Kantapäät nousevat tai polvet painuvat sisään.", tuntuu:"Tuntuu etureisissä. Ei polvinivelessä terävänä." },
   rdl: { laite:"Levytanko.", suoritus:"Saranoi lantiosta taakse, polvet hieman koukussa. Laske kunnes tunnet takareiden venytyksen, selkä neutraalina. Nouse pakaroita jännittäen. Älä pakota syvemmälle kuin kivuton liikerata sallii — takareisi kuormittuu venytyksessä. (Voi tehdä myös käsipainoparilla.)", virhe:"Pyöristät selän tai teet kyykyn saranaliikkeen sijaan.", tuntuu:"Tuntuu takareisien venytyksenä ja pakarassa. Ei alaselässä." },
-  hipthrustbar: { laite:"Tanko + penkki (pehmuste lantiolle).", suoritus:"Yläselkä penkkiä vasten, tanko lantiolla. Työnnä lantio ylös kantapäistä, purista pakarat ääriasennossa, laske hallitusti. Leuka rintaan, ei alaselän yliojennusta.", virhe:"Yliojennat alaselkää ja leuka nousee ylös.", tuntuu:"Tuntuu pakaroissa. Ei alaselässä." },
+  hipthrust1bar: { laite:"Levytanko + penkki, lantiopehmuste tangon alle. Aloita kevyellä kuormalla — yhdellä jalalla tanko asettuu eri tavalla kuin kahdella.", suoritus:"Lapaluiden alaosa penkin reunaa vasten, tanko lantion päällä pehmusteen kanssa. Aseta työjalan kantapää lattiaan niin että ylhäällä polvi on ~90°; toinen jalka koukussa ilmassa tai kevyesti ojennettuna. Työnnä työjalan kantapäästä lantio ylös vaakatasoon, purista pakara 1–2 s, laske hallitusti. Pidä lantio suorassa — se ei saa kiertyä tyhjän jalan puolelle. Tee molemmat puolet, heikompi ensin.", virhe:"Lantio kiertyy tai putoaa toiselta puolelta, alaselkä yliojentuu, tai jalka on liian kaukana jolloin takareisi ottaa vetona pakaran sijaan.", tuntuu:"Tuntuu työjalan pakarassa. Ei alaselässä, eikä terävänä takareiden kiinnityskohdassa (istuinluu) — jos tuntuu, siirrä jalkaa lähemmäs ja kevennä." },
+  hipthrustbar: { laite:"Levytanko + penkki, lantiopehmuste (tai matto) tangon alle. Isoilla levyillä tanko rullaa paikalleen helpommin.", suoritus:"Istu lattialle penkki takana, lapaluiden alaosa penkin reunaa vasten. Tanko lantion päälle pehmusteen kanssa, jalat lattiassa hartioiden leveydellä niin että ylhäällä polvi on ~90°. Työnnä kantapäistä lantio ylös kunnes vartalo on vaakatasossa, purista pakarat 1–2 s, laske hallitusti. Leuka rintaan koko liikkeen ajan. Nosta kuormaa maltillisin askelin.", virhe:"Yliojennat alaselkää ylhäällä pakaran puristuksen sijaan, tai jalat ovat liian kaukana jolloin takareisi ottaa vetona.", tuntuu:"Tuntuu pakaroissa. Ei alaselässä, eikä terävänä takareiden kiinnityskohdassa (istuinluu) — jos tuntuu, siirrä jalkoja lähemmäs ja kevennä." },
   slidercurl: { laite:"Liukukiekot, pyyhe sileällä lattialla tai jumppapallo.", suoritus:"Selinmakuu, kantapäät liukuvalla alustalla. Nosta lantio siltaan, vedä kantapäät kohti pakaroita, ojenna hitaasti jarruttaen. Pidä lantio ylhäällä. Aloita kahdella jalalla.", virhe:"Lantio putoaa ojennusvaiheessa tai ojennat liian nopeasti.", tuntuu:"Tuntuu takareidessä. Jarruta ojennus hitaasti." },
   bbbench: { laite:"Levytanko + penkki.", suoritus:"Selkä penkissä, lavat yhteen, jalat maassa. Laske tanko rinnalle hallitusti, työnnä ylös. Käytä varmistajaa tai turvatankoja raskaalla painolla.", virhe:"Kyynärpäät leviävät 90°; selkäkaari kasvaa liian suureksi.", tuntuu:"Tuntuu rinnassa ja ojentajissa. Ei olkapäässä terävänä." },
   pushup2: { laite:"Kehonpaino.", suoritus:"Kädet hartioita leveämmällä, keho suorana kantapäistä päähän. Laske rinta lähelle lattiaa, työnnä ylös. Skaalaa polvilta jos tarpeen.", virhe:"Lantio roikkuu tai kyynärpäät leviävät suoraan sivulle.", tuntuu:"Tuntuu rinnassa, ojentajissa ja keskivartalossa." },
@@ -692,7 +721,7 @@ const INSTRUCTIONS = {
   poh:I.calves,
   jt:I.snatch, kp:I.mbkick, kl:I.mbhip,
   ak:I.lunge, hab:I.abductor, had:I.adductor,
-  fpp:I.legpress2, hs:I.hacksquat, rdl:I.rdl, htb:I.hipthrustbar, sc:I.slidercurl, tb:I.bbbench, pushup:I.pushup2, bpp:I.bbohp,
+  fpp:I.legpress2, hs:I.hacksquat, rdl:I.rdl, htb:I.hipthrustbar, htb1:I.hipthrust1bar, sc:I.slidercurl, tb:I.bbbench, pushup:I.pushup2, bpp:I.bbohp,
 };
 
 // ── VAIHTOEHTOISET LIIKKEET ───────────────────────────────────────────────────
@@ -704,7 +733,9 @@ const ALTERNATIVES = {
   fpp: [{id:'ky',w:80},{id:'hs',w:60}],
   ko:  [{id:'sc',w:0},{id:'nc',w:0}],
   md:  [{id:'rdl',w:60},{id:'htb',w:60}],
-  la:  [{id:'htb',w:60},{id:'ll',w:0}],
+  la:  [{id:'htb1',w:{L:20,R:20},bilateral:true},{id:'htb',w:60},{id:'ll',w:0}],
+  htb: [{id:'htb1',w:{L:20,R:20},bilateral:true},{id:'la',w:{L:12.5,R:12.5},bilateral:true},{id:'ll',w:0}],
+  htb1:[{id:'la',w:{L:12.5,R:12.5},bilateral:true},{id:'htb',w:60},{id:'ll',w:0}],
   ak:  [{id:'bs',w:12},{id:'fpp',w:150}],
   bs:  [{id:'ak',w:12},{id:'fpp',w:150}],
   pu:  [{id:'tb',w:50},{id:'vi',w:16},{id:'pd',w:35},{id:'pushup',w:0}],
@@ -731,7 +762,208 @@ const ALTERNATIVES = {
   sv:  [{id:'so',w:65},{id:'sk',w:20}],
 };
 
+// ── LIIKEKIRJASTO ─────────────────────────────────────────────────────────────
+// m = lihasryhmä (viikkovolyymin laskentaan), w = oletuspaino, s = sarjat, r = toistot.
+// Sama kartta palvelee sekä "lisää liike" -valitsinta että volyymiseurantaa.
+const LIB = {
+  // Takaketju
+  ko:  {m:'takareisi', w:{L:50,R:55}, s:4, r:8, bil:true},
+  md:  {m:'takareisi', w:80, s:4, r:8},
+  rdl: {m:'takareisi', w:60, s:3, r:10},
+  sc:  {m:'takareisi', w:0,  s:3, r:10},
+  nc:  {m:'takareisi', w:0,  s:3, r:6},
+  // Pakara
+  la:  {m:'pakara', w:{L:12.5,R:12.5}, s:3, r:10, bil:true},
+  htb: {m:'pakara', w:60, s:3, r:10},
+  htb1:{m:'pakara', w:{L:20,R:20}, s:3, r:10, bil:true},
+  ll:  {m:'pakara', w:0,  s:3, r:12},
+  // Etureisi
+  ky:  {m:'etureisi', w:90, s:4, r:8},
+  oj:  {m:'etureisi', w:{L:45,R:45}, s:3, r:10, bil:true},
+  fp:  {m:'etureisi', w:{L:150,R:150}, s:3, r:10, bil:true},
+  fpp: {m:'etureisi', w:150, s:3, r:10},
+  hs:  {m:'etureisi', w:60, s:3, r:10},
+  ak:  {m:'etureisi', w:12, s:3, r:'10/jalka'},
+  bs:  {m:'etureisi', w:12, s:3, r:'10/jalka'},
+  go:  {m:'etureisi', w:24, s:3, r:10},
+  // Lonkka
+  hab: {m:'lonkka', w:45, s:3, r:15},
+  had: {m:'lonkka', w:45, s:3, r:15},
+  // Pohkeet
+  poh: {m:'pohkeet', w:60, s:3, r:15},
+  // Rinta
+  pu:  {m:'rinta', w:20, s:4, r:8},
+  vi:  {m:'rinta', w:16, s:3, r:10},
+  pd:  {m:'rinta', w:35, s:3, r:12},
+  tb:  {m:'rinta', w:50, s:3, r:8},
+  pushup: {m:'rinta', w:0, s:3, r:12},
+  // Hartiat
+  hp:  {m:'hartiat', w:18, s:4, r:8},
+  sh:  {m:'hartiat', w:16, s:3, r:10},
+  si:  {m:'hartiat', w:8,  s:4, r:12},
+  bpp: {m:'hartiat', w:30, s:3, r:8},
+  // Selkä
+  av:  {m:'selka', w:85, s:4, r:10},
+  so:  {m:'selka', w:65, s:4, r:10},
+  sk:  {m:'selka', w:20, s:3, r:12},
+  sv:  {m:'selka', w:50, s:3, r:10},
+  ks:  {m:'selka', w:60, s:3, r:15},
+  // Kädet
+  bk:  {m:'kadet', w:14, s:3, r:12},
+  hk:  {m:'kadet', w:14, s:3, r:12},
+  tp:  {m:'kadet', w:55, s:3, r:12},
+  to:  {m:'kadet', w:12, s:3, r:12},
+  // Keskivartalo
+  cr:  {m:'keskivartalo', w:90, s:3, r:15},
+  rt:  {m:'keskivartalo', w:90, s:3, r:15},
+  wc:  {m:'keskivartalo', w:20, s:3, r:12},
+  pl:  {m:'keskivartalo', w:0, s:3, r:'45s', time:true},
+  sp:  {m:'keskivartalo', w:0, s:3, r:'30s/puoli', time:true},
+  hl:  {m:'keskivartalo', w:0, s:3, r:12},
+  // Nopeus (fysion liikkeet)
+  jt:  {m:'nopeus', w:8, s:4, r:'4/puoli'},
+  kp:  {m:'nopeus', w:4, s:3, r:'8-10'},
+  kl:  {m:'nopeus', w:4, s:3, r:'8/puoli'},
+};
+
+const MUSCLE_LABELS = {
+  takareisi:'Takareisi', pakara:'Pakara', etureisi:'Etureisi', lonkka:'Lonkka',
+  pohkeet:'Pohkeet', rinta:'Rinta', hartiat:'Hartiat', selka:'Selkä',
+  kadet:'Kädet', keskivartalo:'Keskivartalo', nopeus:'Nopeus',
+};
+// Ohjelman liikkeet, joita ei ole kirjastossa omana rivinään (aliakset volyymiin)
+const MUSCLE_ALIAS = { av2:'selka', av3:'selka', fp2:'selka', ks3:'selka', ts:'kadet',
+  ks2:'kadet', ab:'keskivartalo', spr:'keskivartalo', wc2:'keskivartalo',
+  bs2:'etureisi', nc2:'takareisi', ss:'rinta', ss2:'rinta' };
+
+function muscleOf(id) { return (LIB[id] && LIB[id].m) || MUSCLE_ALIAS[id] || null; }
+
 function getInstr(id) { return INSTRUCTIONS[id] || null; }
+
+// ── PROGRESSIOEHDOTUS ─────────────────────────────────────────────────────────
+// Jos viime kerralla kaikki suunnitellut sarjat tulivat täysillä toistoilla
+// samalla painolla, ehdota yhtä porrasta lisää.
+function progressionHint(ex, day) {
+  if (ex.isTime) return null;
+  const side = ex.bilateral ? (ex.activeSide || 'L') : null;
+  const last = getLastPerformance(ex.name, side, day, ex.id);
+  if (!last || !last.sets || !last.sets.length) return null;
+  const target = typeof ex.reps === 'number' ? ex.reps
+    : (String(ex.reps).match(/\d+/) ? parseInt(String(ex.reps).match(/\d+/)[0]) : 8);
+  const planned = ex.bilateral ? ex.sets[side].length : ex.sets.length;
+  if (last.sets.length < planned) return null;
+  const w0 = last.sets[0].weight;
+  const allFull = last.sets.every(s => s.reps >= target && s.weight >= w0);
+  if (!allFull || w0 <= 0) return null;
+  const next = w0 + getStep(ex);
+  return { from: w0, next, side };
+}
+
+// ── VIIKKOVOLYYMI LIHASRYHMITTÄIN ─────────────────────────────────────────────
+function weeklyVolume(week) {
+  const out = {};
+  state.sessions.filter(s => s.week === week).forEach(s => {
+    (s.exercises || []).forEach(e => {
+      const m = muscleOf(e.id);
+      if (!m) return;
+      const n = e.bilateral
+        ? ((e.setsL || []).length + (e.setsR || []).length)
+        : (e.sets || []).length;
+      out[m] = (out[m] || 0) + n;
+    });
+  });
+  return out;
+}
+
+// ── LISÄÄ LIIKE TREENIIN ──────────────────────────────────────────────────────
+function toggleLibrary() {
+  state.libOpen = !state.libOpen;
+  state.libFilter = state.libFilter || null;
+  render();
+}
+function setLibFilter(m) {
+  state.libFilter = state.libFilter === m ? null : m;
+  render();
+}
+function addLibExercise(id) {
+  const w = state.activeWorkout;
+  if (!w) return;
+  const meta = LIB[id];
+  if (!meta) return;
+  const nm = NAMES[id] || { fi:id, en:'' };
+  const built = buildExercise({
+    id, name: nm.fi, en: nm.en,
+    bilateral: !!meta.bil, isTime: !!meta.time,
+    defaultWeight: meta.w, sets: meta.s, reps: meta.r,
+  }, w.day);
+  built.extra = true;
+  w.exercises.push(built);
+  state.libOpen = false;
+  state.libFilter = null;
+  render();
+  setTimeout(() => {
+    const el = document.getElementById('ex-' + (w.exercises.length - 1));
+    if (el && el.scrollIntoView) el.scrollIntoView({behavior:'smooth', block:'center'});
+  }, 60);
+}
+function removeExtraExercise(ei) {
+  const w = state.activeWorkout;
+  if (!w) return;
+  if (!confirm('Poistetaanko lisätty liike treenistä?')) return;
+  w.exercises.splice(ei, 1);
+  render();
+}
+function renderLibrary() {
+  const w = state.activeWorkout;
+  const inWorkout = new Set(w.exercises.map(e => e.origId || e.id));
+  const groups = {};
+  Object.keys(LIB).forEach(id => {
+    if (inWorkout.has(id)) return;
+    const m = LIB[id].m;
+    (groups[m] = groups[m] || []).push(id);
+  });
+  const keys = Object.keys(MUSCLE_LABELS).filter(m => groups[m] && groups[m].length);
+  const active = state.libFilter && groups[state.libFilter] ? state.libFilter : null;
+  const chips = keys.map(m =>
+    `<button class="lib-chip ${active===m?'on':''}" onclick="setLibFilter('${m}')">${MUSCLE_LABELS[m]}</button>`
+  ).join('');
+  const shown = active ? [active] : keys;
+  const list = shown.map(m => `
+    <div class="lib-group">${MUSCLE_LABELS[m]}</div>
+    ${groups[m].map(id => {
+      const meta = LIB[id];
+      return `<div class="lib-item" onclick="addLibExercise('${id}')">
+        <div style="flex:1;min-width:0">
+          <div class="lib-name">${(NAMES[id]||{}).fi || id}</div>
+          <div class="lib-meta">${meta.s} × ${meta.r}${meta.bil?' · V/O':''}</div>
+        </div>
+        <div class="lib-add">+</div>
+      </div>`;
+    }).join('')}
+  `).join('');
+  return `<div class="lib-panel">
+    <div class="lib-head">
+      <div class="swap-title" style="margin:0">Lisää liike tähän treeniin</div>
+      <button class="btn btn-sm btn-secondary" onclick="toggleLibrary()">Sulje</button>
+    </div>
+    <div class="lib-chips">${chips}</div>
+    <div class="lib-list">${list || '<div style="padding:12px;color:var(--text3);font-size:13px">Kaikki kirjaston liikkeet ovat jo treenissä.</div>'}</div>
+  </div>`;
+}
+
+// ── FIILIS (RPE) ──────────────────────────────────────────────────────────────
+const RPE_OPTS = [
+  {v:1, label:'Helppo'},
+  {v:2, label:'Sopiva'},
+  {v:3, label:'Raskas'},
+  {v:4, label:'Liian raskas'},
+];
+function setRpe(v) {
+  if (!state.activeWorkout) return;
+  state.activeWorkout.rpe = state.activeWorkout.rpe === v ? null : v;
+  render();
+}
+function rpeLabel(v) { const o = RPE_OPTS.find(x=>x.v===v); return o ? o.label : null; }
 
 // Painon säätöporras liikkeen tyypin mukaan:
 // kahvakuula 2 kg · käsipainot 1 kg · muut (tanko/laite/kaapeli) 5 kg
@@ -777,6 +1009,9 @@ let state = {
   restTimer: null,    // {remaining, total, interval}
   runs: [],           // [{id, date, dateStr, week, distance, durationSec, type}]
   runDraft: { distance: 5, min: 30, sec: 0, type: 'Rauhallinen' },
+  libOpen: false,
+  libFilter: null,
+  speedSessions: [],  // [{id, date, dateStr, week, type, s1, s2, s3, note}]
 };
 
 function getPhase(week) {
@@ -922,6 +1157,7 @@ function save() {
     goals: state.goals,
     measurements: state.measurements,
     runs: state.runs,
+    speedSessions: state.speedSessions,
     lastBackup: state.lastBackup || null,
   }));
 }
@@ -934,6 +1170,7 @@ function load() {
       state.sessions = d.sessions || [];
       state.measurements = d.measurements || [];
       state.runs = d.runs || [];
+      state.speedSessions = d.speedSessions || [];
       state.lastBackup = d.lastBackup || null;
       // Aloita aina tuoreista tavoitemäärittelyistä (match/auto/weeks),
       // mutta säilytä käyttäjän tallentamat nykyiset arvot ja tavoitteet.
@@ -1217,6 +1454,8 @@ function startWorkout(day) {
   state.instrOpen = {};
   state.swapOpen = null;
   state.exExpanded = {};
+  state.libOpen = false;
+  state.libFilter = null;
   state.activeWorkout = {
     phase, day,
     week: state.currentWeek,
@@ -1342,7 +1581,20 @@ function renderWorkout() {
       </div>
     </div>` : ''}
 
+    ${state.libOpen ? renderLibrary() : ''}
+
     ${w.exercises.map((ex,ei) => renderExerciseBlock(ex,ei)).join('')}
+
+    <div class="add-ex-row">
+      <button class="btn btn-secondary add-ex-btn" onclick="toggleLibrary()">＋ Lisää liike tähän treeniin</button>
+    </div>
+
+    <div class="rpe-card">
+      <div class="rpe-title">Fiilis treenin jälkeen</div>
+      <div class="rpe-opts">
+        ${RPE_OPTS.map(o => `<button class="rpe-btn ${w.rpe===o.v?'on':''}" onclick="setRpe(${o.v})">${o.label}</button>`).join('')}
+      </div>
+    </div>
 
     <div style="height:24px"></div>
   `;
@@ -1380,9 +1632,12 @@ function renderExerciseBlock(ex, ei) {
           ${ex.isRehab ? '<div class="rehab-badge">KUNTOUTUS</div>' : ''}
         </div>
         ${availableAlternatives(ex, ei).length ? `<button class="swap-btn" onclick="toggleSwap(${ei})">⇄ Vaihda</button>` : ''}
+        ${ex.extra ? `<button class="swap-btn" style="color:var(--text3)" onclick="removeExtraExercise(${ei})">✕</button>` : ''}
       </div>
       ${state.swapOpen===ei ? renderSwapPicker(ex, ei) : ''}
-      <div class="ex-meta">${ex.sets.length || Object.values(ex.sets||{L:[]})[0]?.length || ex.sets} sarjaa × ${ex.reps}${ex.isTime ? '' : ' toistoa'}${ex.note ? ' · ' + ex.note : ''}</div>
+      <div class="ex-meta">${ex.sets.length || Object.values(ex.sets||{L:[]})[0]?.length || ex.sets} sarjaa × ${ex.reps}${ex.isTime ? '' : ' toistoa'}${ex.note ? ' · ' + ex.note : ''}${ex.extra ? ' · <span style="color:var(--accent2)">lisätty</span>' : ''}</div>
+      ${(() => { const h = progressionHint(ex, state.activeWorkout.day); return h
+        ? `<div class="prog-hint">📈 Viimeksi kaikki sarjat täyteen ${h.from} kg:lla${h.side?` (${h.side==='L'?'vasen':'oikea'})`:''} — kokeile <b>${h.next} kg</b></div>` : ''; })()}
 
       ${(() => {
         const instr = getInstr(ex.id);
@@ -1646,6 +1901,7 @@ function finishWorkout() {
     phase: w.phase,
     week: w.week,
     totalSets,
+    rpe: w.rpe || null,
     exercises: w.exercises.map(ex => {
       if (ex.bilateral) {
         return { id: ex.id, name: ex.name, bilateral: true, isRehab: ex.isRehab, isTime: ex.isTime,
@@ -1917,6 +2173,23 @@ function renderGoals() {
       <b style="color:var(--text)">Näin tavoitteet toimivat:</b> Voima- ja jalkaprässitavoitteet päivittyvät automaattisesti treeniesi perusteella. Fysioterapian testitulokset (puoliero, H:Q, polven koukistus) päivität itse "Päivitä"-napilla mittausten jälkeen. Kun saavutat välietapin etuajassa, voit nostaa tavoitetta — uusi tavoite säilyttää saman kehitysvauhdin.
     </div>
 
+    <div class="section-header">📊 VIIKKOVOLYYMI (VKO ${state.currentWeek})</div>
+    <div class="card" style="margin-top:0">
+      ${(() => {
+        const vol = weeklyVolume(state.currentWeek);
+        const keys = Object.keys(MUSCLE_LABELS).filter(m => vol[m]);
+        if (!keys.length) return '<div style="font-size:13px;color:var(--text3)">Ei vielä kirjattuja sarjoja tällä viikolla.</div>';
+        const max = Math.max(...keys.map(m => vol[m]));
+        return keys.map(m => `
+          <div class="vol-row">
+            <div class="vol-label">${MUSCLE_LABELS[m]}</div>
+            <div class="vol-bar"><div class="vol-fill" style="width:${Math.round(vol[m]/max*100)}%"></div></div>
+            <div class="vol-num">${vol[m]}</div>
+          </div>`).join('') +
+          `<div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5">Sarjoja lihasryhmittäin tällä viikolla. Puolikohtaiset liikkeet lasketaan molemmat puolet erikseen.</div>`;
+      })()}
+    </div>
+
     <div class="section-header">📋 KOOSTE VALMENTAJALLE</div>
     <div class="card" style="margin-top:0">
       <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">
@@ -2100,12 +2373,27 @@ function buildCoachSummary() {
       const w = ex.sets && ex.sets.length ? Math.max(...ex.sets.map(x=>x.weight)) : 0;
       return ex.name + ' ' + w + 'kg';
     }).join('; ');
-    L.push('- ' + s.dateStr + ' (Päivä ' + s.day + '): ' + key);
+    L.push('- ' + s.dateStr + ' (Päivä ' + s.day + ')' + (s.rpe ? ' [fiilis: ' + rpeLabel(s.rpe) + ']' : '') + ': ' + key);
   });
+  const _vol = weeklyVolume(state.currentWeek);
+  const _vk = Object.keys(MUSCLE_LABELS).filter(m => _vol[m]);
+  if (_vk.length) {
+    L.push('');
+    L.push('VIIKKOVOLYYMI (sarjoja, vko ' + state.currentWeek + ')');
+    L.push('- ' + _vk.map(m => MUSCLE_LABELS[m] + ' ' + _vol[m]).join(', '));
+  }
+  if (state.speedSessions && state.speedSessions.length) {
+    L.push('');
+    L.push('NOPEUSHARJOITUKSET (fysion protokolla)');
+    state.speedSessions.slice(-5).reverse().forEach(s => {
+      L.push('- ' + s.dateStr + ': ' + (s.type === 'sprintti'
+        ? 'sprinttitreeni, portaat L1 ' + s.s1 + ' / L2 ' + s.s2 + ' / L3 ' + s.s3
+        : 'kotinopeus (kuntopallo)'));
+    });
+  }
   if (state.runs.length) {
     L.push('');
-    L.push('VIIMEISIMMÄT LENKIT');
-    state.runs.slice(-5).reverse().forEach(r => {
+    L.push('VIIMEISIMMÄT LENKIT');    state.runs.slice(-5).reverse().forEach(r => {
       L.push('- ' + r.dateStr + ': ' + r.distance.toFixed(1) + ' km, ' + formatClock(r.durationSec) + ', ' + formatPace(r.durationSec/r.distance) + '/km (' + r.type + ')');
     });
   }
@@ -2250,6 +2538,29 @@ function deleteRun(id) {
   render();
 }
 
+function addSpeedSession(type) {
+  const now = new Date();
+  const g = id => { const el = document.getElementById(id); return el ? parseInt(el.value) || 1 : 1; };
+  const s = {
+    id: Date.now(),
+    date: now.toISOString().slice(0,10),
+    dateStr: now.toLocaleDateString('fi-FI', {weekday:'short', day:'numeric', month:'numeric'}),
+    week: state.currentWeek,
+    type,
+  };
+  if (type === 'sprintti') { s.s1 = g('spd1'); s.s2 = g('spd2'); s.s3 = g('spd3'); }
+  state.speedSessions.push(s);
+  save();
+  render();
+  showToast(type === 'sprintti' ? 'Sprinttitreeni kirjattu ⚡' : 'Kotinopeus kirjattu ⚡');
+}
+function deleteSpeedSession(id) {
+  if (!confirm('Poistetaanko merkintä?')) return;
+  state.speedSessions = state.speedSessions.filter(s => s.id !== id);
+  save();
+  render();
+}
+
 function renderRuns() {
   const st = runStats();
   const d = state.runDraft;
@@ -2316,6 +2627,40 @@ function renderRuns() {
     <div class="card chart-card" style="margin-top:0">
       ${lineChart(kmSeries, { color:'var(--accent)', unit:' km' })}
     </div>` : ''}
+
+    <div class="section-header">⚡ NOPEUSHARJOITUKSET (FYSIO)</div>
+    <div class="card" style="margin-top:0">
+      <div style="font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:12px">
+        Kirjaa sprinttisessio ja millä portaalla kutakin lappua olet. Ehdotus on aina edellinen porras + 1.
+      </div>
+      ${(() => {
+        const last = [...state.speedSessions].reverse().find(s => s.type === 'sprintti');
+        const n = k => Math.min(13, ((last && last[k]) || 0) + 1);
+        return `
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+          <div><div style="font-size:10px;color:var(--text3);margin-bottom:4px">L1 Valmistelu</div>
+            <input id="spd1" type="number" min="1" max="10" value="${n('s1')}" class="input" style="width:100%"></div>
+          <div><div style="font-size:10px;color:var(--text3);margin-bottom:4px">L2 Kiihdytys</div>
+            <input id="spd2" type="number" min="1" max="13" value="${n('s2')}" class="input" style="width:100%"></div>
+          <div><div style="font-size:10px;color:var(--text3);margin-bottom:4px">L3 Toistosprintti</div>
+            <input id="spd3" type="number" min="1" max="12" value="${n('s3')}" class="input" style="width:100%"></div>
+        </div>`;
+      })()}
+      <button class="btn btn-primary" style="width:100%;margin-bottom:8px" onclick="addSpeedSession('sprintti')">Kirjaa sprinttitreeni</button>
+      <button class="btn btn-secondary" style="width:100%" onclick="addSpeedSession('koti')">Kirjaa kotinopeus (kuntopallo)</button>
+
+      ${state.speedSessions.length ? `
+      <div style="margin-top:16px">
+        ${[...state.speedSessions].reverse().slice(0,8).map(s => `
+          <div class="spd-item">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px">${s.type === 'sprintti' ? 'Sprinttitreeni' : 'Kotinopeus'}</div>
+              <div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">${s.dateStr}${s.type==='sprintti' ? ` · L1 ${s.s1} / L2 ${s.s2} / L3 ${s.s3}` : ''}</div>
+            </div>
+            <button class="swap-btn" style="color:var(--text3)" onclick="deleteSpeedSession(${s.id})">✕</button>
+          </div>`).join('')}
+      </div>` : ''}
+    </div>
 
     <div class="section-header">LENKIT (${state.runs.length})</div>
     ${state.runs.length === 0 ? `
