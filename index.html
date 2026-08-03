@@ -261,11 +261,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .lib-name { font-size: 14px; }
 .lib-meta { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: 'DM Mono', monospace; }
 .lib-add { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-.rpe-card { margin: 14px 16px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
-.rpe-title { font-size: 12px; color: var(--text2); margin-bottom: 10px; font-weight: 600; }
-.rpe-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.rpe-btn { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; }
-.rpe-btn.on { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+.ex-rpe { display: flex; align-items: center; gap: 6px; padding: 4px 16px 14px; flex-wrap: wrap; }
+.ex-rpe-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); font-weight: 700; margin-right: 2px; }
+.ex-rpe-btn { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); border-radius: 20px; padding: 6px 11px; font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+.ex-rpe-btn.on { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
 .vol-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 .vol-label { font-size: 12px; color: var(--text2); width: 92px; flex-shrink: 0; }
 .vol-bar { flex: 1; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
@@ -855,8 +854,10 @@ function progressionHint(ex, day) {
   const w0 = last.sets[0].weight;
   const allFull = last.sets.every(s => s.reps >= target && s.weight >= w0);
   if (!allFull || w0 <= 0) return null;
-  const next = w0 + getStep(ex);
-  return { from: w0, next, side };
+  // Fiilis ohjaa askeleen kokoa: "liian raskas" → ei ehdotusta, "helppo" → tuplaporras.
+  if (last.rpe === 4) return null;
+  const step = getStep(ex) * (last.rpe === 1 ? 2 : 1);
+  return { from: w0, next: w0 + step, side, rpe: last.rpe };
 }
 
 // ── VIIKKOVOLYYMI LIHASRYHMITTÄIN ─────────────────────────────────────────────
@@ -953,14 +954,16 @@ function renderLibrary() {
 
 // ── FIILIS (RPE) ──────────────────────────────────────────────────────────────
 const RPE_OPTS = [
-  {v:1, label:'Helppo'},
-  {v:2, label:'Sopiva'},
-  {v:3, label:'Raskas'},
-  {v:4, label:'Liian raskas'},
+  {v:1, label:'Helppo',       short:'Helppo'},
+  {v:2, label:'Sopiva',       short:'Sopiva'},
+  {v:3, label:'Raskas',       short:'Raskas'},
+  {v:4, label:'Liian raskas', short:'Liikaa'},
 ];
-function setRpe(v) {
-  if (!state.activeWorkout) return;
-  state.activeWorkout.rpe = state.activeWorkout.rpe === v ? null : v;
+function setExRpe(ei, v) {
+  const w = state.activeWorkout;
+  if (!w || !w.exercises[ei]) return;
+  const ex = w.exercises[ei];
+  ex.rpe = ex.rpe === v ? null : v;
   render();
 }
 function rpeLabel(v) { const o = RPE_OPTS.find(x=>x.v===v); return o ? o.label : null; }
@@ -1033,7 +1036,7 @@ function getLastPerformance(exName, side, dayLetter, exId) {
     let sets = ex.bilateral ? (side === 'R' ? ex.setsR : ex.setsL) : ex.sets;
     if (!sets || !sets.length) continue;
     const top = sets.reduce((a, b) => b.weight > a.weight ? b : a, sets[0]);
-    return { weight: top.weight, reps: top.reps, dateStr: s.dateStr, sets };
+    return { weight: top.weight, reps: top.reps, dateStr: s.dateStr, sets, rpe: ex.rpe || null };
   }
   return null;
 }
@@ -1589,13 +1592,6 @@ function renderWorkout() {
       <button class="btn btn-secondary add-ex-btn" onclick="toggleLibrary()">＋ Lisää liike tähän treeniin</button>
     </div>
 
-    <div class="rpe-card">
-      <div class="rpe-title">Fiilis treenin jälkeen</div>
-      <div class="rpe-opts">
-        ${RPE_OPTS.map(o => `<button class="rpe-btn ${w.rpe===o.v?'on':''}" onclick="setRpe(${o.v})">${o.label}</button>`).join('')}
-      </div>
-    </div>
-
     <div style="height:24px"></div>
   `;
 }
@@ -1616,7 +1612,7 @@ function renderExerciseBlock(ex, ei) {
           <div class="ex-done-check"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
           <div style="flex:1;min-width:0">
             <div class="ex-name" style="font-size:15px">${ex.name}</div>
-            <div class="ex-collapsed-meta">${summary} · valmis</div>
+            <div class="ex-collapsed-meta">${summary} · valmis${ex.rpe ? ' · ' + rpeLabel(ex.rpe).toLowerCase() : ''}</div>
           </div>
           <svg class="ex-collapsed-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
@@ -1637,7 +1633,7 @@ function renderExerciseBlock(ex, ei) {
       ${state.swapOpen===ei ? renderSwapPicker(ex, ei) : ''}
       <div class="ex-meta">${ex.sets.length || Object.values(ex.sets||{L:[]})[0]?.length || ex.sets} sarjaa × ${ex.reps}${ex.isTime ? '' : ' toistoa'}${ex.note ? ' · ' + ex.note : ''}${ex.extra ? ' · <span style="color:var(--accent2)">lisätty</span>' : ''}</div>
       ${(() => { const h = progressionHint(ex, state.activeWorkout.day); return h
-        ? `<div class="prog-hint">📈 Viimeksi kaikki sarjat täyteen ${h.from} kg:lla${h.side?` (${h.side==='L'?'vasen':'oikea'})`:''} — kokeile <b>${h.next} kg</b></div>` : ''; })()}
+        ? `<div class="prog-hint">📈 Viimeksi kaikki sarjat täyteen ${h.from} kg:lla${h.side?` (${h.side==='L'?'vasen':'oikea'})`:''}${h.rpe===1?' ja tuntui helpolta':''} — kokeile <b>${h.next} kg</b></div>` : ''; })()}
 
       ${(() => {
         const instr = getInstr(ex.id);
@@ -1718,6 +1714,11 @@ function renderExerciseBlock(ex, ei) {
           </button>
         </div>
       </div>`).join('')}
+
+      <div class="ex-rpe">
+        <span class="ex-rpe-label">Fiilis</span>
+        ${RPE_OPTS.map(o => `<button class="ex-rpe-btn ${ex.rpe===o.v?'on':''}" onclick="setExRpe(${ei},${o.v})">${o.short}</button>`).join('')}
+      </div>
     </div>
   `;
 }
@@ -1901,13 +1902,12 @@ function finishWorkout() {
     phase: w.phase,
     week: w.week,
     totalSets,
-    rpe: w.rpe || null,
     exercises: w.exercises.map(ex => {
       if (ex.bilateral) {
-        return { id: ex.id, name: ex.name, bilateral: true, isRehab: ex.isRehab, isTime: ex.isTime,
+        return { id: ex.id, name: ex.name, bilateral: true, isRehab: ex.isRehab, isTime: ex.isTime, rpe: ex.rpe || null,
           setsL: ex.sets.L.filter(s=>s.done), setsR: ex.sets.R.filter(s=>s.done) };
       }
-      return { id: ex.id, name: ex.name, isRehab: ex.isRehab, isTime: ex.isTime, sets: ex.sets.filter(s=>s.done) };
+      return { id: ex.id, name: ex.name, isRehab: ex.isRehab, isTime: ex.isTime, rpe: ex.rpe || null, sets: ex.sets.filter(s=>s.done) };
     })
   };
 
@@ -2364,16 +2364,16 @@ function buildCoachSummary() {
       if (ex.bilateral) {
         const wl = ex.setsL && ex.setsL.length ? Math.max(...ex.setsL.map(x=>x.weight)) : 0;
         const wr = ex.setsR && ex.setsR.length ? Math.max(...ex.setsR.map(x=>x.weight)) : 0;
-        return ex.name + ' V' + wl + '/O' + wr + 'kg';
+        return ex.name + ' V' + wl + '/O' + wr + 'kg' + (ex.rpe ? ' [' + rpeLabel(ex.rpe).toLowerCase() + ']' : '');
       }
       if (ex.isTime) {
         const sec = ex.sets && ex.sets.length ? Math.max(...ex.sets.map(x=>x.reps)) : 0;
-        return ex.name + ' ' + sec + 's';
+        return ex.name + ' ' + sec + 's' + (ex.rpe ? ' [' + rpeLabel(ex.rpe).toLowerCase() + ']' : '');
       }
       const w = ex.sets && ex.sets.length ? Math.max(...ex.sets.map(x=>x.weight)) : 0;
-      return ex.name + ' ' + w + 'kg';
+      return ex.name + ' ' + w + 'kg' + (ex.rpe ? ' [' + rpeLabel(ex.rpe).toLowerCase() + ']' : '');
     }).join('; ');
-    L.push('- ' + s.dateStr + ' (Päivä ' + s.day + ')' + (s.rpe ? ' [fiilis: ' + rpeLabel(s.rpe) + ']' : '') + ': ' + key);
+    L.push('- ' + s.dateStr + ' (Päivä ' + s.day + '): ' + key);
   });
   const _vol = weeklyVolume(state.currentWeek);
   const _vk = Object.keys(MUSCLE_LABELS).filter(m => _vol[m]);
