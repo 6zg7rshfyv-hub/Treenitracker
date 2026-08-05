@@ -545,10 +545,10 @@ const DAY_T1 = { title: "Takaketju + jalat", day: "Takaketju", teho:true,
 const DAY_T2 = { title: "Rinta + hartiat", day: "Rinta+hartiat", teho:true,
   exercises: [
     { id:"pu", name:"Käsipainopunnerrus tasapenkillä", sets:4, reps:8, defaultWeight:20, note:"kg/käsi · painopiste" },
-    { id:"hp", name:"Käsipainohartiaprässi (istuen)", sets:4, reps:8, defaultWeight:18, note:"kg/käsi" },
     { id:"vi", name:"Vinopenkkipunnerrus käsipainoilla", sets:3, reps:10, defaultWeight:14, note:"kg/käsi" },
-    { id:"si", name:"Sivunostot käsipainoilla", sets:4, reps:12, defaultWeight:8, note:"kg/käsi" },
     { id:"pd", name:"Rintojen lähennys (pec deck)", sets:3, reps:12, defaultWeight:35 },
+    { id:"hp", name:"Käsipainohartiaprässi (istuen)", sets:4, reps:8, defaultWeight:18, note:"kg/käsi" },
+    { id:"si", name:"Sivunostot käsipainoilla", sets:4, reps:12, defaultWeight:8, note:"kg/käsi" },
     { id:"tp", name:"Ojentajan taljaveto", sets:3, reps:12, defaultWeight:55 },
     { id:"ks", name:"Kasvoveto taljassa", sets:3, reps:15, defaultWeight:60, note:"veto-tasapaino + olkapään terveys" },
   ]
@@ -557,9 +557,9 @@ const DAY_T2 = { title: "Rinta + hartiat", day: "Rinta+hartiat", teho:true,
 const DAY_T3 = { title: "Etureisi (ylläpito) + core", day: "Etureisi+core", teho:true,
   exercises: [
     { id:"ky", name:"Takakyykky", sets:4, reps:8, defaultWeight:90 },
+    { id:"bs", name:"Bulgarian askelkyykky", sets:3, reps:"10/jalka", defaultWeight:10, note:"kg/käsi · symmetria" },
     { id:"oj", name:"Jalan ojennus laitteessa", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:45,R:45}, note:"ylläpito, kevennetty" },
     { id:"ko", name:"Jalan koukistus laitteessa", isRehab:true, sets:3, reps:10, bilateral:true, defaultWeight:{L:40,R:45}, note:"kevyt — takareisi 2×/vk" },
-    { id:"bs", name:"Bulgarian askelkyykky", sets:3, reps:"10/jalka", defaultWeight:10, note:"kg/käsi · symmetria" },
     { id:"poh", name:"Pohkeennostot", sets:3, reps:15, defaultWeight:60, note:"tukee juoksua" },
     { id:"cr", name:"Vatsarutistus taljassa", sets:3, reps:15, defaultWeight:90 },
     { id:"rt", name:"Vartalon kierto (laite)", sets:3, reps:15, defaultWeight:90 },
@@ -578,6 +578,19 @@ const DAY_T4 = { title: "Selkä + rinta/hartiat vahvistus", day: "Selkä+vahvist
 };
 
 [1,2,3].forEach(p => { PROGRAM[p].T1 = DAY_T1; PROGRAM[p].T2 = DAY_T2; PROGRAM[p].T3 = DAY_T3; PROGRAM[p].T4 = DAY_T4; });
+
+// Kiiretreeni: päivän 3 tärkeintä liikettä. Säilyttää takareiden 2×/vk -frekvenssin
+// ja veto/työntö-tasapainon myös silloin kun aikaa on vain ~30 min.
+const QUICK = {
+  T1: ['md','ko','htb1'],
+  T2: ['pu','hp','ks'],
+  T3: ['ky','ko','bs'],
+  T4: ['av','so','vi'],
+  A:  ['ky','ko','av'],
+  B:  ['md','pu','so'],
+  C:  ['fp','ko','av'],
+  D:  null, E: null,
+};
 
 // ── LIIKKEIDEN NIMET (suomi + englanti) ───────────────────────────────────────
 // Keskitetty nimikartta id:n mukaan. Yhtenäistää nimet kaikissa vaiheissa ja
@@ -880,7 +893,12 @@ function weeklyVolume(week) {
 function toggleLibrary() {
   state.libOpen = !state.libOpen;
   state.libFilter = state.libFilter || null;
+  const opening = state.libOpen;
   render();
+  if (opening) setTimeout(() => {
+    const el = document.getElementById('lib-anchor');
+    if (el && el.scrollIntoView) el.scrollIntoView({behavior:'smooth', block:'center'});
+  }, 60);
 }
 function setLibFilter(m) {
   state.libFilter = state.libFilter === m ? null : m;
@@ -964,6 +982,8 @@ function setExRpe(ei, v) {
   if (!w || !w.exercises[ei]) return;
   const ex = w.exercises[ei];
   ex.rpe = ex.rpe === v ? null : v;
+  // Fiiliksen antaminen vapauttaa automaattitiivistyksen (jos liike on valmis).
+  if (ex.rpe != null && state.exExpanded && state.exExpanded[ei] === true) state.exExpanded[ei] = undefined;
   render();
 }
 function rpeLabel(v) { const o = RPE_OPTS.find(x=>x.v===v); return o ? o.label : null; }
@@ -1259,6 +1279,7 @@ function renderHero() {
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
       Aloita treeni
     </button>
+    ${QUICK[t.day] ? `<button class="btn btn-secondary hero-btn" style="margin-top:8px" onclick="startWorkout('${t.day}', true)">⚡ Kiiretreeni · 3 liikettä</button>` : ''}
   </div>`;
 }
 
@@ -1395,6 +1416,7 @@ function renderHome() {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         Aloita päivä ${state.selectedDay}
       </button>
+      ${QUICK[state.selectedDay] ? `<button class="btn btn-secondary" style="width:100%;margin-top:8px" onclick="startWorkout('${state.selectedDay}', true)">⚡ Kiiretreeni · 3 liikettä</button>` : ''}
     </div>` : ''}
 
     ${lastSession ? `
@@ -1451,9 +1473,15 @@ function buildExercise(ex, day) {
   return { ...ex, sets: Array.from({length:ex.sets},() => ({ weight:w0, reps:reps0, done:false })) };
 }
 
-function startWorkout(day) {
+function startWorkout(day, quick) {
   const phase = getPhase(state.currentWeek);
   const dayPlan = PROGRAM[phase][day];
+  let planned = dayPlan.exercises;
+  if (quick && QUICK[day]) {
+    const ids = QUICK[day];
+    planned = ids.map(id => planned.find(e => e.id === id)).filter(Boolean);
+    if (!planned.length) planned = dayPlan.exercises;
+  }
   state.instrOpen = {};
   state.swapOpen = null;
   state.exExpanded = {};
@@ -1462,7 +1490,8 @@ function startWorkout(day) {
   state.activeWorkout = {
     phase, day,
     week: state.currentWeek,
-    exercises: dayPlan.exercises.map(ex => buildExercise(ex, day)),
+    exercises: planned.map(ex => buildExercise(ex, day)),
+    quick: !!quick,
   };
   showTab('workout');
 }
@@ -1477,6 +1506,11 @@ function isExDone(ex) {
 function expandEx(ei) {
   if (!state.exExpanded) state.exExpanded = {};
   state.exExpanded[ei] = true;
+  render();
+}
+function collapseEx(ei) {
+  if (!state.exExpanded) state.exExpanded = {};
+  state.exExpanded[ei] = false;
   render();
 }
 
@@ -1563,7 +1597,7 @@ function renderWorkout() {
   return `
     <div class="wo-sticky">
       <div class="wo-sticky-top">
-        <div class="phase-badge">Päivä ${w.day} · Vaihe ${w.phase}</div>
+        <div class="phase-badge">Päivä ${w.day} · Vaihe ${w.phase}${w.quick ? ' · ⚡ kiire' : ''}</div>
         <div class="wo-actions">
           <button class="btn btn-sm btn-secondary" onclick="cancelWorkout()">Peruuta</button>
           <button class="btn btn-sm wo-save ${allDone?'wo-save-ready':''}" onclick="finishWorkout()">${allDone?'Tallenna ✓':'Tallenna'}</button>
@@ -1584,13 +1618,13 @@ function renderWorkout() {
       </div>
     </div>` : ''}
 
-    ${state.libOpen ? renderLibrary() : ''}
-
     ${w.exercises.map((ex,ei) => renderExerciseBlock(ex,ei)).join('')}
 
     <div class="add-ex-row">
-      <button class="btn btn-secondary add-ex-btn" onclick="toggleLibrary()">＋ Lisää liike tähän treeniin</button>
+      <button class="btn btn-secondary add-ex-btn" onclick="toggleLibrary()">${state.libOpen ? '✕ Sulje liikevalikko' : '＋ Lisää liike tähän treeniin'}</button>
     </div>
+
+    <div id="lib-anchor">${state.libOpen ? renderLibrary() : ''}</div>
 
     <div style="height:24px"></div>
   `;
@@ -1602,8 +1636,11 @@ function renderExerciseBlock(ex, ei) {
   const sets = isBilateral ? ex.sets[side] : ex.sets;
   const step = getStep(ex);
 
-  // Valmis liike näytetään tiivistettynä, ellei käyttäjä ole avannut sitä.
-  if (isExDone(ex) && !(state.exExpanded && state.exExpanded[ei])) {
+  // Valmis liike tiivistyy vasta kun fiilis on annettu — tai kun tiivistät sen itse.
+  // exExpanded[ei]: true = käyttäjä avasi, false = käyttäjä tiivisti, undefined = automaatti.
+  const _exp = state.exExpanded ? state.exExpanded[ei] : undefined;
+  const _collapse = isExDone(ex) && _exp !== true && (ex.rpe != null || _exp === false);
+  if (_collapse) {
     const setCount = isBilateral ? ex.sets.L.length : ex.sets.length;
     const summary = ex.isTime ? 'pito valmis' : `${setCount} sarjaa${isBilateral?' · V+O':''}`;
     return `
@@ -1627,6 +1664,7 @@ function renderExerciseBlock(ex, ei) {
           ${ex.en ? `<div class="ex-name-en">${ex.en}</div>` : ''}
           ${ex.isRehab ? '<div class="rehab-badge">KUNTOUTUS</div>' : ''}
         </div>
+        ${isExDone(ex) ? `<button class="swap-btn" onclick="collapseEx(${ei})">▲ Tiivistä</button>` : ''}
         ${availableAlternatives(ex, ei).length ? `<button class="swap-btn" onclick="toggleSwap(${ei})">⇄ Vaihda</button>` : ''}
         ${ex.extra ? `<button class="swap-btn" style="color:var(--text3)" onclick="removeExtraExercise(${ei})">✕</button>` : ''}
       </div>
