@@ -225,6 +225,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 /* Last-time reference */
 .last-time { font-size: 12px; color: var(--text2); padding: 4px 16px 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.side-mode-row { padding: 0 16px 6px; }
+.side-mode-btn { background: none; border: none; padding: 2px 0; font-size: 12px; color: var(--accent2); font-family: 'DM Sans', sans-serif; cursor: pointer; }
 .last-time b { color: var(--text); font-family: 'DM Mono', monospace; }
 .pr-tag { background: rgba(124,106,240,0.15); color: var(--accent2); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
 
@@ -287,6 +289,25 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .exd-stats i { display: block; font-size: 10px; color: var(--text3); font-style: normal; margin-top: 2px; }
 .exd-legend { display: flex; gap: 16px; justify-content: center; margin-top: 8px; font-size: 11px; color: var(--text2); }
 .exd-legend i { display: inline-block; width: 10px; height: 3px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+.kpi-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.kpi-good { color: var(--green); }
+.kpi-warn { color: var(--orange); }
+.dash-empty { font-size: 12px; color: var(--text3); padding: 14px 0; }
+.trk-row { padding: 10px 0; border-bottom: 1px solid var(--border); }
+.trk-row:last-of-type { border-bottom: none; }
+.trk-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 7px; }
+.trk-name { font-size: 13px; font-weight: 600; }
+.trk { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
+.trk-done { background: rgba(74,222,128,0.15); color: var(--green); }
+.trk-on { background: rgba(124,106,240,0.15); color: var(--accent2); }
+.trk-behind { background: rgba(251,146,60,0.15); color: var(--orange); }
+.trk-bar { position: relative; height: 8px; background: var(--surface2); border-radius: 4px; }
+.trk-fill { height: 100%; border-radius: 4px; background: var(--accent); }
+.trk-fill.trk-done { background: var(--green); }
+.trk-fill.trk-behind { background: var(--orange); }
+.trk-exp { position: absolute; top: -3px; width: 2px; height: 14px; background: var(--text); border-radius: 1px; transform: translateX(-1px); }
+.trk-vals { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); margin-top: 5px; font-family: 'DM Mono', monospace; }
+.trk-vals b { color: var(--text); font-weight: 600; }
 .spd-item { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); }
 .input { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 16px; padding: 10px; text-align: center; -webkit-appearance: none; }
 .input:focus { outline: none; border-color: var(--accent); }
@@ -387,9 +408,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 6.5h11m-11 5h11m-11 5h11M4 6.5h1m-1 5h1m-1 5h1M18 6.5h1m-1 5h1m-1 5h1"/></svg>
       Treeni
     </div>
-    <div class="tab" id="tab-runs" onclick="showTab('runs')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      Juoksu
+    <div class="tab" id="tab-dash" onclick="showTab('dash')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="20" x2="6" y2="13"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="10"/><line x1="3" y1="20" x2="21" y2="20"/></svg>
+      Kehitys
     </div>
     <div class="tab" id="tab-history" onclick="showTab('history')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -1093,16 +1114,24 @@ function getStep(ex) {
 
 const GOALS = {
   rehab: [],
-  // Kausiohjelma (viikot 13–24). Nykyarvo lasketaan treenihistoriasta latauksessa.
+  // Kausi vk 13–24. Ylävartalo on painopiste (2–3 krt/vk), jalat ylläpidolla sählyn takia.
   strength: [
-    { id:"sq2",   name:"Takakyykky", start:100, targets:[105,110,115], unit:"kg", current:100, weeks:[16,20,24], auto:true, match:"takakyykky" },
-    { id:"rdl2",  name:"Romanialainen maastaveto", start:100, targets:[105,110,117.5], unit:"kg", current:100, weeks:[16,20,24], auto:true, match:"romanialainen" },
-    { id:"bp2",   name:"Käsipainopenkki (per käsi)", start:23, targets:[24,26,28], unit:"kg", current:23, weeks:[16,20,24], auto:true, match:"tasapenkillä" },
-    { id:"lat2",  name:"Alasvetolaite", start:105, targets:[110,115,120], unit:"kg", current:105, weeks:[16,20,24], auto:true, match:"alasvetolaite" },
-    { id:"row2",  name:"Soutuveto laitteessa", start:80, targets:[82.5,85,90], unit:"kg", current:80, weeks:[16,20,24], auto:true, match:"soutuveto laitteessa" },
-    { id:"curl2", name:"Jalan koukistus (vasen)", start:60, targets:[62.5,65,70], unit:"kg", current:60, weeks:[16,20,24], auto:true, match:"jalan koukistus", side:"L" },
+    { id:"bp3",   name:"Käsipainopenkki (per käsi)", start:23,  targets:[24,25,26],        unit:"kg", current:23,  weeks:[16,20,24], auto:true, match:"tasapenkillä" },
+    { id:"ohp3",  name:"Pystypunnerrus (per käsi)",  start:15,  targets:[16,17,18],        unit:"kg", current:15,  weeks:[16,20,24], auto:true, match:"hartiaprässi" },
+    { id:"lat3",  name:"Alasvetolaite",              start:105, targets:[107.5,110,115],   unit:"kg", current:105, weeks:[16,20,24], auto:true, match:"alasvetolaite" },
+    { id:"row3",  name:"Soutuveto laitteessa",       start:80,  targets:[82.5,85,87.5],    unit:"kg", current:80,  weeks:[16,20,24], auto:true, match:"soutuveto laitteessa" },
+    { id:"rdl3",  name:"Romanialainen maastaveto",   start:100, targets:[102.5,105,110],   unit:"kg", current:100, weeks:[16,20,24], auto:true, match:"romanialainen" },
+    { id:"curl3", name:"Jalan koukistus (vasen)",    start:60,  targets:[60,62.5,65],      unit:"kg", current:60,  weeks:[16,20,24], auto:true, match:"jalan koukistus", side:"L" },
+    { id:"sq3",   name:"Takakyykky (ylläpito)",      start:100, targets:[100,100,105],     unit:"kg", current:100, weeks:[16,20,24], auto:true, match:"takakyykky" },
+  ],
+  // Kehon mittarit: pienempi on parempi. Päivitetään käsin (aamupaino, vyötärö navan yläreunasta).
+  body: [
+    { id:"wt",    name:"Paino (aamu, viikon ka.)",   start:99,  targets:[97.5,95.5,94],    unit:"kg", current:99,  weeks:[16,20,24], dir:"down" },
+    { id:"waist", name:"Vyötärö",                    start:100, targets:[98.5,96.5,95],    unit:"cm", current:100, weeks:[16,20,24], dir:"down" },
   ]
 };
+const PROGRAM_START_WEEK = 13;
+function allGoals() { return [...state.goals.rehab, ...state.goals.strength, ...(state.goals.body || [])]; }
 
 let state = {
   currentTab: 'home',
@@ -1126,15 +1155,22 @@ let state = {
 };
 
 function recalcAutoGoals() {
+  const cut = new Date(); cut.setDate(cut.getDate() - 60);
+  const cutStr = cut.toISOString().slice(0,10);
   state.goals.strength.concat(state.goals.rehab).forEach(g => {
     if (!g.auto || !g.match) return;
     let best = 0;
-    state.sessions.forEach(s => (s.exercises || []).forEach(ex => {
+    state.sessions.filter(s => !s.date || s.date >= cutStr).forEach(s => (s.exercises || []).forEach(ex => {
       if (!ex.name.toLowerCase().includes(g.match)) return;
       let sets = ex.bilateral ? (g.side === 'R' ? ex.setsR : ex.setsL) : ex.sets;
       (sets || []).forEach(x => { if (x.reps > 0 && x.weight > best) best = x.weight; });
     }));
     if (best > 0) g.current = best;
+  });
+  // Kehon mittarit: viimeisin kirjattu arvo
+  (state.goals.body || []).forEach(g => {
+    const ms = state.measurements.filter(m => m.goalId === g.id);
+    if (ms.length) g.current = ms[ms.length-1].value;
   });
 }
 
@@ -1285,6 +1321,7 @@ function save() {
     measurements: state.measurements,
     runs: state.runs,
     speedSessions: state.speedSessions,
+    sideMode: state.sideMode || {},
     lastBackup: state.lastBackup || null,
     programVersion: 2,
   }));
@@ -1299,6 +1336,7 @@ function load() {
       state.measurements = d.measurements || [];
       state.runs = d.runs || [];
       state.speedSessions = d.speedSessions || [];
+      state.sideMode = d.sideMode || {};
       state.lastBackup = d.lastBackup || null;
       // Kausiohjelma alkaa viikosta 13 (vanha 12 vk ohjelma päättyi).
       if ((d.programVersion || 1) < 2 && state.currentWeek <= 12) state.currentWeek = 13;
@@ -1306,7 +1344,7 @@ function load() {
       // mutta säilytä käyttäjän tallentamat nykyiset arvot ja tavoitteet.
       state.goals = JSON.parse(JSON.stringify(GOALS));
       if (d.goals) {
-        ['rehab','strength'].forEach(cat => {
+        ['rehab','strength','body'].forEach(cat => {
           (state.goals[cat] || []).forEach(g => {
             const saved = (d.goals[cat] || []).find(x => x.id === g.id);
             if (saved) {
@@ -1325,7 +1363,7 @@ function load() {
 
 function showTab(tab) {
   state.currentTab = tab;
-  ['home','workout','runs','history','goals'].forEach(t => {
+  ['home','workout','dash','history','goals'].forEach(t => {
     document.getElementById('tab-'+t).classList.toggle('active', t===tab);
   });
   render();
@@ -1337,7 +1375,7 @@ function render() {
   const c = document.getElementById('main-content');
   if (state.currentTab === 'home') { c.innerHTML = renderHome(); updateHeaderSubtitle(); }
   else if (state.currentTab === 'workout') { c.innerHTML = renderWorkout(); }
-  else if (state.currentTab === 'runs') { c.innerHTML = renderRuns(); }
+  else if (state.currentTab === 'dash' || state.currentTab === 'runs') { c.innerHTML = renderDashboard(); }
   else if (state.currentTab === 'history') { c.innerHTML = renderHistory(); }
   else if (state.currentTab === 'goals') { c.innerHTML = renderGoals(); }
 }
@@ -1449,8 +1487,8 @@ function renderHome() {
         <div class="stat-label">Salitreenejä tällä viikolla</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value" style="color:var(--orange)">${runsThisWeek}</div>
-        <div class="stat-label">Lenkkejä tällä viikolla</div>
+        <div class="stat-value" style="color:var(--orange)">${(() => { const w = sessionsPerWeek(5).slice(0,4); return (Math.round(w.reduce((a,d)=>a+d.value,0)/4*10)/10).toLocaleString('fi-FI'); })()}</div>
+        <div class="stat-label">Treenejä / vk (4 vk ka.)</div>
       </div>
     </div>
 
@@ -1537,7 +1575,36 @@ function selectDay(d) {
 
 // Rakentaa yhden liikkeen "elävän" olion (sarjat + esitäytetyt painot).
 // ex: meta jossa sets = sarjojen LUKUMÄÄRÄ (numero), reps = ohjelman toistot.
+// Käyttäjän valinta: liike V/O erikseen (true) tai yhdessä (false). Muistetaan liikkeittäin.
+function applySideMode(ex) {
+  const m = state.sideMode ? state.sideMode[ex.id] : undefined;
+  if (m === undefined || ex.isTime || !!ex.bilateral === m) return ex;
+  const dw = ex.defaultWeight;
+  let ndw = dw;
+  if (m && typeof dw === 'number') ndw = { L: dw, R: dw };
+  if (!m && dw && typeof dw === 'object') ndw = dw.L ?? dw.R ?? 0;
+  return { ...ex, bilateral: m, defaultWeight: ndw };
+}
+
+function toggleSideMode(ei) {
+  const w = state.activeWorkout;
+  const ex = w.exercises[ei];
+  const anyDone = ex.bilateral ? ex.sets.L.concat(ex.sets.R).some(x=>x.done) : ex.sets.some(x=>x.done);
+  if (anyDone && !confirm('Tämän liikkeen merkityt sarjat nollautuvat. Vaihdetaanko silti?')) return;
+  const newMode = !ex.bilateral;
+  if (!state.sideMode) state.sideMode = {};
+  state.sideMode[ex.id] = newMode;
+  save();
+  const setCount = ex.bilateral ? ex.sets.L.length : ex.sets.length;
+  const keep = { origId: ex.origId, extra: ex.extra, rpe: ex.rpe };
+  const rebuilt = buildExercise({ ...ex, sets: setCount, activeSide: undefined }, w.day);
+  w.exercises[ei] = Object.assign(rebuilt, keep);
+  render();
+  showToast(newMode ? 'Vasen ja oikea kirjataan nyt erikseen' : 'Liike kirjataan nyt yhdessä');
+}
+
 function buildExercise(ex, day) {
+  ex = applySideMode(ex);
   const parsed = typeof ex.reps === 'number' ? ex.reps : (String(ex.reps).match(/\d+/) ? parseInt(String(ex.reps).match(/\d+/)[0]) : 8);
   if (ex.bilateral) {
     const lastL = getLastPerformance(ex.name, 'L', day, ex.id);
@@ -1756,6 +1823,7 @@ function renderExerciseBlock(ex, ei) {
       </div>
       ${state.swapOpen===ei ? renderSwapPicker(ex, ei) : ''}
       <div class="ex-meta">${ex.sets.length || Object.values(ex.sets||{L:[]})[0]?.length || ex.sets} sarjaa × ${ex.reps}${ex.isTime ? '' : ' toistoa'}${ex.note ? ' · ' + ex.note : ''}${ex.extra ? ' · <span style="color:var(--accent2)">lisätty</span>' : ''}</div>
+      ${ex.isTime ? '' : `<div class="side-mode-row"><button class="side-mode-btn" onclick="toggleSideMode(${ei})">${ex.bilateral ? '⇉ Kirjaa yhdessä' : '⇆ Vasen ja oikea erikseen'}</button></div>`}
       ${(() => { const h = progressionHint(ex, state.activeWorkout.day); return h
         ? `<div class="prog-hint">📈 Viimeksi kaikki sarjat täyteen ${h.from} kg:lla${h.side?` (${h.side==='L'?'vasen':'oikea'})`:''}${h.rpe===1?' ja tuntui helpolta':''} — kokeile <b>${h.next} kg</b></div>` : ''; })()}
 
@@ -1787,12 +1855,17 @@ function renderExerciseBlock(ex, ei) {
       ${(() => {
         const last = getLastPerformance(ex.name, side, state.activeWorkout?.day, ex.id);
         if (!last) return `<div class="last-time">${ex.isTime ? 'Ensimmäinen kerta — pidä asentoa tavoiteajan verran' : 'Ensimmäinen kerta — aseta sopiva paino'}</div>`;
+        const _d = last.dateStr.split(' ').slice(-2).join(' ');
         if (ex.isTime) {
-          return `<div class="last-time"><span>Viimeksi (${last.dateStr.split(' ').slice(-2).join(' ')}): <b>${last.reps} s pito</b></span></div>`;
+          return `<div class="last-time"><span>Viimeksi (${_d}): <b>${last.sets.map(x=>x.reps).join(' / ')} s</b></span></div>`;
         }
         const pr = getPR(ex.name, side, null, ex.id);
+        const _same = last.sets.every(x => x.weight === last.sets[0].weight);
+        const _txt = _same
+          ? `${last.sets[0].weight} kg × ${last.sets.map(x=>x.reps).join(' / ')}`
+          : last.sets.map(x => `${x.weight}×${x.reps}`).join(' · ');
         return `<div class="last-time">
-          <span>Viimeksi (${last.dateStr.split(' ').slice(-2).join(' ')}): <b>${last.weight} kg × ${last.reps}</b></span>
+          <span>Viimeksi (${_d}): <b>${_txt}</b></span>
           ${pr ? `<span class="pr-tag">PR ${pr} kg</span>` : ''}
         </div>`;
       })()}
@@ -2094,7 +2167,7 @@ function celebratePR(prs) {
 
 // Päivittää tavoitteiden "nykyinen"-arvon treenilokin perusteella (auto-tracked)
 function updateGoalsFromSession(session) {
-  const all = [...state.goals.rehab, ...state.goals.strength];
+  const all = allGoals();
   let advanced = false, ahead = false;
   session.exercises.forEach(ex => {
     all.forEach(g => {
@@ -2114,9 +2187,30 @@ function updateGoalsFromSession(session) {
 function goalStatus(g) {
   const weeks = g.weeks || [4, 8, 12];
   let reached = -1;
-  for (let i = 0; i < 3; i++) if (g.current >= g.targets[i]) reached = i;
-  const ahead = reached >= 0 && reached < 2 && state.currentWeek < weeks[reached];
+  const hit = t => g.dir === 'down' ? g.current <= t : g.current >= t;
+  for (let i = 0; i < 3; i++) if (hit(g.targets[i])) reached = i;
+  const ahead = g.dir !== 'down' && reached >= 0 && reached < 2 && state.currentWeek < weeks[reached];
   return { reached, ahead };
+}
+
+// Odotettu arvo nyt (lineaarisesti välietapista toiseen) ja tila.
+function goalTrack(g) {
+  const wk = state.currentWeek;
+  const pts = [[PROGRAM_START_WEEK, g.start], ...g.weeks.map((w,i) => [w, g.targets[i]])];
+  let expected = g.targets[2];
+  for (let i = 0; i < pts.length - 1; i++) {
+    const [w0,v0] = pts[i], [w1,v1] = pts[i+1];
+    if (wk <= w0) { expected = v0; break; }
+    if (wk <= w1) { expected = v0 + (v1 - v0) * (wk - w0) / (w1 - w0); break; }
+  }
+  const down = g.dir === 'down';
+  const span = Math.abs(g.targets[2] - g.start) || 1;
+  const prog = down ? (g.start - g.current) / span : (g.current - g.start) / span;
+  const expProg = down ? (g.start - expected) / span : (expected - g.start) / span;
+  const done = down ? g.current <= g.targets[2] : g.current >= g.targets[2];
+  const tol = 0.15;
+  const state_ = done ? 'done' : (prog >= expProg - tol ? 'on' : 'behind');
+  return { expected, prog: Math.max(0, Math.min(1, prog)), expProg: Math.max(0, Math.min(1, expProg)), state: state_ };
 }
 
 function roundNice(v, unit) {
@@ -2137,7 +2231,7 @@ function doRaise(g) {
 }
 
 function raiseGoal(id) {
-  const g = [...state.goals.rehab, ...state.goals.strength].find(x => x.id === id);
+  const g = allGoals().find(x => x.id === id);
   if (!g) return;
   doRaise(g);
   save();
@@ -2147,7 +2241,7 @@ function raiseGoal(id) {
 
 function raiseAllAhead() {
   let n = 0;
-  [...state.goals.rehab, ...state.goals.strength].forEach(g => {
+  allGoals().forEach(g => {
     if (goalStatus(g).ahead) { doRaise(g); n++; }
   });
   save();
@@ -2242,7 +2336,15 @@ function renderExDetail(exId) {
   const nm = (NAMES[exId] || {}).fi || exId;
   const en = (NAMES[exId] || {}).en || '';
   if (!hist.length) return `<div class="card">Ei kirjauksia liikkeelle ${nm}.</div>`;
-  const bil = hist[0].bilateral, isTime = hist[0].isTime;
+  // Jos kirjaustapa on vaihtunut (yhdessä ↔ V/O), näytetään kaikki viimeisimmän tavan mukaan.
+  const _pref = state.sideMode ? state.sideMode[exId] : undefined;
+  const isTime = hist[0].isTime;
+  const bil = (!isTime && _pref !== undefined) ? _pref : hist[hist.length-1].bilateral;
+  for (let i = 0; i < hist.length; i++) {
+    const h = hist[i];
+    if (bil && !h.bilateral) hist[i] = { ...h, bilateral:true, L:h.value, R:h.value, setsL:h.sets, setsR:h.sets };
+    else if (!bil && h.bilateral) hist[i] = { ...h, bilateral:false, value:Math.max(h.L, h.R), sets:Math.max(h.setsL, h.setsR), reps:'' };
+  }
   const unit = isTime ? 's' : 'kg';
   const first = hist[0], last = hist[hist.length-1];
   let delta;
@@ -2290,7 +2392,7 @@ function renderExDetail(exId) {
         return `<div class="exd-row">
           <div style="flex:1;min-width:0">
             <div style="font-size:13px">${h.dateStr} <span style="color:var(--text3)">· ${h.day} · vk ${h.week}</span></div>
-            <div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">${bil?`${h.setsL}+${h.setsR} sarjaa`:`${h.sets} × ${h.reps}${isTime?' s':''}`}${h.rpe?' · '+rpeLabel(h.rpe).toLowerCase():''}</div>
+            <div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">${bil?`${h.setsL}+${h.setsR} sarjaa`:(h.reps===''?`${h.sets} sarjaa`:`${h.sets} × ${h.reps}${isTime?' s':''}`)}${h.rpe?' · '+rpeLabel(h.rpe).toLowerCase():''}</div>
           </div>
           <div style="text-align:right">
             <div style="font-family:'DM Mono',monospace;font-size:14px">${bil?`V${h.L} / O${h.R}`:h.value+' '+unit}</div>
@@ -2377,12 +2479,12 @@ function toggleSessionDetail(id) {
 
 function renderGoals() {
 
-  const anyAhead = [...state.goals.rehab, ...state.goals.strength].some(g => goalStatus(g).ahead);
+  const anyAhead = allGoals().some(g => goalStatus(g).ahead);
 
   function renderGoalCard(goal) {
     const status = goalStatus(goal);
     const weeks = goal.weeks || [4,8,12];
-    const pct = Math.min(100, Math.max(0, Math.round((goal.current - goal.start) / (goal.targets[2] - goal.start) * 100)));
+    const pct = Math.round(goalTrack(goal).prog * 100);
 
     return `
       <div class="goal-row">
@@ -2395,7 +2497,7 @@ function renderGoals() {
         </div>
         <div class="milestone-row">
           ${goal.targets.map((t,i) => {
-            const reached = goal.current >= t;
+            const reached = goal.dir === 'down' ? goal.current <= t : goal.current >= t;
             return `<div class="milestone ${reached?'reached':''}">
               <div class="milestone-val">${t}${goal.unit}</div>
               <div class="milestone-label">Vko ${weeks[i]}</div>
@@ -2428,45 +2530,25 @@ function renderGoals() {
       <button class="btn btn-sm raise-btn" onclick="raiseAllAhead()">Nosta kaikki</button>
     </div>` : ''}
 
-    <div class="section-header">📈 VOIMAKEHITYS</div>
-    <div class="chart-tabs">
-      ${chartOptions.map(o => `<div class="chart-tab ${o.id===state.chartExercise?'active':''}" onclick="setChartExercise('${o.id}')">${o.label}</div>`).join('')}
-    </div>
-    <div class="card chart-card" style="margin-top:0">
-      <div class="card-title">${chosen.label} — paino (kg)</div>
-      ${lineChart(strSeries, { color:'var(--accent)', target:chosen.target, unit:'kg' })}
-    </div>
-
     <div class="section-header">💪 VOIMATAVOITTEET</div>
     <div class="card" style="margin-top:0">
       ${state.goals.strength.map(renderGoalCard).join('')}
     </div>
 
-    <div class="card" style="background:var(--surface2);font-size:12px;color:var(--text2);line-height:1.5">
-      <b style="color:var(--text)">Näin tavoitteet toimivat:</b> Tavoitteet päivittyvät automaattisesti treeniesi perusteella (paras sarja, jossa toistoja > 0). Välietapit ovat kausiohjelman viikoilla 16, 20 ja 24. Kun saavutat välietapin etuajassa, voit nostaa tavoitetta — uusi tavoite säilyttää saman kehitysvauhdin.
+    <div class="section-header">⚖️ KEHON MITTARIT</div>
+    <div class="card" style="margin-top:0">
+      ${(state.goals.body || []).map(renderGoalCard).join('')}
+      <div style="font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5">Päivitä kerran viikossa: paino aamulla viikon keskiarvona, vyötärö navan yläreunasta uloshengityksellä.</div>
     </div>
 
-    <div class="section-header">📊 VIIKKOVOLYYMI (VKO ${state.currentWeek})</div>
-    <div class="card" style="margin-top:0">
-      ${(() => {
-        const vol = weeklyVolume(state.currentWeek);
-        const keys = Object.keys(MUSCLE_LABELS).filter(m => vol[m]);
-        if (!keys.length) return '<div style="font-size:13px;color:var(--text3)">Ei vielä kirjattuja sarjoja tällä viikolla.</div>';
-        const max = Math.max(...keys.map(m => vol[m]));
-        return keys.map(m => `
-          <div class="vol-row">
-            <div class="vol-label">${MUSCLE_LABELS[m]}</div>
-            <div class="vol-bar"><div class="vol-fill" style="width:${Math.round(vol[m]/max*100)}%"></div></div>
-            <div class="vol-num">${vol[m]}</div>
-          </div>`).join('') +
-          `<div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5">Sarjoja lihasryhmittäin tällä viikolla. Puolikohtaiset liikkeet lasketaan molemmat puolet erikseen.</div>`;
-      })()}
+    <div class="card" style="background:var(--surface2);font-size:12px;color:var(--text2);line-height:1.5">
+      <b style="color:var(--text)">Näin tavoitteet toimivat:</b> Tavoitteet päivittyvät automaattisesti treeniesi perusteella (paras sarja, jossa toistoja > 0). Kehon mittarit päivität itse. Välietapit ovat kausiohjelman viikoilla 16, 20 ja 24. Kun saavutat välietapin etuajassa, voit nostaa tavoitetta — uusi tavoite säilyttää saman kehitysvauhdin.
     </div>
 
     <div class="section-header">📋 KOOSTE VALMENTAJALLE</div>
     <div class="card" style="margin-top:0">
       <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">
-        Luo tiivis tekstikooste edistymisestäsi (treenit, painot, ennätykset, juoksu, tavoitteet). Kopioi se ja liitä Claude-keskusteluun saadaksesi valmentajapalautetta. Suositus: vaiheen vaihtuessa (vk 4, 8, 12).
+        Luo tiivis tekstikooste edistymisestäsi (treenit, painot, tavoitteet, treenitiheys). Kopioi se ja liitä Claude-keskusteluun saadaksesi valmentajapalautetta. Suositus: välietappien kohdalla (vk 16, 20, 24).
       </div>
       <button class="btn btn-primary" style="width:100%" onclick="showCoachSummary()">
         📋 Luo kooste
@@ -2505,7 +2587,7 @@ function setChartExercise(id) {
 }
 
 function updateGoalCurrent(id) {
-  const goal = [...state.goals.rehab, ...state.goals.strength].find(g => g.id === id);
+  const goal = allGoals().find(g => g.id === id);
   if (!goal) return;
   const val = parseFloat(prompt(`Syötä ${goal.name} arvo (${goal.unit}):`, goal.current));
   if (!isNaN(val) && val >= 0) {
@@ -2572,7 +2654,7 @@ function handleImportFile(e) {
       // merge goals (säilytä uudet kentät)
       state.goals = JSON.parse(JSON.stringify(GOALS));
       if (d.goals) {
-        ['rehab','strength'].forEach(cat => {
+        ['rehab','strength','body'].forEach(cat => {
           (state.goals[cat]||[]).forEach(g => {
             const saved = (d.goals[cat]||[]).find(x => x.id === g.id);
             if (saved) { if (typeof saved.current==='number') g.current = saved.current; if (Array.isArray(saved.targets)) g.targets = saved.targets; }
@@ -2617,12 +2699,7 @@ function buildCoachSummary() {
   const _cut = new Date(); _cut.setDate(_cut.getDate() - 28);
   const _last4 = state.sessions.filter(x => x.date && new Date(x.date) >= _cut).length;
   L.push('- Treenitiheys viim. 4 vk: ' + _last4 + ' treeniä (' + (Math.round(_last4/4*10)/10) + '/vk)');
-  if (state.runs.length) {
-    L.push('- Lenkkejä: ' + state.runs.length + ' (yht. ' + (Math.round(st.totalKm*10)/10) + ' km, ' + formatTotalTime(st.totalSec) + ', keskivauhti ' + formatPace(st.avgPace) + '/km)');
-  } else {
-    L.push('- Lenkkejä: ei vielä kirjattu');
-  }
-  L.push('- Putki: ' + getStreak() + ' päivää');
+  L.push('- Putki: ' + getStreak() + ' täyttä treeniviikkoa peräkkäin');
   L.push('');
   if (state.goals.rehab.length) {
     L.push('KUNTOUTUSTAVOITTEET');
@@ -2633,9 +2710,18 @@ function buildCoachSummary() {
   }
   L.push('VOIMATAVOITTEET (nyt → tavoitteet vk ' + ((state.goals.strength[0]||{}).weeks||[4,8,12]).join('/') + ')');
   state.goals.strength.forEach(g => {
-    L.push('- ' + g.name + ': ' + g.current + ' ' + g.unit + ' → ' + g.targets.join('/') + ' ' + g.unit);
+    const t = goalTrack(g);
+    L.push('- ' + g.name + ': ' + g.current + ' ' + g.unit + ' → ' + g.targets.join('/') + ' ' + g.unit + ' [' + (t.state==='done'?'saavutettu':t.state==='on'?'aikataulussa':'jäljessä') + ']');
   });
   L.push('');
+  if ((state.goals.body || []).length) {
+    L.push('KEHON MITTARIT (nyt → tavoitteet vk ' + state.goals.body[0].weeks.join('/') + ')');
+    state.goals.body.forEach(g => {
+      const n = state.measurements.filter(m => m.goalId === g.id).length;
+      L.push('- ' + g.name + ': ' + g.current + ' ' + g.unit + ' → ' + g.targets.join('/') + ' ' + g.unit + (n ? '' : ' (ei kirjattu, lähtöarvo)'));
+    });
+    L.push('');
+  }
   L.push('VIIMEISIMMÄT TREENIT');
   if (!state.sessions.length) L.push('- ei vielä treenejä');
   state.sessions.slice(-6).reverse().forEach(s => {
@@ -2660,21 +2746,6 @@ function buildCoachSummary() {
     L.push('');
     L.push('VIIKKOVOLYYMI (sarjoja, vko ' + state.currentWeek + ')');
     L.push('- ' + _vk.map(m => MUSCLE_LABELS[m] + ' ' + _vol[m]).join(', '));
-  }
-  if (state.speedSessions && state.speedSessions.length) {
-    L.push('');
-    L.push('NOPEUSHARJOITUKSET (fysion protokolla)');
-    state.speedSessions.slice(-5).reverse().forEach(s => {
-      L.push('- ' + s.dateStr + ': ' + (s.type === 'sprintti'
-        ? 'sprinttitreeni, portaat L1 ' + s.s1 + ' / L2 ' + s.s2 + ' / L3 ' + s.s3
-        : 'kotinopeus (kuntopallo)'));
-    });
-  }
-  if (state.runs.length) {
-    L.push('');
-    L.push('VIIMEISIMMÄT LENKIT');    state.runs.slice(-5).reverse().forEach(r => {
-      L.push('- ' + r.dateStr + ': ' + r.distance.toFixed(1) + ' km, ' + formatClock(r.durationSec) + ', ' + formatPace(r.durationSec/r.distance) + '/km (' + r.type + ')');
-    });
   }
   L.push('');
   L.push('TAUSTA: 37v mies, 190 cm, n. 99 kg. Vasemman takareiden proksimaalinen avulsiokorjaus 29.1.2026, kuntoutus päättynyt ja palannut salibandyyn (treenit ti + to, pelit la). Yliliikkuvat olkapäät ja nilkat. Tavoitteet: lihaskasvu (painopiste ylävartalo/rinta), vammojen ehkäisy (eksentrinen takareisi, lähentäjät, lapatuki), rasvanpudotus n. -5 kg. Ohjelma: K1 su (raskas jalkapäivä) + K2 ke, valinnainen K3 pe.');
@@ -2838,6 +2909,159 @@ function deleteSpeedSession(id) {
   state.speedSessions = state.speedSessions.filter(s => s.id !== id);
   save();
   render();
+}
+
+// ── KEHITYS (DASHBOARD) ───────────────────────────────────────────────────────
+// Maanantaista alkava kalenteriviikko päivämäärästä (riippumaton käsin säädetystä viikkolaskurista).
+function weekStartStr(d) {
+  const x = new Date(d + 'T12:00:00');
+  const day = (x.getDay() + 6) % 7;
+  x.setDate(x.getDate() - day);
+  return x.toISOString().slice(0,10);
+}
+function isoWeekNo(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00');
+  d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+  const w1 = new Date(d.getFullYear(), 0, 4);
+  return 1 + Math.round(((d - w1) / 86400000 - 3 + (w1.getDay() + 6) % 7) / 7);
+}
+function sessionsPerWeek(n) {
+  const today = new Date().toISOString().slice(0,10);
+  const thisMon = weekStartStr(today);
+  const out = [];
+  for (let i = n - 1; i >= 0; i--) {
+    const m = new Date(thisMon + 'T12:00:00'); m.setDate(m.getDate() - 7*i);
+    const ms = m.toISOString().slice(0,10);
+    const cnt = state.sessions.filter(s => s.date && weekStartStr(s.date) === ms).length;
+    out.push({ label: 'vk ' + isoWeekNo(ms), value: cnt, current: i === 0 });
+  }
+  return out;
+}
+
+function barChart(data, opts = {}) {
+  const W = 320, H = 140, pad = { l: 22, r: 8, t: 16, b: 22 };
+  const max = Math.max(opts.target || 0, ...data.map(d => d.value), 1);
+  const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
+  const bw = plotW / data.length, barW = Math.max(6, bw - 6);
+  const y = v => pad.t + plotH - (v / max) * plotH;
+  const bars = data.map((d, i) => {
+    const x = pad.l + i * bw + (bw - barW) / 2;
+    const h = Math.max(0, pad.t + plotH - y(d.value));
+    const r = Math.min(4, h / 2);
+    const top = y(d.value);
+    const path = h > 0 ? `M${x},${pad.t+plotH} L${x},${top+r} Q${x},${top} ${x+r},${top} L${x+barW-r},${top} Q${x+barW},${top} ${x+barW},${top+r} L${x+barW},${pad.t+plotH} Z` : '';
+    return `<g><title>${d.label}: ${d.value}</title>
+      ${path ? `<path d="${path}" fill="${d.current ? 'var(--accent2)' : 'var(--accent)'}" opacity="${d.current ? 0.75 : 1}"/>` : ''}
+      <text x="${x + barW/2}" y="${(h > 0 ? top : pad.t + plotH) - 4}" text-anchor="middle" font-size="10" fill="var(--text2)" font-family="DM Mono,monospace">${d.value}</text>
+      <text x="${x + barW/2}" y="${H - 6}" text-anchor="middle" font-size="9" fill="var(--text3)">${d.label.replace('vk ','')}</text></g>`;
+  }).join('');
+  const tgt = opts.target != null ? `<line x1="${pad.l}" y1="${y(opts.target)}" x2="${W-pad.r}" y2="${y(opts.target)}" stroke="var(--text3)" stroke-width="1" stroke-dasharray="4 3"/>
+    <text x="${pad.l - 4}" y="${y(opts.target) + 3}" text-anchor="end" font-size="9" fill="var(--text3)">${opts.target}</text>` : '';
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
+    <line x1="${pad.l}" y1="${pad.t+plotH}" x2="${W-pad.r}" y2="${pad.t+plotH}" stroke="var(--border)" stroke-width="1"/>
+    ${tgt}${bars}</svg>`;
+}
+
+function trackChip(st) {
+  if (st === 'done')   return '<span class="trk trk-done">✓ Saavutettu</span>';
+  if (st === 'on')     return '<span class="trk trk-on">● Aikataulussa</span>';
+  return '<span class="trk trk-behind">▼ Jäljessä</span>';
+}
+
+function renderDashboard() {
+  const weeks = sessionsPerWeek(10);
+  const last4 = weeks.slice(-5, -1);
+  const avg4 = Math.round(last4.reduce((a,d) => a + d.value, 0) / 4 * 10) / 10;
+  const goals = [...state.goals.strength, ...(state.goals.body || [])];
+  const tracks = goals.map(g => ({ g, t: goalTrack(g) }));
+  const onCount = tracks.filter(x => x.t.state !== 'behind').length;
+  const wt = (state.goals.body || []).find(g => g.id === 'wt');
+  const waist = (state.goals.body || []).find(g => g.id === 'waist');
+  const hasM = id => state.measurements.some(m => m.goalId === id);
+  const kpi = (val, label, sub, cls) => `<div class="stat-card"><div class="stat-value ${cls||''}">${val}</div><div class="stat-label">${label}</div>${sub ? `<div class="kpi-sub">${sub}</div>` : ''}</div>`;
+
+  const chartOptions = state.goals.strength.map(g => ({ id:g.id, label:g.name.replace(' (per käsi)','').replace(' laitteessa','').replace(' (ylläpito)',''), match:g.match, side:g.side||null, target:g.targets[2] }));
+  const chosen = chartOptions.find(o => o.id === state.chartExercise) || chartOptions[0];
+  const strSeries = exerciseSeries(chosen.match, chosen.side);
+
+  const vol = (() => {
+    const out = {};
+    const cut = new Date(); cut.setDate(cut.getDate() - 28);
+    const cs = cut.toISOString().slice(0,10);
+    state.sessions.filter(s => s.date && s.date >= cs).forEach(s => (s.exercises||[]).forEach(e => {
+      const m = muscleOf(e.id); if (!m) return;
+      const n = e.bilateral ? Math.max((e.setsL||[]).length, (e.setsR||[]).length) : (e.sets||[]).length;
+      out[m] = (out[m] || 0) + n;
+    }));
+    Object.keys(out).forEach(k => out[k] = Math.round(out[k] / 4 * 10) / 10);
+    return out;
+  })();
+  const volKeys = Object.keys(MUSCLE_LABELS).filter(m => vol[m]);
+  const volMax = Math.max(10, ...volKeys.map(m => vol[m]));
+
+  return `
+    <div class="section-header">KEHITYS · VIIKKO ${state.currentWeek}</div>
+    <div class="stats-grid">
+      ${kpi(avg4.toLocaleString('fi-FI'), 'Treenejä / vk (4 vk ka.)', 'tavoite 2', avg4 >= 2 ? 'kpi-good' : 'kpi-warn')}
+      ${kpi(onCount + '/' + goals.length, 'Tavoitteista aikataulussa', 'vk 16 · 20 · 24', onCount >= goals.length * 0.7 ? 'kpi-good' : 'kpi-warn')}
+      ${kpi(wt ? wt.current.toLocaleString('fi-FI') : '–', 'Paino, kg', wt ? 'tavoite ' + wt.targets[2] + (hasM('wt') ? '' : ' · ei vielä kirjattu') : '')}
+      ${kpi(waist ? waist.current.toLocaleString('fi-FI') : '–', 'Vyötärö, cm', waist ? 'tavoite ' + waist.targets[2] + (hasM('waist') ? '' : ' · ei vielä kirjattu') : '')}
+    </div>
+    <div style="display:flex;gap:8px;padding:0 16px 4px">
+      <button class="btn btn-sm btn-secondary" style="flex:1" onclick="updateGoalCurrent('wt')">⚖️ Kirjaa paino</button>
+      <button class="btn btn-sm btn-secondary" style="flex:1" onclick="updateGoalCurrent('waist')">📏 Kirjaa vyötärö</button>
+    </div>
+
+    <div class="section-header">TREENIT VIIKOITTAIN</div>
+    <div class="card chart-card" style="margin-top:0">
+      <div class="card-title">Salitreenit / kalenteriviikko</div>
+      ${barChart(weeks, { target: 2 })}
+      <div style="font-size:11px;color:var(--text3);margin-top:6px">Katkoviiva = tavoite 2 treeniä. Vaaleampi pylväs = kuluva viikko.</div>
+    </div>
+
+    <div class="section-header">TAVOITTEET</div>
+    <div class="card" style="margin-top:0">
+      ${tracks.map(({g,t}) => `
+        <div class="trk-row">
+          <div class="trk-top">
+            <div class="trk-name">${g.name}</div>
+            ${trackChip(t.state)}
+          </div>
+          <div class="trk-bar"><div class="trk-fill trk-${t.state}" style="width:${Math.round(t.prog*100)}%"></div><div class="trk-exp" style="left:${Math.round(t.expProg*100)}%"></div></div>
+          <div class="trk-vals"><span>${g.start} ${g.unit}</span><b>${g.current} ${g.unit}</b><span>${g.targets[2]} ${g.unit}</span></div>
+        </div>`).join('')}
+      <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5">Pystyviiva = missä pitäisi olla nyt, jotta viikon 24 tavoite toteutuu. Voimatavoitteet päivittyvät treeneistä, kehon mittarit kirjaat itse.</div>
+    </div>
+
+    <div class="section-header">PAINO JA VYÖTÄRÖ</div>
+    <div class="card chart-card" style="margin-top:0">
+      <div class="card-title">Paino (kg)</div>
+      ${hasM('wt') ? lineChart(measurementSeries('wt', wt.start), { color:'var(--accent)', target:wt.targets[2], unit:' kg' }) : '<div class="dash-empty">Kirjaa paino kerran viikossa, niin käyrä piirtyy tähän.</div>'}
+      <div class="card-title" style="margin-top:14px">Vyötärö (cm)</div>
+      ${hasM('waist') ? lineChart(measurementSeries('waist', waist.start), { color:'var(--accent)', target:waist.targets[2], unit:' cm' }) : '<div class="dash-empty">Kirjaa vyötärö kerran viikossa, niin käyrä piirtyy tähän.</div>'}
+    </div>
+
+    <div class="section-header">VOIMAKEHITYS</div>
+    <div class="chart-tabs">
+      ${chartOptions.map(o => `<div class="chart-tab ${o.id===chosen.id?'active':''}" onclick="setChartExercise('${o.id}')">${o.label}</div>`).join('')}
+    </div>
+    <div class="card chart-card" style="margin-top:0">
+      <div class="card-title">${chosen.label} — paras sarja (kg)</div>
+      ${lineChart(strSeries, { color:'var(--accent)', target:chosen.target, unit:' kg' })}
+    </div>
+
+    <div class="section-header">VOLYYMI LIHASRYHMITTÄIN</div>
+    <div class="card" style="margin-top:0">
+      ${volKeys.length ? volKeys.map(m => `
+        <div class="vol-row">
+          <div class="vol-label">${MUSCLE_LABELS[m]}</div>
+          <div class="vol-bar"><div class="vol-fill" style="width:${Math.round(vol[m]/volMax*100)}%"></div></div>
+          <div class="vol-num">${vol[m].toLocaleString('fi-FI')}</div>
+        </div>`).join('') : '<div class="dash-empty">Ei treenejä viimeisen 4 viikon aikana.</div>'}
+      <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5">Sarjoja viikossa, 4 viikon keskiarvo. Puolikohtaisissa liikkeissä yksi sarja = molemmat puolet.</div>
+    </div>
+    <div style="height:20px"></div>
+  `;
 }
 
 function renderRuns() {
