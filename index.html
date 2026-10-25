@@ -132,6 +132,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .session-day-badge.C { background: rgba(251,146,60,0.15); color: var(--orange); }
 .session-day-badge.D { background: rgba(192,132,252,0.15); color: #c084fc; }
 .session-day-badge.E { background: rgba(34,211,238,0.15); color: #22d3ee; }
+.session-day-badge.K1, .session-day-badge.K2, .session-day-badge.K3 { background: rgba(74,222,128,0.15); color: var(--green); }
+.day-card.K1 .day-letter, .day-card.K2 .day-letter, .day-card.K3 .day-letter { color: var(--green); }
+.warmup-card { margin: 10px 16px 4px; padding: 10px 12px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); font-size: 12px; color: var(--text2); line-height: 1.5; }
 .session-day-badge.T1, .session-day-badge.T2, .session-day-badge.T3, .session-day-badge.T4 { background: rgba(245,185,66,0.15); color: #f5b942; }
 .session-info { flex: 1; }
 .session-date { font-size: 15px; font-weight: 600; }
@@ -270,6 +273,20 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .vol-bar { flex: 1; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
 .vol-fill { height: 100%; background: var(--accent); border-radius: 4px; }
 .vol-num { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; width: 26px; text-align: right; }
+.hist-tabs { display: flex; gap: 8px; padding: 14px 16px 0; }
+.hist-tab { flex: 1; background: var(--surface2); color: var(--text2); border: 1px solid var(--border); border-radius: 10px; padding: 10px; font-size: 14px; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+.hist-tab.on { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+.exd-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.exd-row:last-child { border-bottom: none; }
+.exd-up { font-size: 11px; color: var(--green); font-family: 'DM Mono', monospace; }
+.exd-down { font-size: 11px; color: var(--orange); font-family: 'DM Mono', monospace; }
+.exd-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 14px; }
+.exd-stats > div { background: var(--surface2); border-radius: 10px; padding: 10px 8px; text-align: center; }
+.exd-stats span { display: block; font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
+.exd-stats b { display: block; font-size: 14px; margin-top: 3px; font-family: 'DM Mono', monospace; }
+.exd-stats i { display: block; font-size: 10px; color: var(--text3); font-style: normal; margin-top: 2px; }
+.exd-legend { display: flex; gap: 16px; justify-content: center; margin-top: 8px; font-size: 11px; color: var(--text2); }
+.exd-legend i { display: inline-block; width: 10px; height: 3px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
 .spd-item { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); }
 .input { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 16px; padding: 10px; text-align: center; -webkit-appearance: none; }
 .input:focus { outline: none; border-color: var(--accent); }
@@ -579,9 +596,63 @@ const DAY_T4 = { title: "Selkä + rinta/hartiat vahvistus", day: "Selkä+vahvist
 
 [1,2,3].forEach(p => { PROGRAM[p].T1 = DAY_T1; PROGRAM[p].T2 = DAY_T2; PROGRAM[p].T3 = DAY_T3; PROGRAM[p].T4 = DAY_T4; });
 
+// ── KAUSIOHJELMA (sählykausi, 2 pv + valinnainen 3.) ─────────────────────────
+// Sählytreenit ti + to, pelit la. K1 sunnuntaina on viikon ainoa raskas jalkapäivä
+// (48 h ennen tiistain treeniä). K2 keskiviikkona, K3 perjantaina vain ylävartaloa.
+// Toistohaarukka + kaksoisprogressio: kun kaikki sarjat menevät haarukan yläpäähän, nosta.
+const DAY_K1 = { title: "Koko keho · alavartalopaino", day: "Su · jalat + ylävartalo",
+  exercises: [
+    { id:"ky",  name:"Takakyykky", sets:3, reps:"6–8", defaultWeight:100, note:"tai jalkaprässi (⇄) — vaihda 4 vk välein" },
+    { id:"rdl", name:"Romanialainen maastaveto", sets:3, reps:"8–10", defaultWeight:100, note:"3 s lasku" },
+    { id:"pu",  name:"Käsipainopunnerrus tasapenkillä", sets:3, reps:"6–8", defaultWeight:23, note:"kg/käsi · parisarja alasvedon kanssa" },
+    { id:"av",  name:"Alasvetolaite", sets:3, reps:"8–10", defaultWeight:105, note:"parisarja penkin kanssa" },
+    { id:"bs",  name:"Bulgarian askelkyykky", sets:3, reps:"8–10/jalka", defaultWeight:22, note:"kg/käsi · parisarja koukistuksen kanssa" },
+    { id:"ko",  name:"Jalan koukistus laitteessa", sets:3, reps:"8–10", bilateral:true, defaultWeight:{L:60,R:60}, note:"3 s lasku · ei tingitä" },
+    { id:"hab", name:"Lonkan loitonnus (abductor-laite)", sets:3, reps:"12–15", defaultWeight:85, note:"supersetti lähennyksen kanssa" },
+    { id:"had", name:"Lonkan lähennys (adductor-laite)", sets:3, reps:"12–15", defaultWeight:85, note:"nivusvammojen ehkäisy" },
+  ]
+};
+const DAY_K2 = { title: "Koko keho · ylävartalopaino", day: "Ke · veto + työntö + core",
+  exercises: [
+    { id:"hp",   name:"Käsipainohartiaprässi (istuen)", sets:3, reps:"8–10", defaultWeight:15, note:"kg/käsi · parisarja soudun kanssa" },
+    { id:"so",   name:"Soutuveto laitteessa", sets:3, reps:"8–10", defaultWeight:80, note:"parisarja pystypunnerruksen kanssa" },
+    { id:"vi",   name:"Vinopenkkipunnerrus käsipainoilla", sets:3, reps:"8–10", defaultWeight:22, note:"kg/käsi · parisarja yhden käden soudun kanssa" },
+    { id:"sk",   name:"Soutuveto kaapelilla, yksi käsi", sets:3, reps:"8–10/käsi", defaultWeight:22 },
+    { id:"pd",   name:"Rintojen lähennys (pec deck)", sets:3, reps:"12–15", defaultWeight:55, note:"supersetti kasvovedon kanssa" },
+    { id:"ks",   name:"Kasvoveto taljassa", sets:3, reps:"12–15", defaultWeight:75 },
+    { id:"htb1", name:"Yhden jalan lantionnosto tangolla", sets:3, reps:"10", bilateral:true, defaultWeight:{L:40,R:40}, note:"kevyt — 2–3 toistoa varaa (torstaina sähly)" },
+    { id:"poh",  name:"Pohkeennostot", sets:3, reps:"12–15", defaultWeight:150, note:"supersetti Pallofin kanssa" },
+    { id:"pal",  name:"Pallof-painallus", sets:3, reps:"10–12/puoli", defaultWeight:15, note:"kierron vastustus" },
+    { id:"cr",   name:"Vatsarutistus taljassa", sets:3, reps:"10–12", defaultWeight:105, note:"supersetti kylkilankun kanssa" },
+    { id:"sp",   name:"Kylkilankku", sets:3, reps:"30s/puoli", defaultWeight:0, isTime:true },
+  ]
+};
+const DAY_K3 = { title: "Ylävartalo (valinnainen)", day: "Pe · rinta + kädet",
+  exercises: [
+    { id:"pu", name:"Käsipainopunnerrus tasapenkillä", sets:3, reps:"8–10", defaultWeight:22, note:"kg/käsi · toinen rintakerta" },
+    { id:"av", name:"Alasvetolaite", sets:3, reps:"10–12", defaultWeight:95 },
+    { id:"si", name:"Sivunostot käsipainoilla", sets:3, reps:"12–15", defaultWeight:7, note:"kg/käsi" },
+    { id:"bk", name:"Hauiskääntö käsipainoilla", sets:3, reps:"10–12", defaultWeight:13, note:"kg/käsi · supersetti ojentajan kanssa" },
+    { id:"tp", name:"Ojentajan taljaveto", sets:3, reps:"10–12", defaultWeight:60 },
+  ]
+};
+[1,2,3].forEach(p => { PROGRAM[p].K1 = DAY_K1; PROGRAM[p].K2 = DAY_K2; PROGRAM[p].K3 = DAY_K3; });
+
+const WARMUP = 'Lämmittely (~7 min): 3–4 min kuntopyörä · yhden jalan seisonta 2×30 s/jalka · pogohypyt 2×15 · 1–2 kevyttä nousevaa sarjaa ensimmäisestä liikkeestä.';
+
 // Kiiretreeni: päivän 3 tärkeintä liikettä. Säilyttää takareiden 2×/vk -frekvenssin
 // ja veto/työntö-tasapainon myös silloin kun aikaa on vain ~30 min.
+// Fysioterapeutin määräämät olkapääliikkeet — mukana jokaisessa treenissä.
+// Liitetään startWorkout'issa, jotta ne tulevat myös kiiretreeniin.
+const FYSIO_OLKAPAA = [
+  { id:"uk", name:"Olkanivelen ulkokierto", isRehab:false, sets:2, reps:12, bilateral:true, defaultWeight:{L:5,R:5}, note:"fysio · RIR 0–2" },
+  { id:"yn", name:"Y-nosto vinopenkillä (45°)", isRehab:false, sets:2, reps:12, defaultWeight:2, note:"fysio · kevyt, hallinta edellä" },
+];
+
 const QUICK = {
+  K1: ['ky','rdl','pu'],
+  K2: ['hp','so','vi'],
+  K3: ['pu','av','si'],
   T1: ['md','ko','htb1'],
   T2: ['pu','hp','ks'],
   T3: ['ky','ko','bs'],
@@ -645,6 +716,9 @@ const NAMES = {
   rdl: { fi:"Romanialainen maastaveto",            en:"Romanian deadlift" },
   htb: { fi:"Lantionnosto tangolla",               en:"Barbell hip thrust" },
   htb1:{ fi:"Yhden jalan lantionnosto tangolla",   en:"Single-leg barbell hip thrust" },
+  pal: { fi:"Pallof-painallus",                     en:"Pallof press" },
+  uk:  { fi:"Olkanivelen ulkokierto",              en:"Shoulder external rotation" },
+  yn:  { fi:"Y-nosto vinopenkillä (45°)",          en:"Prone Y-raise, 45° bench" },
   sc:  { fi:"Liukukelkkakoukistus",                en:"Slider hamstring curl" },
   tb:  { fi:"Tankopenkkipunnerrus",                en:"Barbell bench press" },
   pushup: { fi:"Punnerrus (kehonpaino)",           en:"Push-up" },
@@ -660,7 +734,7 @@ const NAMES = {
   ss2: { fi:"Rintojen lähennys + kasvoveto (supersetti)", en:"Pec deck + face pull (superset)" },
 };
 
-[1,2,3].forEach(p => ['A','B','C','D','E','T1','T2','T3','T4'].forEach(d => {
+[1,2,3].forEach(p => ['A','B','C','D','E','T1','T2','T3','T4','K1','K2','K3'].forEach(d => {
   PROGRAM[p][d].exercises.forEach(ex => {
     const n = NAMES[ex.id];
     if (n) { ex.name = n.fi; ex.en = n.en; }
@@ -674,13 +748,13 @@ const I = {
   legext: { laite:"Jalkojen ojennuslaite (leg extension). Tuoli jossa pehmustettu rulla nilkan edessä.", suoritus:"Istu selkä tukevasti, jalka rullan alle nilkan yläpuolelle. Ojenna polvi suoraksi hallitusti, pidä 1 s, laske rauhallisesti. Tee toistot yhdellä jalalla, sitten vaihda.", virhe:"Heilautat painon ylös vauhdilla tai lukitset polven rajusti ääriasennossa.", tuntuu:"Tuntuu etureidessä. Ei saa tuntua polvinivelessä terävänä." },
   legcurl: { laite:"Jalkojen koukistuslaite (leg curl) — makuu- tai istuva versio.", suoritus:"Aseta nilkka rullan alle/taakse. Koukista polvi tuomalla kantapää kohti pakaraa, laske hallitusti. Yksi jalka kerrallaan. Vasemmalla kevyempi paino — tärkeä kuntoutusliike.", virhe:"Nostat lantiota irti penkistä saadaksesi lisävoimaa.", tuntuu:"Tuntuu takareidessä. Ei terävänä kiinnityskohdassa (istuinluun seutu) — silloin lopeta." },
   legpress: { laite:"Jalkaprässilaite. Iso laite jossa työnnetään alustaa jaloilla. Penkin asento lukitaan.", suoritus:"Jalka alustan keskelle hartianlevyisesti. Laske alusta hallitusti (~90° polvessa), ojenna — älä lukitse polvea. Yksi jalka kerrallaan. Pidä penkin asento samana (asento 11).", virhe:"Päästät polven painumaan sisään tai alaselän irtoamaan tuesta syvällä.", tuntuu:"Tuntuu etureidessä ja pakarassa. Ei alaselässä." },
-  squat: { laite:"Olympiatanko + tangonpidike (squat/power rack).", suoritus:"Tanko hartioille (ei niskaan). Jalat hartianlevyisesti, varpaat hieman ulos. Laske lantio taakse ja alas vähintään reidet vaakatasoon, nouse ylös. Selkä suorana, kantapäät maassa.", virhe:"Polvet painuvat sisään, kantapäät nousevat tai selkä pyöristyy alhaalla.", tuntuu:"Tuntuu etureisissä ja pakaroissa. Ei alaselässä terävänä." },
+  squat: { laite:"Olympiatanko + tangonpidike (squat/power rack).", suoritus:"Tanko hartioille (ei niskaan). Jalat hartianlevyisesti, varpaat hieman ulos. Laske lantio taakse ja alas vähintään reidet vaakatasoon, nouse ylös. Selkä suorana, kantapäät maassa. HUOM (yliliikkuvat nilkat): sinulla on runsaasti nilkan liikkuvuutta, joten syvyys ei ole rajoite — hallinta on. Pidä polvi varpaiden linjassa koko liikkeen ajan äläkä hae syvyyttä liikeradan ääripäästä.", virhe:"Polvet painuvat sisään, kantapäät nousevat tai selkä pyöristyy alhaalla.", tuntuu:"Tuntuu etureisissä ja pakaroissa. Ei alaselässä terävänä." },
   kbdl: { laite:"Trap-tanko (heksatanko).", suoritus:"Seiso trap-tangon sisällä, tartu kahvoista. Saranoi lantiosta taakse, selkä suorana, polvet hieman koukussa. Nouse ojentamalla lonkka ja polvet yhtä aikaa — lantio ohjaa. Pystympi asento kuin tavallisessa maastavedossa, vähemmän selkäkuormaa. Pidä liike hallittuna ja kivuttomana. (Kevyempi vaihtoehto: sama liike kahvakuulalla.)", virhe:"Selkä pyöristyy tai vedät käsillä lantion ojennuksen sijaan.", tuntuu:"Tuntuu takareisissä ja pakaroissa. Ei alaselässä." },
   hipthrust: { laite:"Matala boksi / korotettu alusta (tai lattia aluksi).", suoritus:"Yksi jalka boksille kantapää kiinni, toinen ilmassa. Makaa selällesi, nosta lantio ylös suoraan linjaan, purista pakaraa 1–2 s, laske hallitusti. Molemmat jalat erikseen.", virhe:"Yliojennat alaselkää ylhäällä pakaran puristuksen sijaan.", tuntuu:"Tuntuu pakarassa. Ei alaselässä." },
-  dbbench: { laite:"Tasainen penkki + käsipainot.", suoritus:"Selällesi, käsipainot rinnan vieressä kyynärpäät ~45–60° vartalosta. Paina ylös kunnes kädet lähes suorana, laske hallitusti. Lavat yhdessä, rinta ylhäällä.", virhe:"Kyynärpäät leviävät suoraan sivulle (90°) olkapäitä rasittaen.", tuntuu:"Tuntuu rinnassa ja ojentajissa. Ei olkapään etuosassa terävänä." },
-  inclinebench: { laite:"Vinopenkki (30–45°) + käsipainot.", suoritus:"Selällesi vinopenkille, käsipainot rinnan yläosan vieressä. Paina ylös, laske hallitusti. Kohdistuu rinnan yläosaan ja etuhartiaan.", virhe:"Penkki liian pystyssä, jolloin liike muuttuu olkapääliikkeeksi.", tuntuu:"Tuntuu ylärinnassa. Ei niskassa tai olkapäässä." },
-  shoulderpress: { laite:"Penkki pystyssä (istuen) tai seisaaltaan + käsipainot.", suoritus:"Käsipainot olkapäiden korkeudelle, kyynärpäät 90°. Paina pään yläpuolelle, laske hallitusti. Jännitä vatsa, älä kaarra alaselkää.", virhe:"Notkistat alaselkää työntäessä ylös.", tuntuu:"Tuntuu olkapäissä ja ojentajissa. Ei alaselässä." },
-  lateral: { laite:"Käsipainot (kevyet). Seisaaltaan.", suoritus:"Nosta käsipainot suoraan sivuille hartian tasolle, peukalot hieman alas. Ei vauhtia eikä heilautusta. Laske hallitusti. Kevyt paino + puhdas tekniikka.", virhe:"Heilautat painot ylös vauhdilla ja nostat olkapäät korviin.", tuntuu:"Tuntuu olkapään sivuosassa. Ei niskassa tai lapaseudussa." },
+  dbbench: { laite:"Tasainen penkki + käsipainot.", suoritus:"Selällesi, käsipainot rinnan vieressä kyynärpäät ~45–60° vartalosta. Paina ylös kunnes kädet lähes suorana, laske hallitusti. Lavat yhdessä, rinta ylhäällä. HUOM (yliliikkuvat olkapäät): älä laske käsipainoja rintakehän tason alapuolelle — pysähdy suunnilleen rinnan tasolle, vaikka liikerata sallisi enemmän.", virhe:"Kyynärpäät leviävät suoraan sivulle (90°) olkapäitä rasittaen.", tuntuu:"Tuntuu rinnassa ja ojentajissa. Ei olkapään etuosassa terävänä." },
+  inclinebench: { laite:"Vinopenkki (30–45°) + käsipainot.", suoritus:"Selällesi vinopenkille, käsipainot rinnan yläosan vieressä. Paina ylös, laske hallitusti. Kohdistuu rinnan yläosaan ja etuhartiaan. HUOM (yliliikkuvat olkapäät): pysäytä lasku rinnan tasolle, älä hae ääriasentoa venytyksestä.", virhe:"Penkki liian pystyssä, jolloin liike muuttuu olkapääliikkeeksi.", tuntuu:"Tuntuu ylärinnassa. Ei niskassa tai olkapäässä." },
+  shoulderpress: { laite:"Penkki pystyssä (istuen) tai seisaaltaan + käsipainot.", suoritus:"Käsipainot olkapäiden korkeudelle, kyynärpäät 90°. Paina pään yläpuolelle, laske hallitusti. Jännitä vatsa, älä kaarra alaselkää. HUOM (yliliikkuvat olkapäät): pysäytä lasku niin, että kyynärpää on korkeintaan hartialinjan tasolla, äläkä lukitse kyynärpäitä ylhäällä. Hallinta edellä, ei ääriasentoja.", virhe:"Notkistat alaselkää työntäessä ylös.", tuntuu:"Tuntuu olkapäissä ja ojentajissa. Ei alaselässä." },
+  lateral: { laite:"Käsipainot (kevyet). Seisaaltaan.", suoritus:"Nosta käsipainot suoraan sivuille hartian tasolle, peukalot hieman alas. Ei vauhtia eikä heilautusta. Laske hallitusti. Kevyt paino + puhdas tekniikka. HUOM (yliliikkuvat olkapäät): nosta korkeintaan hartialinjaan asti, ei ylemmäs, ja hallitse laskuvaihe.", virhe:"Heilautat painot ylös vauhdilla ja nostat olkapäät korviin.", tuntuu:"Tuntuu olkapään sivuosassa. Ei niskassa tai lapaseudussa." },
   pushdown: { laite:"Kaapelilaite, suora tanko tai köysi yläkaapelissa.", suoritus:"Kyynärpäät kiinni kylkiin ja paikallaan. Ojenna kädet alas suoraksi, pidä 1 s, palaa hallitusti 90°:een. Kyynärpäät eivät liiku.", virhe:"Kyynärpäät liikkuvat eteen-taakse; autat koko vartalolla.", tuntuu:"Tuntuu ojentajissa (takaolkavarsi). Ei kyynärnivelessä terävänä." },
   overhead: { laite:"Yksi käsipaino molemmin käsin (tai kaksi).", suoritus:"Käsipaino pään yläpuolelle, kyynärpäät ylös lähellä korvia. Laske hallitusti pään taakse vain kyynärpäistä taivuttaen, ojenna takaisin.", virhe:"Kyynärpäät leviävät ulos ja liikkuvat suorituksen aikana.", tuntuu:"Tuntuu ojentajissa. Ei kyynärnivelessä." },
   tsuperset: { laite:"Kaapelilaite (pushdown + overhead).", suoritus:"Tee ensin pushdown (kyynärpäät kiinni), heti perään overhead extension ilman taukoa. Supersetti — koko sarja kerralla.", virhe:"Kiirehdit toisen liikkeen tekniikan kustannuksella.", tuntuu:"Tuntuu ojentajissa." },
@@ -693,7 +767,7 @@ const I = {
   curlsuperset: { laite:"Käsipainot.", suoritus:"Tee ensin normaali kääntö (kämmenet ylös), heti perään haamarikääntö (peukalo ylös) ilman taukoa.", virhe:"Käytät vauhtia hallitun suorituksen sijaan.", tuntuu:"Tuntuu hauiksessa." },
   facepull: { laite:"Kaapelilaite, köyskahva silmän korkeudella tai ylempänä.", suoritus:"Vedä köyttä kohti kasvoja hajottaen kädet sivuille, kyynärpäät hartiakorkeudella. Purista olkapäät taakse (ulkorotaatio). Laske hallitusti.", virhe:"Vedät liian raskaalla, jolloin isot lihakset ottavat vallan.", tuntuu:"Tuntuu takaolkapäässä ja yläselässä. Ei niskassa." },
   goblet: { laite:"Kahvakuula. Seisaaltaan.", suoritus:"Pidä kahvakuulaa molemmin käsin rinnan edessä. Laske kyykkyyn kyynärpäät polvien sisäpuolelle, selkä suorana. Nouse ylös. Hyvä kyykyn perusliike.", virhe:"Kallistut eteen ja kantapäät nousevat.", tuntuu:"Tuntuu etureisissä ja pakaroissa. Ei alaselässä." },
-  bulgarian: { laite:"Penkki/boksi takajalalle (+ käsipainot myöhemmin).", suoritus:"Takajalka penkille, etummainen jalka edessä. Laske molempia polvia, takapolvi kohti lattiaa. Nouse etummaisen jalan voimalla. Ylävartalo pystyssä.", virhe:"Etupolvi painuu sisään tai nojaat liikaa eteen.", tuntuu:"Tuntuu etujalan etureidessä ja pakarassa." },
+  bulgarian: { laite:"Penkki/boksi takajalalle (+ käsipainot myöhemmin).", suoritus:"Takajalka penkille, etummainen jalka edessä. Laske molempia polvia, takapolvi kohti lattiaa. Nouse etummaisen jalan voimalla. Ylävartalo pystyssä. HUOM (yliliikkuvat nilkat): tukijalan nilkka vakaana; jos nilkka heiluu, kevennä painoa ja keskity hallintaan.", virhe:"Etupolvi painuu sisään tai nojaat liikaa eteen.", tuntuu:"Tuntuu etujalan etureidessä ja pakarassa." },
   nordic: { laite:"Kiinteä tuki jalkaterille (laite/penkki/kaveri pitää nilkoista).", suoritus:"Polvet lattialla, keho pystyssä. Laske itsesi hitaasti (5 s) eteenpäin vain polvista taivuttaen — takareidet jarruttavat. Käytä käsiä apuna. Raskas liike!", virhe:"Taivut lonkasta etkä pidä kehoa suorana; lasket liian nopeasti.", tuntuu:"Tuntuu takareidessä voimakkaasti. Lopeta heti jos terävä kipu kiinnityskohdassa." },
   rotary: { laite:"Rotary torso -laite. Istuva kiertolaite.", suoritus:"Rintakehä pehmustetta vasten, ota kahvoista. Kierrä vartaloa rauhallisesti sivulle (liike ylävartalosta), palaa keskelle. Tee toistot ensin yhteen suuntaan.", virhe:"Kierrät lantiosta etkä keskivartalosta; käytät vauhtia.", tuntuu:"Tuntuu vinoissa vatsalihaksissa. Ei alaselässä." },
   plank: { laite:"Ei välineitä.", suoritus:"Kyynärpäät hartioiden alla, keho suorassa linjassa kantapäistä hartioihin. Älä anna lantion vajota. Jännitä vatsa ja pakara. Hengitä rauhallisesti.", virhe:"Lantio roikkuu alas tai nousee liian ylös.", tuntuu:"Tuntuu keskivartalossa (vatsa). Ei alaselässä." },
@@ -702,24 +776,27 @@ const I = {
   abwheel: { laite:"Vatsapyörä (ab wheel) tai kaapelicrunch.", suoritus:"Polvillaan, rullauta pyörää hitaasti eteen keho suorana (lantio ei vajoa), vedä takaisin vatsalihaksilla. Aloita lyhyellä matkalla.", virhe:"Alaselkä notkolle rullatessa eteen.", tuntuu:"Tuntuu vatsalihaksissa. Ei alaselässä." },
   hanging: { laite:"Leuanvetotanko tai dippiteline käsinojilla.", suoritus:"Roiku tangosta. Tuo jalat ylös ~90° vatsalla (ei vauhdilla), laske hallitusti. Aloita polvet koukussa, etene suoriin jalkoihin.", virhe:"Heilut ja käytät vauhtia noston sijaan.", tuntuu:"Tuntuu alavatsassa." },
   woodchop: { laite:"Kaapelilaite, yksi kahva ylhäällä.", suoritus:"Vedä kahva diagonaalisesti ylhäältä alas vastakkaiselle lantiolle, käsivarret lähes suorina. Liike kiertää koko vartalon lantiosta. Tee molemmat suunnat.", virhe:"Käytät pelkkiä käsiä etkä keskivartalon kiertoa.", tuntuu:"Tuntuu vinoissa vatsalihaksissa." },
-  pecdeck: { laite:"Pec deck / butterfly -laite.", suoritus:"Säädä istuin niin että kahvat rinnan korkeudella. Tuo käsivarret yhteen edessä, purista rintaa, laske hallitusti ilman yliojennusta.", virhe:"Yliojennat olkapäät taakse alkuasennossa.", tuntuu:"Tuntuu rinnassa. Ei olkapään etuosassa terävänä." },
+  pecdeck: { laite:"Pec deck / butterfly -laite.", suoritus:"Säädä istuin niin että kahvat rinnan korkeudella. Tuo käsivarret yhteen edessä, purista rintaa, laske hallitusti ilman yliojennusta. HUOM (yliliikkuvat olkapäät): lyhennä alkuasentoa — älä anna käsien mennä vartalolinjan taakse. Työ tehdään keskiliikeradalla.", virhe:"Yliojennat olkapäät taakse alkuasennossa.", tuntuu:"Tuntuu rinnassa. Ei olkapään etuosassa terävänä." },
   pecsuperset: { laite:"Pec deck + kaapelilaite (kasvosveto).", suoritus:"Tee ensin pec deck, heti perään kasvosveto kaapelilla ilman taukoa. Supersetti rinta + takahartia.", virhe:"Kiirehdit supersetin läpi.", tuntuu:"Tuntuu rinnassa ja takaolkapäässä." },
   calves: { laite:"Pohjelaite (calf raise machine), pohjelaite Smith-koneessa, tai porras/koroke jolla kantapäät pääsevät vapaiksi.", suoritus:"Päkiät tukevasti alustalle, kantapäät vapaina. Nouse päkiöille mahdollisimman ylös ja purista pohkeet täyteen jännitykseen (1 s pito). Laske hallitusti syvälle venyttäen pohjetta. Tee molemmilla jaloilla yhtä aikaa tai vuorotellen yhdellä jalalla.", virhe:"Lyhyt liikerata ja pomppiminen.", tuntuu:"Tuntuu pohkeissa. Täysi venytys alhaalla, purista ylhäällä." },
   snatch: { laite:"Yksi käsipaino. Fysioterapeutin nopeusliike — tee tuoreena treenin alussa.", suoritus:"Seiso yhdellä jalalla, käsipaino toisessa kädessä alhaalla. Ojenna räjähtävästi lonkka ja polvi ja tempaa käsipaino yhdellä sulavalla liikkeellä suoralle kädelle pään yläpuolelle. Laske hallitusti. Terävä ja nopea veto, kevyt paino. Lämmittele huolella ennen. Vammakohdan kipu = lopeta.", virhe:"Vedät pelkillä käsillä räjähtävän lonkan ojennuksen sijaan.", tuntuu:"Tuntuu koko takaketjussa ja hartiassa. Terävä kipu vammakohdassa = lopeta." },
   mbkick: { laite:"Kuntopallo (3–5 kg). Fysioterapeutin nopeusliike.", suoritus:"Tee nopeita, teräviä potkuja kuntopalloa vasten — sekä polvet koukistaen että jalat suorana, kuten fysioterapeutti ohjeisti. Nopea suoritus, hallittu keskivartalo. Aloita kevyellä pallolla ja maltillisella teholla, nosta progressiivisesti.", virhe:"Suoritus on hidas ja hallitsematon.", tuntuu:"Tuntuu takareidessä ja lonkassa. Nopea mutta hallittu." },
   mbhip: { laite:"Kuntopallo. Fysioterapeutin nopeusliike.", suoritus:"Yhden jalan lantionnosto: pidä lantio ylhäällä ja liikuta kuntopalloa nopeasti eteen ja taakse. Liike nopea mutta hallittu, keskivartalo tiukkana. Tee molemmille puolille.", virhe:"Lantio putoaa kesken liikkeen.", tuntuu:"Tuntuu pakarassa ja takareidessä." },
-  lunge: { laite:"Käsipainot kyljillä.", suoritus:"Ota askel eteen (tai kävele eteenpäin), laskeudu kunnes takapolvi lähes koskettaa lattiaa ja etureisi on vaakatasossa. Nouse työntäen etujalan kantapäästä. Pidä ylävartalo pystyssä, etupolvi varpaiden suunnassa (ei sisään). Tee molemmille jaloille.", virhe:"Etupolvi painuu sisään tai askel jää liian lyhyeksi.", tuntuu:"Tuntuu etujalan etureidessä ja pakarassa. Ei polvinivelessä terävänä." },
+  lunge: { laite:"Käsipainot kyljillä.", suoritus:"Ota askel eteen (tai kävele eteenpäin), laskeudu kunnes takapolvi lähes koskettaa lattiaa ja etureisi on vaakatasossa. Nouse työntäen etujalan kantapäästä. Pidä ylävartalo pystyssä, etupolvi varpaiden suunnassa (ei sisään). Tee molemmille jaloille. HUOM (yliliikkuvat nilkat): pidä nilkka vakaana ja polvi varpaiden linjassa — älä anna nilkan kiertyä sisään laskuvaiheessa.", virhe:"Etupolvi painuu sisään tai askel jää liian lyhyeksi.", tuntuu:"Tuntuu etujalan etureidessä ja pakarassa. Ei polvinivelessä terävänä." },
   abductor: { laite:"Lonkan loitonnuslaite (hip abductor). Istuen, pehmusteet reisien ulkosivuilla.", suoritus:"Istu tukevasti, työnnä polvia ulospäin auki jännittäen pakaran sivuja. Purista ääriasennossa, palauta hallitusti. Vahvistaa lonkan sivustabilaatiota — tukee juoksua, hallintaa ja polven linjausta.", virhe:"Käytät vauhtia ja nojaat taakse.", tuntuu:"Tuntuu pakaran sivussa (ulkoreisi)." },
   adductor: { laite:"Lonkan lähennyslaite (hip adductor). Istuen, pehmusteet reisien sisäsivuilla.", suoritus:"Istu tukevasti, purista polvia yhteen jännittäen sisäreisiä. Purista ääriasennossa, palauta hallitusti äläkä päästä nykäisemään auki. Vahvistaa sisäreittä ja lonkan tasapainoa.", virhe:"Päästät jalat nykäisemään auki hallitsematta.", tuntuu:"Tuntuu sisäreidessä." },
   legpress2: { laite:"Jalkaprässi (molemmat jalat).", suoritus:"Molemmat jalat alustalle hartioiden leveydelle. Laske hallitusti kunnes polvet noin 90°, työnnä ylös lukitsematta polvia. Pidä alaselkä tuessa. Molemmilla jaloilla yhtä aikaa.", virhe:"Alaselkä irtoaa tuesta liian syvällä; lukitset polvet.", tuntuu:"Tuntuu etureisissä ja pakaroissa. Ei alaselässä." },
   hacksquat: { laite:"Hack-kyykkylaite.", suoritus:"Hartiat pehmusteita vasten, jalat alustalle. Kyykkää hallitusti alas, työnnä kantapäistä ylös. Etureisipainotteinen, vakaa liikerata.", virhe:"Kantapäät nousevat tai polvet painuvat sisään.", tuntuu:"Tuntuu etureisissä. Ei polvinivelessä terävänä." },
   rdl: { laite:"Levytanko.", suoritus:"Saranoi lantiosta taakse, polvet hieman koukussa. Laske kunnes tunnet takareiden venytyksen, selkä neutraalina. Nouse pakaroita jännittäen. Älä pakota syvemmälle kuin kivuton liikerata sallii — takareisi kuormittuu venytyksessä. (Voi tehdä myös käsipainoparilla.)", virhe:"Pyöristät selän tai teet kyykyn saranaliikkeen sijaan.", tuntuu:"Tuntuu takareisien venytyksenä ja pakarassa. Ei alaselässä." },
+  pallof: { laite:"Talja (kahva rinnan korkeudella) tai kuminauha. Seiso sivuttain taljaan nähden.", suoritus:"Seiso hartioiden leveydellä, polvet hieman koukussa, sivuttain taljaan. Pidä kahvaa molemmin käsin rintalastan edessä. Työnnä kädet suoraksi eteen ja pidä 2 s — talja yrittää kiertää vartaloa kohti laitetta, sinä et anna sen kiertyä. Palauta hallitusti rintaan. Tee molemmat puolet. Lantio ja hartiat pysyvät koko ajan suoraan eteenpäin.", virhe:"Vartalo kiertyy taljaa kohti tai lantio väistää sivulle — silloin paino on liian iso. Myös hartioiden kohottaminen korviin.", tuntuu:"Tuntuu vinoissa vatsalihaksissa ja koko keskivartalossa, laitteen puoleisella kyljellä. Ei alaselässä eikä olkapäissä." },
+  extrot: { laite:"Käsipaino tai talja. Fysioterapeutin määräämä liike.", suoritus:"Kylkimakuulla ylempi käsi kyljessä, kyynärpää 90° ja tiukasti kylkeä vasten (voit pitää pyyhettä välissä). Kierrä kämmenselkä ulospäin niin pitkälle kuin liikerata sallii kivuttomasti, laske hitaasti takaisin. Ranne pysyy suorana, kyynärpää ei irtoa kyljestä. Vaihtoehtoisesti seisten taljassa. RIR 0–2 eli sarja viedään lähes loppuun asti.", virhe:"Kyynärpää irtoaa kyljestä tai kierto tehdään ranteesta ja vartaloa kiertämällä — silloin kiertäjäkalvosin ei tee työtä.", tuntuu:"Tuntuu olkapään takaosassa syvällä. Ei niskassa, ei etuolkapäässä terävänä." },
+  yraise: { laite:"Kevyet käsipainot + vinopenkki 45°. Fysioterapeutin määräämä liike.", suoritus:"Rinta vinopenkkiä vasten, kädet roikkuen alas. Nosta suorat kädet ylös vinottain eteen Y-kirjaimen muotoon (peukalot ylöspäin), noin 45° kulmassa vartalosta. Vie ylös kunnes kädet ovat korvien linjassa, laske hallitusti. Aloita liike lapaluusta, älä hartioita kohauttamalla. Kevyt paino riittää — tämä on hallintaliike, ei voimaliike.", virhe:"Liian iso paino, jolloin hartiat nousevat korviin ja epäkäslihaksen yläosa ottaa työn lapatuen sijaan.", tuntuu:"Tuntuu lapaluun alaosassa ja yläselässä. Ei niskassa eikä olkapään päällä." },
   hipthrust1bar: { laite:"Levytanko + penkki, lantiopehmuste tangon alle. Aloita kevyellä kuormalla — yhdellä jalalla tanko asettuu eri tavalla kuin kahdella.", suoritus:"Lapaluiden alaosa penkin reunaa vasten, tanko lantion päällä pehmusteen kanssa. Aseta työjalan kantapää lattiaan niin että ylhäällä polvi on ~90°; toinen jalka koukussa ilmassa tai kevyesti ojennettuna. Työnnä työjalan kantapäästä lantio ylös vaakatasoon, purista pakara 1–2 s, laske hallitusti. Pidä lantio suorassa — se ei saa kiertyä tyhjän jalan puolelle. Tee molemmat puolet, heikompi ensin.", virhe:"Lantio kiertyy tai putoaa toiselta puolelta, alaselkä yliojentuu, tai jalka on liian kaukana jolloin takareisi ottaa vetona pakaran sijaan.", tuntuu:"Tuntuu työjalan pakarassa. Ei alaselässä, eikä terävänä takareiden kiinnityskohdassa (istuinluu) — jos tuntuu, siirrä jalkaa lähemmäs ja kevennä." },
   hipthrustbar: { laite:"Levytanko + penkki, lantiopehmuste (tai matto) tangon alle. Isoilla levyillä tanko rullaa paikalleen helpommin.", suoritus:"Istu lattialle penkki takana, lapaluiden alaosa penkin reunaa vasten. Tanko lantion päälle pehmusteen kanssa, jalat lattiassa hartioiden leveydellä niin että ylhäällä polvi on ~90°. Työnnä kantapäistä lantio ylös kunnes vartalo on vaakatasossa, purista pakarat 1–2 s, laske hallitusti. Leuka rintaan koko liikkeen ajan. Nosta kuormaa maltillisin askelin.", virhe:"Yliojennat alaselkää ylhäällä pakaran puristuksen sijaan, tai jalat ovat liian kaukana jolloin takareisi ottaa vetona.", tuntuu:"Tuntuu pakaroissa. Ei alaselässä, eikä terävänä takareiden kiinnityskohdassa (istuinluu) — jos tuntuu, siirrä jalkoja lähemmäs ja kevennä." },
   slidercurl: { laite:"Liukukiekot, pyyhe sileällä lattialla tai jumppapallo.", suoritus:"Selinmakuu, kantapäät liukuvalla alustalla. Nosta lantio siltaan, vedä kantapäät kohti pakaroita, ojenna hitaasti jarruttaen. Pidä lantio ylhäällä. Aloita kahdella jalalla.", virhe:"Lantio putoaa ojennusvaiheessa tai ojennat liian nopeasti.", tuntuu:"Tuntuu takareidessä. Jarruta ojennus hitaasti." },
-  bbbench: { laite:"Levytanko + penkki.", suoritus:"Selkä penkissä, lavat yhteen, jalat maassa. Laske tanko rinnalle hallitusti, työnnä ylös. Käytä varmistajaa tai turvatankoja raskaalla painolla.", virhe:"Kyynärpäät leviävät 90°; selkäkaari kasvaa liian suureksi.", tuntuu:"Tuntuu rinnassa ja ojentajissa. Ei olkapäässä terävänä." },
-  pushup2: { laite:"Kehonpaino.", suoritus:"Kädet hartioita leveämmällä, keho suorana kantapäistä päähän. Laske rinta lähelle lattiaa, työnnä ylös. Skaalaa polvilta jos tarpeen.", virhe:"Lantio roikkuu tai kyynärpäät leviävät suoraan sivulle.", tuntuu:"Tuntuu rinnassa, ojentajissa ja keskivartalossa." },
-  bbohp: { laite:"Levytanko.", suoritus:"Seisten, tanko olkapäiltä. Työnnä suoraan ylös pään yli, keskivartalo tiukkana. Älä notkista alaselkää. Laske hallitusti olkapäille.", virhe:"Notkistat alaselkää ja työnnät tangon liian eteen.", tuntuu:"Tuntuu olkapäissä ja ojentajissa. Ei alaselässä." },
+  bbbench: { laite:"Levytanko + penkki.", suoritus:"Selkä penkissä, lavat yhteen, jalat maassa. Laske tanko rinnalle hallitusti, työnnä ylös. Käytä varmistajaa tai turvatankoja raskaalla painolla. HUOM (yliliikkuvat olkapäät): käytä tarvittaessa lautaa tai pysäytä tanko hieman ennen rintaa — älä anna olkapään valua ääriasentoon.", virhe:"Kyynärpäät leviävät 90°; selkäkaari kasvaa liian suureksi.", tuntuu:"Tuntuu rinnassa ja ojentajissa. Ei olkapäässä terävänä." },
+  pushup2: { laite:"Kehonpaino.", suoritus:"Kädet hartioita leveämmällä, keho suorana kantapäistä päähän. Laske rinta lähelle lattiaa, työnnä ylös. Skaalaa polvilta jos tarpeen. HUOM (yliliikkuvat olkapäät): laske rinta korkeintaan käsien tasolle, älä syvemmälle (esim. kahvojen tai levyjen päällä).", virhe:"Lantio roikkuu tai kyynärpäät leviävät suoraan sivulle.", tuntuu:"Tuntuu rinnassa, ojentajissa ja keskivartalossa." },
+  bbohp: { laite:"Levytanko.", suoritus:"Seisten, tanko olkapäiltä. Työnnä suoraan ylös pään yli, keskivartalo tiukkana. Älä notkista alaselkää. Laske hallitusti olkapäille. HUOM (yliliikkuvat olkapäät): hallittu liikerata ilman lukitusta ylhäällä; tanko laskeutuu leuan tasolle, ei alemmas.", virhe:"Notkistat alaselkää ja työnnät tangon liian eteen.", tuntuu:"Tuntuu olkapäissä ja ojentajissa. Ei alaselässä." },
 };
 
 const INSTRUCTIONS = {
@@ -733,7 +810,7 @@ const INSTRUCTIONS = {
   poh:I.calves,
   jt:I.snatch, kp:I.mbkick, kl:I.mbhip,
   ak:I.lunge, hab:I.abductor, had:I.adductor,
-  fpp:I.legpress2, hs:I.hacksquat, rdl:I.rdl, htb:I.hipthrustbar, htb1:I.hipthrust1bar, sc:I.slidercurl, tb:I.bbbench, pushup:I.pushup2, bpp:I.bbohp,
+  fpp:I.legpress2, hs:I.hacksquat, rdl:I.rdl, htb:I.hipthrustbar, htb1:I.hipthrust1bar, uk:I.extrot, yn:I.yraise, pal:I.pallof, sc:I.slidercurl, tb:I.bbbench, pushup:I.pushup2, bpp:I.bbohp,
 };
 
 // ── VAIHTOEHTOISET LIIKKEET ───────────────────────────────────────────────────
@@ -788,6 +865,9 @@ const LIB = {
   la:  {m:'pakara', w:{L:12.5,R:12.5}, s:3, r:10, bil:true},
   htb: {m:'pakara', w:60, s:3, r:10},
   htb1:{m:'pakara', w:{L:20,R:20}, s:3, r:10, bil:true},
+  uk:  {m:'hartiat', w:{L:5,R:5}, s:2, r:12, bil:true},
+  pal: {m:'keskivartalo', w:15, s:3, r:'10–12/puoli'},
+  yn:  {m:'hartiat', w:2, s:2, r:12},
   ll:  {m:'pakara', w:0,  s:3, r:12},
   // Etureisi
   ky:  {m:'etureisi', w:90, s:4, r:8},
@@ -855,13 +935,22 @@ function getInstr(id) { return INSTRUCTIONS[id] || null; }
 // ── PROGRESSIOEHDOTUS ─────────────────────────────────────────────────────────
 // Jos viime kerralla kaikki suunnitellut sarjat tulivat täysillä toistoilla
 // samalla painolla, ehdota yhtä porrasta lisää.
+// Toistotavoite: haarukasta (esim. "8–10") yläpää, muuten ensimmäinen luku.
+function repTarget(reps) {
+  if (typeof reps === 'number') return reps;
+  const r = String(reps);
+  const m = r.match(/(\d+)\s*[-–]\s*(\d+)/);
+  if (m) return parseInt(m[2]);
+  const n = r.match(/\d+/);
+  return n ? parseInt(n[0]) : 8;
+}
+
 function progressionHint(ex, day) {
   if (ex.isTime) return null;
   const side = ex.bilateral ? (ex.activeSide || 'L') : null;
   const last = getLastPerformance(ex.name, side, day, ex.id);
   if (!last || !last.sets || !last.sets.length) return null;
-  const target = typeof ex.reps === 'number' ? ex.reps
-    : (String(ex.reps).match(/\d+/) ? parseInt(String(ex.reps).match(/\d+/)[0]) : 8);
+  const target = repTarget(ex.reps);
   const planned = ex.bilateral ? ex.sets[side].length : ex.sets.length;
   if (last.sets.length < planned) return null;
   const w0 = last.sets[0].weight;
@@ -1003,18 +1092,15 @@ function getStep(ex) {
 // physio-testit (symm, hq, polven koukistus -testi) pidetään manuaalisina
 
 const GOALS = {
-  rehab: [
-    { id:"flexL", name:"Polven koukistus testi (vasen)", start:34.1, targets:[40,45,50], unit:"kg", current:34.1, weeks:[4,8,12] },
-    { id:"symm", name:"Puoliero (vasen vs. oikea)", start:55.6, targets:[65,75,80], unit:"%", current:55.6, weeks:[4,8,12] },
-    { id:"hq", name:"H:Q-suhde vasen", start:68, targets:[72,77,80], unit:"%", current:68, weeks:[4,8,12] },
-    { id:"fpL", name:"Jalkaprässi vasen", start:141, targets:[155,170,185], unit:"kg", current:141, weeks:[4,8,12], auto:true, match:"jalkaprässi", side:"L" },
-  ],
+  rehab: [],
+  // Kausiohjelma (viikot 13–24). Nykyarvo lasketaan treenihistoriasta latauksessa.
   strength: [
-    { id:"squat", name:"Takakyykky", start:90, targets:[100,110,120], unit:"kg", current:90, weeks:[4,8,12], auto:true, match:"takakyykky" },
-    { id:"dead", name:"Maastaveto (kahvakuula)", start:32, targets:[36,40,44], unit:"kg", current:32, weeks:[4,8,12], auto:true, match:"maastaveto" },
-    { id:"lat", name:"Alasvetolaite", start:70, targets:[80,90,100], unit:"kg", current:70, weeks:[4,8,12], auto:true, match:"alasvetolaite" },
-    { id:"row", name:"Soutuveto", start:40, targets:[50,57,65], unit:"kg", current:40, weeks:[4,8,12], auto:true, match:"soutu" },
-    { id:"bench", name:"Punnerrus käsipainoilla (per käsi)", start:16, targets:[18,20,22], unit:"kg", current:16, weeks:[4,8,12], auto:true, match:"punnerrus" },
+    { id:"sq2",   name:"Takakyykky", start:100, targets:[105,110,115], unit:"kg", current:100, weeks:[16,20,24], auto:true, match:"takakyykky" },
+    { id:"rdl2",  name:"Romanialainen maastaveto", start:100, targets:[105,110,117.5], unit:"kg", current:100, weeks:[16,20,24], auto:true, match:"romanialainen" },
+    { id:"bp2",   name:"Käsipainopenkki (per käsi)", start:23, targets:[24,26,28], unit:"kg", current:23, weeks:[16,20,24], auto:true, match:"tasapenkillä" },
+    { id:"lat2",  name:"Alasvetolaite", start:105, targets:[110,115,120], unit:"kg", current:105, weeks:[16,20,24], auto:true, match:"alasvetolaite" },
+    { id:"row2",  name:"Soutuveto laitteessa", start:80, targets:[82.5,85,90], unit:"kg", current:80, weeks:[16,20,24], auto:true, match:"soutuveto laitteessa" },
+    { id:"curl2", name:"Jalan koukistus (vasen)", start:60, targets:[62.5,65,70], unit:"kg", current:60, weeks:[16,20,24], auto:true, match:"jalan koukistus", side:"L" },
   ]
 };
 
@@ -1026,6 +1112,8 @@ let state = {
   goals: JSON.parse(JSON.stringify(GOALS)),
   selectedDay: null,
   expandedSession: null,
+  histMode: 'sessions',   // 'sessions' | 'exercises'
+  histExercise: null,     // valitun liikkeen id
   instrOpen: {},
   measurements: [],   // [{date, goalId, value}]
   chartExercise: 'squat',
@@ -1036,6 +1124,19 @@ let state = {
   libFilter: null,
   speedSessions: [],  // [{id, date, dateStr, week, type, s1, s2, s3, note}]
 };
+
+function recalcAutoGoals() {
+  state.goals.strength.concat(state.goals.rehab).forEach(g => {
+    if (!g.auto || !g.match) return;
+    let best = 0;
+    state.sessions.forEach(s => (s.exercises || []).forEach(ex => {
+      if (!ex.name.toLowerCase().includes(g.match)) return;
+      let sets = ex.bilateral ? (g.side === 'R' ? ex.setsR : ex.setsL) : ex.sets;
+      (sets || []).forEach(x => { if (x.reps > 0 && x.weight > best) best = x.weight; });
+    }));
+    if (best > 0) g.current = best;
+  });
+}
 
 function getPhase(week) {
   if (week <= 4) return 1;
@@ -1054,10 +1155,13 @@ function getLastPerformance(exName, side, dayLetter, exId) {
     const ex = s.exercises.find(e => (exId && e.id === exId) || e.name === exName);
     if (!ex) continue;
     let sets = ex.bilateral ? (side === 'R' ? ex.setsR : ex.setsL) : ex.sets;
-    if (!sets || !sets.length) continue;
+    sets = (sets || []).filter(x => x.reps > 0);
+    if (!sets.length) continue;
     const top = sets.reduce((a, b) => b.weight > a.weight ? b : a, sets[0]);
     return { weight: top.weight, reps: top.reps, dateStr: s.dateStr, sets, rpe: ex.rpe || null };
   }
+  // Uudessa ohjelmassa päiväkirjain vaihtui: haetaan silloin mistä tahansa päivästä.
+  if (dayLetter) return getLastPerformance(exName, side, null, exId);
   return null;
 }
 
@@ -1165,7 +1269,7 @@ function getStreak() {
   const weeks = getWeeklyData();
   let streak = 0;
   for (let w = state.currentWeek; w >= 1; w--) {
-    if ((weeks[w] || 0) >= 3) streak++;
+    if ((weeks[w] || 0) >= (w > 12 ? 2 : 3)) streak++;
     else if (w < state.currentWeek) break; // nykyviikko kesken ei katkaise
   }
   return streak;
@@ -1182,6 +1286,7 @@ function save() {
     runs: state.runs,
     speedSessions: state.speedSessions,
     lastBackup: state.lastBackup || null,
+    programVersion: 2,
   }));
 }
 
@@ -1195,6 +1300,8 @@ function load() {
       state.runs = d.runs || [];
       state.speedSessions = d.speedSessions || [];
       state.lastBackup = d.lastBackup || null;
+      // Kausiohjelma alkaa viikosta 13 (vanha 12 vk ohjelma päättyi).
+      if ((d.programVersion || 1) < 2 && state.currentWeek <= 12) state.currentWeek = 13;
       // Aloita aina tuoreista tavoitemäärittelyistä (match/auto/weeks),
       // mutta säilytä käyttäjän tallentamat nykyiset arvot ja tavoitteet.
       state.goals = JSON.parse(JSON.stringify(GOALS));
@@ -1209,6 +1316,7 @@ function load() {
           });
         });
       }
+      recalcAutoGoals();
     }
   } catch(e) {}
 }
@@ -1238,7 +1346,7 @@ function updateHeaderSubtitle() {
   const el = document.getElementById('header-subtitle');
   const phase = getPhase(state.currentWeek);
   const phaseNames = {1:'Perusta',2:'Kehitys',3:'Teho'};
-  el.innerHTML = `Viikko <span>${state.currentWeek}</span> · Vaihe ${phase}: ${phaseNames[phase]}`;
+  el.innerHTML = state.currentWeek > 12 ? `Viikko <span>${state.currentWeek}</span> · Kausiohjelma` : `Viikko <span>${state.currentWeek}</span> · Vaihe ${phase}: ${phaseNames[phase]}`;
 }
 
 // ── HOME ──────────────────────────────────────────────────────────────────────
@@ -1246,11 +1354,11 @@ function updateHeaderSubtitle() {
 function todaysWorkout() {
   if (state.activeWorkout) return { type:'resume', day: state.activeWorkout.day };
   const phase = getPhase(state.currentWeek);
-  const rotation = ['T1','T2','T3','T4'];
   const doneThisWeek = new Set(state.sessions.filter(s => s.week === state.currentWeek).map(s => s.day));
-  const next = rotation.find(d => !doneThisWeek.has(d));
-  if (!next) return { type:'rest' };
-  return { type:'workout', day: next, info: PROGRAM[phase][next] };
+  const next = ['K1','K2'].find(d => !doneThisWeek.has(d));
+  if (next) return { type:'workout', day: next, info: PROGRAM[phase][next] };
+  if (!doneThisWeek.has('K3')) return { type:'workout', day: 'K3', info: PROGRAM[phase].K3, optional: true };
+  return { type:'rest' };
 }
 
 function renderHero() {
@@ -1266,15 +1374,15 @@ function renderHero() {
   if (t.type === 'rest') {
     return `<div class="hero hero-rest">
       <div class="hero-label" style="color:var(--green)">Tänään</div>
-      <div class="hero-title">Tehotreenit tehty 💪</div>
-      <div class="hero-sub">Tämän viikon T1–T4 on kirjattu. Lepo tai rauhallinen juoksu palauttaa parhaiten.</div>
+      <div class="hero-title">Viikon salitreenit tehty 💪</div>
+      <div class="hero-sub">K1, K2 ja K3 on kirjattu. Sähly hoitaa loput — lepo palauttaa.</div>
     </div>`;
   }
   const n = t.info.exercises.length;
   return `<div class="hero">
-    <div class="hero-label">Tänään · suositus</div>
+    <div class="hero-label">${t.optional ? 'Valinnainen lisäpäivä' : 'Seuraava treeni'}</div>
     <div class="hero-title">${t.day} · ${t.info.title}</div>
-    <div class="hero-sub">${n} liikettä · nopeusliikkeet tuoreena alussa</div>
+    <div class="hero-sub">${n} liikettä + olkapään tuki · ${t.info.day}${t.optional ? ' · tee jos viikko sallii' : ''}</div>
     <button class="btn btn-primary hero-btn" onclick="startWorkout('${t.day}')">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
       Aloita treeni
@@ -1295,14 +1403,16 @@ function renderHome() {
   const runsThisWeek = state.runs.filter(r => r.week === state.currentWeek).length;
 
   const schedule = [
-    { day:'Ma', act:'Sali — Päivä A (etuketju + Push)', load:'low', txt:'Matala' },
-    { day:'Ti', act:'Rauhallinen juoksu', load:'low', txt:'Matala' },
-    { day:'Ke', act:'Sali — Päivä B (takaketju + Pull)', load:'high', txt:'Korkea' },
-    { day:'To', act:'Lepo', load:'rest', txt:'Lepo' },
-    { day:'Pe', act:'Sali — Päivä C (jalat kevyt + Core)', load:'mid', txt:'Keski' },
-    { day:'La', act:'Lepo', load:'rest', txt:'Lepo' },
-    { day:'Su', act:'Pidempi rauhallinen lenkki', load:'low', txt:'Matala' },
+    { day:'Ma', act:'Lepo', load:'rest', txt:'Lepo' },
+    { day:'Ti', act:'Sähly', load:'high', txt:'Laji' },
+    { day:'Ke', act:'Sali — K2 (ylävartalopaino)', load:'mid', txt:'Keski' },
+    { day:'To', act:'Sähly', load:'high', txt:'Laji' },
+    { day:'Pe', act:'Sali — K3 (valinnainen, ei jalkoja)', load:'low', txt:'Matala' },
+    { day:'La', act:'Peli', load:'high', txt:'Laji' },
+    { day:'Su', act:'Sali — K1 (viikon raskas jalkapäivä)', load:'high', txt:'Korkea' },
   ];
+  const cycleStart = Math.floor((state.currentWeek - 1) / 12) * 12 + 1;
+  const weekTarget = state.currentWeek > 12 ? 2 : 3;
 
   return `
     ${renderHero()}
@@ -1335,11 +1445,11 @@ function renderHome() {
 
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-value" style="color:var(--accent2)">${thisWeekSessions}/3</div>
+        <div class="stat-value" style="color:var(--accent2)">${thisWeekSessions}/${weekTarget}</div>
         <div class="stat-label">Salitreenejä tällä viikolla</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value" style="color:var(--orange)">${runsThisWeek}/2</div>
+        <div class="stat-value" style="color:var(--orange)">${runsThisWeek}</div>
         <div class="stat-label">Lenkkejä tällä viikolla</div>
       </div>
     </div>
@@ -1352,69 +1462,44 @@ function renderHome() {
           <div class="sched-act">${s.act}</div>
           <div class="sched-load ${s.load}">${s.txt}</div>
         </div>`).join('')}
-      <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5">Kovat takareisikuormat (Ke ja Pe) on eroteltu 48 h välein, juoksut osuvat matalan kuorman päiville. Voit siirtää päiviä, kunhan pidät tämän rytmin. Jos viikossa on aikaa 4–5 treenille, lisää Päivä D (yläkeho) tai E (pohkeet/kädet) lepopäivän tilalle — ne eivät kuormita takareittä.</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5">K1 on viikon ainoa raskas jalkapäivä ja 48 h ennen tiistain sählyä. Jos lauantaina ei ole peliä, K1 voi siirtyä lauantaille. Jos jalat ovat pelin jäljiltä tukossa, pudota K1:stä kyykky ja Bulgarian — RDL:ää ja koukistusta ei pudoteta. Kevennysviikko 6–8 viikon välein.</div>
     </div>
 
-    <div class="section-header">12 VIIKON EDISTYMINEN</div>
+    <div class="section-header">VIIKOT ${cycleStart}–${cycleStart+11}</div>
     <div class="week-grid">
       ${Array.from({length:12},(_,i)=>{
-        const wk = i+1;
+        const wk = cycleStart + i;
         const n = weekly[wk] || 0;
-        const cls = n >= 3 ? 'done' : (n > 0 ? 'partial' : '');
+        const tgt = wk > 12 ? 2 : 3;
+        const cls = n >= tgt ? 'done' : (n > 0 ? 'partial' : '');
         const cur = wk === state.currentWeek ? 'current' : '';
         return `<div class="week-cell ${cls} ${cur}">
           <div class="wc-num">${wk}</div>
-          <div class="wc-dots">${'●'.repeat(n)}${'○'.repeat(Math.max(0,3-n))}</div>
+          <div class="wc-dots">${'●'.repeat(Math.min(n,4))}${'○'.repeat(Math.max(0,tgt-n))}</div>
         </div>`;
       }).join('')}
     </div>
 
-    <div class="section-header">VALITSE TREENI</div>
+    <div class="section-header">KAUSIOHJELMA · VALITSE TREENI</div>
     <div class="day-grid">
-      ${['A','B','C'].map(d => {
+      ${['K1','K2','K3'].map(d => {
         const info = PROGRAM[phase][d];
         const done = state.sessions.some(s => s.week === state.currentWeek && s.day === d);
-        return `<div class="day-card ${d} ${state.selectedDay===d?'selected':''}" onclick="selectDay('${d}')">
+        return `<div class="day-card ${d} ${d==='K3'?'optional':''} ${state.selectedDay===d?'selected':''}" onclick="selectDay('${d}')">
           <div class="day-letter">${d}</div>
           <div class="day-name">${info.day}</div>
           ${done ? '<div style="color:var(--green);font-size:11px;margin-top:4px">✓ tehty</div>' : ''}
         </div>`;
       }).join('')}
     </div>
-
-    <div style="padding:14px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;font-weight:600">VAPAAEHTOISET (4–5 treeniä/vk)</div>
-    <div class="day-grid" style="grid-template-columns:1fr 1fr">
-      ${['D','E'].map(d => {
-        const info = PROGRAM[phase][d];
-        const done = state.sessions.some(s => s.week === state.currentWeek && s.day === d);
-        return `<div class="day-card optional ${d} ${state.selectedDay===d?'selected':''}" onclick="selectDay('${d}')">
-          <div class="day-letter">${d}</div>
-          <div class="day-name">${info.day}</div>
-          ${done ? '<div style="color:var(--green);font-size:11px;margin-top:4px">✓ tehty</div>' : ''}
-        </div>`;
-      }).join('')}
-    </div>
-
-    <div style="padding:14px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;font-weight:600">TEHOJAKSO (4 pv · takaketju + nopeus)</div>
-    <div class="day-grid" style="grid-template-columns:1fr 1fr">
-      ${['T1','T2','T3','T4'].map(d => {
-        const info = PROGRAM[phase][d];
-        const done = state.sessions.some(s => s.week === state.currentWeek && s.day === d);
-        return `<div class="day-card teho ${d} ${state.selectedDay===d?'selected':''}" onclick="selectDay('${d}')">
-          <div class="day-letter">${d}</div>
-          <div class="day-name">${info.day}</div>
-          ${done ? '<div style="color:var(--green);font-size:11px;margin-top:4px">✓ tehty</div>' : ''}
-        </div>`;
-      }).join('')}
-    </div>
-    <div style="padding:2px 16px 6px;font-size:11px;color:var(--text3);line-height:1.5">Rytmi: T1 → kevyt → T2 → intervallit → T3 → lepo → T4. Nopeusliikkeet aina tuoreena alussa. Nosta painoa 3 vk, kevennä 4. vk. Pidä T1 ja kovat juoksuintervallit 48 h erillään.</div>
+    <div style="padding:2px 16px 6px;font-size:11px;color:var(--text3);line-height:1.5">2 salipäivää viikossa (K1 + K2), K3 kun viikko sallii. Toistohaarukka: kun kaikki sarjat menevät yläpäähän, nosta painoa. Jos sarja jää tekemättä, merkitse se 0 toistolla.</div>
 
     ${state.selectedDay ? `
     <div style="padding:0 16px 16px">
       <div style="font-size:13px;color:var(--text2);margin-bottom:8px">${PROGRAM[phase][state.selectedDay].title}</div>
       <button class="btn btn-primary" style="width:100%" onclick="startWorkout('${state.selectedDay}')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Aloita päivä ${state.selectedDay}
+        Aloita ${state.selectedDay}
       </button>
       ${QUICK[state.selectedDay] ? `<button class="btn btn-secondary" style="width:100%;margin-top:8px" onclick="startWorkout('${state.selectedDay}', true)">⚡ Kiiretreeni · 3 liikettä</button>` : ''}
     </div>` : ''}
@@ -1438,7 +1523,7 @@ function renderHome() {
 }
 
 function changeWeek(d) {
-  state.currentWeek = Math.max(1, Math.min(12, state.currentWeek + d));
+  state.currentWeek = Math.max(1, Math.min(60, state.currentWeek + d));
   save();
   render();
 }
@@ -1490,7 +1575,7 @@ function startWorkout(day, quick) {
   state.activeWorkout = {
     phase, day,
     week: state.currentWeek,
-    exercises: planned.map(ex => buildExercise(ex, day)),
+    exercises: planned.concat(FYSIO_OLKAPAA).map(ex => buildExercise(ex, day)),
     quick: !!quick,
   };
   showTab('workout');
@@ -1597,7 +1682,7 @@ function renderWorkout() {
   return `
     <div class="wo-sticky">
       <div class="wo-sticky-top">
-        <div class="phase-badge">Päivä ${w.day} · Vaihe ${w.phase}${w.quick ? ' · ⚡ kiire' : ''}</div>
+        <div class="phase-badge">${/^K/.test(w.day) ? w.day + ' · ' + (PROGRAM[w.phase][w.day]||{}).title : 'Päivä ' + w.day + ' · Vaihe ' + w.phase}${w.quick ? ' · ⚡ kiire' : ''}</div>
         <div class="wo-actions">
           <button class="btn btn-sm btn-secondary" onclick="cancelWorkout()">Peruuta</button>
           <button class="btn btn-sm wo-save ${allDone?'wo-save-ready':''}" onclick="finishWorkout()">${allDone?'Tallenna ✓':'Tallenna'}</button>
@@ -1608,6 +1693,7 @@ function renderWorkout() {
         <div class="wo-progress-label">${doneSets}/${totalSets} sarjaa · ${exDone}/${w.exercises.length} liikettä</div>
       </div>
     </div>
+    ${/^K/.test(w.day) && doneSets === 0 ? `<div class="warmup-card">🔥 ${WARMUP}</div>` : ''}
 
     ${allDone ? `
     <div class="done-banner">
@@ -1641,7 +1727,7 @@ function renderExerciseBlock(ex, ei) {
   const _exp = state.exExpanded ? state.exExpanded[ei] : undefined;
   const _collapse = isExDone(ex) && _exp !== true && (ex.rpe != null || _exp === false);
   if (_collapse) {
-    const setCount = isBilateral ? ex.sets.L.length : ex.sets.length;
+    const setCount = isBilateral ? ex.sets.L.filter(x=>x.reps>0).length : ex.sets.filter(x=>x.reps>0).length;
     const summary = ex.isTime ? 'pito valmis' : `${setCount} sarjaa${isBilateral?' · V+O':''}`;
     return `
       <div class="ex-block ex-collapsed" onclick="expandEx(${ei})">
@@ -1790,7 +1876,7 @@ function adjustWeight(ei, si, side, delta) {
 function adjustReps(ei, si, side, delta) {
   const w = state.activeWorkout;
   const isTime = w.exercises[ei].isTime;
-  const minVal = isTime ? 5 : 1;
+  const minVal = 0; // 0 = sarja jäi tekemättä (kirjataan totuudenmukaisesti)
   if (side) {
     w.exercises[ei].sets[side][si].reps = Math.max(minVal, w.exercises[ei].sets[side][si].reps + delta);
   } else {
@@ -1927,9 +2013,10 @@ function finishWorkout() {
   const now = new Date();
   const dateStr = now.toLocaleDateString('fi-FI', {weekday:'long',day:'numeric',month:'long'});
 
+  const _real = x => x.done && x.reps > 0;
   const totalSets = w.exercises.reduce((sum,ex) => {
-    if (ex.bilateral) return sum + ex.sets.L.filter(s=>s.done).length + ex.sets.R.filter(s=>s.done).length;
-    return sum + ex.sets.filter(s=>s.done).length;
+    if (ex.bilateral) return sum + ex.sets.L.filter(_real).length + ex.sets.R.filter(_real).length;
+    return sum + ex.sets.filter(_real).length;
   }, 0);
 
   const session = {
@@ -1943,10 +2030,10 @@ function finishWorkout() {
     exercises: w.exercises.map(ex => {
       if (ex.bilateral) {
         return { id: ex.id, name: ex.name, bilateral: true, isRehab: ex.isRehab, isTime: ex.isTime, rpe: ex.rpe || null,
-          setsL: ex.sets.L.filter(s=>s.done), setsR: ex.sets.R.filter(s=>s.done) };
+          setsL: ex.sets.L.filter(_real), setsR: ex.sets.R.filter(_real) };
       }
-      return { id: ex.id, name: ex.name, isRehab: ex.isRehab, isTime: ex.isTime, rpe: ex.rpe || null, sets: ex.sets.filter(s=>s.done) };
-    })
+      return { id: ex.id, name: ex.name, isRehab: ex.isRehab, isTime: ex.isTime, rpe: ex.rpe || null, sets: ex.sets.filter(_real) };
+    }).filter(e => e.bilateral ? (e.setsL.length || e.setsR.length) : e.sets.length)
   };
 
   // Tunnista ennätykset ENNEN session tallennusta (vertaa aiempiin)
@@ -1954,14 +2041,14 @@ function finishWorkout() {
   w.exercises.forEach(ex => {
     if (ex.bilateral) {
       ['L','R'].forEach(sd => {
-        const doneSets = ex.sets[sd].filter(s=>s.done);
+        const doneSets = ex.sets[sd].filter(s=>s.done && s.reps>0);
         if (!doneSets.length) return;
         const maxW = Math.max(...doneSets.map(s=>s.weight));
         const prevPR = getPR(ex.name, sd, null, ex.id);
         if (maxW > prevPR && prevPR > 0 && maxW > 0) prs.push(`${ex.name} (${sd==='L'?'vasen':'oikea'}): ${maxW} kg`);
       });
     } else {
-      const doneSets = ex.sets.filter(s=>s.done);
+      const doneSets = ex.sets.filter(s=>s.done && s.reps>0);
       if (!doneSets.length) return;
       const maxW = Math.max(...doneSets.map(s=>s.weight));
       const prevPR = getPR(ex.name, null, null, ex.id);
@@ -2070,6 +2157,170 @@ function raiseAllAhead() {
 
 // ── HISTORY ───────────────────────────────────────────────────────────────────
 
+// ── LIIKEKOHTAINEN HISTORIA ───────────────────────────────────────────────────
+// Kerää yhden liikkeen kaikki kirjatut kerrat aikajärjestyksessä.
+function exerciseHistory(exId) {
+  const out = [];
+  state.sessions.forEach(s => {
+    (s.exercises || []).forEach(ex => {
+      if (ex.id !== exId) return;
+      if (ex.bilateral) {
+        const l = (ex.setsL || []).filter(x => x.weight > 0 || x.reps > 0);
+        const r = (ex.setsR || []).filter(x => x.weight > 0 || x.reps > 0);
+        if (!l.length && !r.length) return;
+        out.push({
+          id: s.id, date: s.date, dateStr: s.dateStr, week: s.week, day: s.day, rpe: ex.rpe || null,
+          bilateral: true, isTime: !!ex.isTime,
+          L: l.length ? Math.max(...l.map(x => ex.isTime ? x.reps : x.weight)) : 0,
+          R: r.length ? Math.max(...r.map(x => ex.isTime ? x.reps : x.weight)) : 0,
+          setsL: l.length, setsR: r.length,
+        });
+      } else {
+        const st = (ex.sets || []);
+        if (!st.length) return;
+        out.push({
+          id: s.id, date: s.date, dateStr: s.dateStr, week: s.week, day: s.day, rpe: ex.rpe || null,
+          bilateral: false, isTime: !!ex.isTime,
+          value: Math.max(...st.map(x => ex.isTime ? x.reps : x.weight)),
+          reps: st[st.length-1].reps, sets: st.length,
+        });
+      }
+    });
+  });
+  return out;
+}
+
+// Kaikki liikkeet joista on kirjauksia, ryhmiteltynä lihasryhmän mukaan.
+function loggedExercises() {
+  const seen = {};
+  state.sessions.forEach(s => (s.exercises || []).forEach(ex => {
+    if (!seen[ex.id]) seen[ex.id] = { id: ex.id, name: ex.name, n: 0, last: null };
+    seen[ex.id].n++;
+    seen[ex.id].name = ex.name;
+    seen[ex.id].last = s.dateStr;
+  }));
+  const groups = {};
+  Object.values(seen).forEach(e => {
+    const m = muscleOf(e.id) || 'muu';
+    (groups[m] = groups[m] || []).push(e);
+  });
+  Object.values(groups).forEach(g => g.sort((a,b) => a.name.localeCompare(b.name,'fi')));
+  return groups;
+}
+
+function setHistMode(m) { state.histMode = m; state.histExercise = null; render(); }
+function openExHistory(id) { state.histExercise = id; render(); }
+function closeExHistory() { state.histExercise = null; render(); }
+
+// Kahden sarjan (V/O) kuvaaja
+function dualLineChart(hist) {
+  const W = 320, H = 150, pad = { l: 34, r: 12, t: 12, b: 22 };
+  if (!hist.length) return '<div style="padding:24px;text-align:center;color:var(--text3);font-size:13px">Ei dataa</div>';
+  const all = hist.flatMap(h => [h.L, h.R]).filter(v => v > 0);
+  let min = Math.min(...all), max = Math.max(...all);
+  if (min === max) { min -= 1; max += 1; }
+  const r = max - min; min -= r*0.12; max += r*0.12;
+  const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
+  const x = i => pad.l + (hist.length === 1 ? plotW/2 : (i/(hist.length-1))*plotW);
+  const y = v => pad.t + plotH - ((v-min)/(max-min))*plotH;
+  const path = key => hist.map((h,i) => `${i?'L':'M'}${x(i).toFixed(1)},${y(h[key]).toFixed(1)}`).join(' ');
+  const dots = (key,color) => hist.map((h,i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(h[key]).toFixed(1)}" r="3" fill="${color}"/>`).join('');
+  const ticks = [min + (max-min)*0.1, (min+max)/2, max - (max-min)*0.1];
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">
+    ${ticks.map(t => `<line x1="${pad.l}" y1="${y(t).toFixed(1)}" x2="${W-pad.r}" y2="${y(t).toFixed(1)}" stroke="var(--border)" stroke-width="1"/>
+      <text x="${pad.l-6}" y="${(y(t)+4).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--text3)" font-family="DM Mono,monospace">${Math.round(t)}</text>`).join('')}
+    <path d="${path('R')}" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linejoin="round"/>
+    <path d="${path('L')}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>
+    ${dots('R','var(--text2)')}${dots('L','var(--accent)')}
+    <text x="${pad.l}" y="${H-6}" font-size="9" fill="var(--text3)" font-family="DM Mono,monospace">${hist[0].dateStr}</text>
+    <text x="${W-pad.r}" y="${H-6}" text-anchor="end" font-size="9" fill="var(--text3)" font-family="DM Mono,monospace">${hist[hist.length-1].dateStr}</text>
+  </svg>`;
+}
+
+function renderExDetail(exId) {
+  const hist = exerciseHistory(exId);
+  const nm = (NAMES[exId] || {}).fi || exId;
+  const en = (NAMES[exId] || {}).en || '';
+  if (!hist.length) return `<div class="card">Ei kirjauksia liikkeelle ${nm}.</div>`;
+  const bil = hist[0].bilateral, isTime = hist[0].isTime;
+  const unit = isTime ? 's' : 'kg';
+  const first = hist[0], last = hist[hist.length-1];
+  let delta;
+  if (bil) {
+    const dl = last.L - first.L, dr = last.R - first.R;
+    const gap = last.R > 0 ? Math.round(last.L/last.R*100) : null;
+    delta = `<div class="exd-stats">
+      <div><span>Vasen</span><b>${first.L} → ${last.L} ${unit}</b><i>${dl>=0?'+':''}${Math.round(dl*10)/10}</i></div>
+      <div><span>Oikea</span><b>${first.R} → ${last.R} ${unit}</b><i>${dr>=0?'+':''}${Math.round(dr*10)/10}</i></div>
+      ${gap!=null?`<div><span>Suhde V/O</span><b>${gap} %</b><i>salin laite</i></div>`:''}
+    </div>`;
+  } else {
+    const d = last.value - first.value;
+    const pct = first.value > 0 ? Math.round((last.value-first.value)/first.value*100) : null;
+    delta = `<div class="exd-stats">
+      <div><span>Alku</span><b>${first.value} ${unit}</b><i>${first.dateStr}</i></div>
+      <div><span>Nyt</span><b>${last.value} ${unit}</b><i>${last.dateStr}</i></div>
+      <div><span>Muutos</span><b>${d>=0?'+':''}${Math.round(d*10)/10} ${unit}</b><i>${pct!=null?(pct>=0?'+':'')+pct+' %':''}</i></div>
+    </div>`;
+  }
+  const chart = bil ? dualLineChart(hist)
+    : lineChart(hist.map(h => ({ label: h.dateStr, value: h.value })), { color:'var(--accent)', unit:' '+unit });
+  return `
+    <div style="padding:10px 16px 0">
+      <button class="btn btn-sm btn-secondary" onclick="closeExHistory()">← Kaikki liikkeet</button>
+    </div>
+    <div class="section-header">${nm.toUpperCase()}</div>
+    <div class="card chart-card" style="margin-top:0">
+      ${en?`<div style="font-size:12px;color:var(--text3);margin-bottom:2px">${en}</div>`:''}
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">${hist.length} kirjattua kertaa</div>
+      ${chart}
+      ${bil?`<div class="exd-legend"><span><i style="background:var(--accent)"></i>Vasen</span><span><i style="background:var(--text2)"></i>Oikea</span></div>`:''}
+      ${delta}
+    </div>
+    <div class="section-header">KAIKKI KERRAT</div>
+    <div class="card" style="margin-top:0;padding:0;overflow:hidden">
+      ${[...hist].reverse().map((h,i,arr) => {
+        const prev = arr[i+1];
+        let trend = '';
+        if (prev) {
+          const now = bil ? h.L : h.value, was = bil ? prev.L : prev.value;
+          if (now > was) trend = `<span class="exd-up">▲ +${Math.round((now-was)*10)/10}</span>`;
+          else if (now < was) trend = `<span class="exd-down">▼ ${Math.round((now-was)*10)/10}</span>`;
+        }
+        return `<div class="exd-row">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px">${h.dateStr} <span style="color:var(--text3)">· ${h.day} · vk ${h.week}</span></div>
+            <div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">${bil?`${h.setsL}+${h.setsR} sarjaa`:`${h.sets} × ${h.reps}${isTime?' s':''}`}${h.rpe?' · '+rpeLabel(h.rpe).toLowerCase():''}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:'DM Mono',monospace;font-size:14px">${bil?`V${h.L} / O${h.R}`:h.value+' '+unit}</div>
+            ${trend}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="height:20px"></div>
+  `;
+}
+
+function renderExerciseList() {
+  const groups = loggedExercises();
+  const keys = Object.keys(MUSCLE_LABELS).filter(m => groups[m]).concat(groups.muu ? ['muu'] : []);
+  if (!keys.length) return '<div class="card">Ei vielä kirjauksia.</div>';
+  return keys.map(m => `
+    <div class="section-header">${m==='muu'?'MUUT':MUSCLE_LABELS[m].toUpperCase()}</div>
+    <div class="card" style="margin-top:0;padding:0;overflow:hidden">
+      ${groups[m].map(e => `
+        <div class="exd-row" style="cursor:pointer" onclick="openExHistory('${e.id}')">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px">${e.name}</div>
+            <div style="font-size:11px;color:var(--text3)">${e.n} kertaa · viimeksi ${e.last}</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>`).join('')}
+    </div>`).join('') + '<div style="height:20px"></div>';
+}
+
 function renderHistory() {
   if (state.sessions.length === 0) {
     return `<div class="empty">
@@ -2078,8 +2329,17 @@ function renderHistory() {
     </div>`;
   }
 
+  const tabs = `<div class="hist-tabs">
+    <button class="hist-tab ${state.histMode!=='exercises'?'on':''}" onclick="setHistMode('sessions')">Treenit</button>
+    <button class="hist-tab ${state.histMode==='exercises'?'on':''}" onclick="setHistMode('exercises')">Liikkeet</button>
+  </div>`;
+
+  if (state.histMode === 'exercises') {
+    return tabs + (state.histExercise ? renderExDetail(state.histExercise) : renderExerciseList());
+  }
+
   const sorted = [...state.sessions].reverse();
-  return `
+  return tabs + `
     <div class="section-header">TREENIHISTORIA (${state.sessions.length} treeniä)</div>
     <div class="card" style="padding:0;overflow:hidden">
       ${sorted.map((s,i) => `
@@ -2116,7 +2376,7 @@ function toggleSessionDetail(id) {
 // ── GOALS ─────────────────────────────────────────────────────────────────────
 
 function renderGoals() {
-  const milestoneLabels = ['Vko 4','Vko 8','Vko 12'];
+
   const anyAhead = [...state.goals.rehab, ...state.goals.strength].some(g => goalStatus(g).ahead);
 
   function renderGoalCard(goal) {
@@ -2138,7 +2398,7 @@ function renderGoals() {
             const reached = goal.current >= t;
             return `<div class="milestone ${reached?'reached':''}">
               <div class="milestone-val">${t}${goal.unit}</div>
-              <div class="milestone-label">${milestoneLabels[i]}</div>
+              <div class="milestone-label">Vko ${weeks[i]}</div>
             </div>`;
           }).join('')}
         </div>
@@ -2154,19 +2414,8 @@ function renderGoals() {
     `;
   }
 
-  // Symmetria-data: puoliero ajan myötä (sankarikuva)
-  const symmGoal = state.goals.rehab.find(g => g.id === 'symm');
-  const symmSeries = measurementSeries('symm', symmGoal.start);
-
-  // Voimakäyrän liikevalinta
-  const chartOptions = [
-    { id:'squat', label:'Kyykky', match:'takakyykky', side:null, target: state.goals.strength.find(g=>g.id==='squat').targets[2] },
-    { id:'dead', label:'Maastaveto', match:'maastaveto', side:null, target: state.goals.strength.find(g=>g.id==='dead').targets[2] },
-    { id:'lat', label:'Alasveto', match:'alasvetolaite', side:null, target: state.goals.strength.find(g=>g.id==='lat').targets[2] },
-    { id:'fpL', label:'Jalkaprässi V', match:'jalkaprässi', side:'L', target: state.goals.rehab.find(g=>g.id==='fpL').targets[2] },
-    { id:'fpR', label:'Jalkaprässi O', match:'jalkaprässi', side:'R', target:null },
-    { id:'bench', label:'Punnerrus', match:'punnerrus', side:null, target: state.goals.strength.find(g=>g.id==='bench').targets[2] },
-  ];
+  // Voimakäyrän liikevalinta = voimatavoitteet
+  const chartOptions = state.goals.strength.map(g => ({ id:g.id, label:g.name.replace(' (per käsi)','').replace(' laitteessa',''), match:g.match, side:g.side||null, target:g.targets[2] }));
   const chosen = chartOptions.find(o => o.id === state.chartExercise) || chartOptions[0];
   const strSeries = exerciseSeries(chosen.match, chosen.side);
   const backupDays = daysSinceBackup();
@@ -2179,15 +2428,6 @@ function renderGoals() {
       <button class="btn btn-sm raise-btn" onclick="raiseAllAhead()">Nosta kaikki</button>
     </div>` : ''}
 
-    <div class="section-header">🟢 TAKAREIDEN PALAUTUMINEN</div>
-    <div class="symmetry-hero">
-      <div class="sh-title">PUOLIERO — vasen vs. oikea</div>
-      <div class="sh-big" style="color:${symmGoal.current>=80?'var(--green)':symmGoal.current>=70?'var(--accent2)':'var(--orange)'}">${symmGoal.current}%</div>
-      <div class="sh-sub">Lähtötaso ${symmGoal.start}% · tavoite 80%${symmGoal.current>symmGoal.start?` · +${(symmGoal.current-symmGoal.start).toFixed(1)} %-yksikköä 💪`:''}</div>
-      ${lineChart(symmSeries, { color:'var(--rehab)', target:80, unit:'%', min:50, max:100 })}
-      <div style="font-size:11px;color:var(--text3);margin-top:6px">Päivitä arvo fysioterapian mittauksen jälkeen kohdasta Kuntoutustavoitteet → Päivitä.</div>
-    </div>
-
     <div class="section-header">📈 VOIMAKEHITYS</div>
     <div class="chart-tabs">
       ${chartOptions.map(o => `<div class="chart-tab ${o.id===state.chartExercise?'active':''}" onclick="setChartExercise('${o.id}')">${o.label}</div>`).join('')}
@@ -2197,18 +2437,13 @@ function renderGoals() {
       ${lineChart(strSeries, { color:'var(--accent)', target:chosen.target, unit:'kg' })}
     </div>
 
-    <div class="section-header">🟢 KUNTOUTUSTAVOITTEET</div>
-    <div class="card" style="margin-top:0">
-      ${state.goals.rehab.map(renderGoalCard).join('')}
-    </div>
-
     <div class="section-header">💪 VOIMATAVOITTEET</div>
     <div class="card" style="margin-top:0">
       ${state.goals.strength.map(renderGoalCard).join('')}
     </div>
 
     <div class="card" style="background:var(--surface2);font-size:12px;color:var(--text2);line-height:1.5">
-      <b style="color:var(--text)">Näin tavoitteet toimivat:</b> Voima- ja jalkaprässitavoitteet päivittyvät automaattisesti treeniesi perusteella. Fysioterapian testitulokset (puoliero, H:Q, polven koukistus) päivität itse "Päivitä"-napilla mittausten jälkeen. Kun saavutat välietapin etuajassa, voit nostaa tavoitetta — uusi tavoite säilyttää saman kehitysvauhdin.
+      <b style="color:var(--text)">Näin tavoitteet toimivat:</b> Tavoitteet päivittyvät automaattisesti treeniesi perusteella (paras sarja, jossa toistoja > 0). Välietapit ovat kausiohjelman viikoilla 16, 20 ja 24. Kun saavutat välietapin etuajassa, voit nostaa tavoitetta — uusi tavoite säilyttää saman kehitysvauhdin.
     </div>
 
     <div class="section-header">📊 VIIKKOVOLYYMI (VKO ${state.currentWeek})</div>
@@ -2344,6 +2579,7 @@ function handleImportFile(e) {
           });
         });
       }
+      recalcAutoGoals();
       save();
       render();
       showToast('Varmuuskopio palautettu!');
@@ -2373,11 +2609,14 @@ function buildCoachSummary() {
   const thisWeek = state.sessions.filter(s=>s.week===state.currentWeek).length;
   const L = [];
   L.push('TREENIKOOSTE VALMENTAJALLE');
-  L.push('Viikko ' + state.currentWeek + '/12 · Vaihe ' + phase + ': ' + phaseNames[phase]);
+  L.push(state.currentWeek > 12 ? 'Viikko ' + state.currentWeek + ' · Kausiohjelma (2 pv/vk + valinnainen 3.)' : 'Viikko ' + state.currentWeek + '/12 · Vaihe ' + phase + ': ' + phaseNames[phase]);
   L.push('Päivä: ' + today);
   L.push('');
   L.push('YHTEENVETO');
-  L.push('- Salitreenejä yhteensä: ' + state.sessions.length + ' (tällä viikolla ' + thisWeek + '/3)');
+  L.push('- Salitreenejä yhteensä: ' + state.sessions.length + ' (tällä viikolla ' + thisWeek + '/' + (state.currentWeek > 12 ? 2 : 3) + ')');
+  const _cut = new Date(); _cut.setDate(_cut.getDate() - 28);
+  const _last4 = state.sessions.filter(x => x.date && new Date(x.date) >= _cut).length;
+  L.push('- Treenitiheys viim. 4 vk: ' + _last4 + ' treeniä (' + (Math.round(_last4/4*10)/10) + '/vk)');
   if (state.runs.length) {
     L.push('- Lenkkejä: ' + state.runs.length + ' (yht. ' + (Math.round(st.totalKm*10)/10) + ' km, ' + formatTotalTime(st.totalSec) + ', keskivauhti ' + formatPace(st.avgPace) + '/km)');
   } else {
@@ -2385,12 +2624,14 @@ function buildCoachSummary() {
   }
   L.push('- Putki: ' + getStreak() + ' päivää');
   L.push('');
-  L.push('KUNTOUTUSTAVOITTEET (nyt → tavoitteet vk4/8/12)');
-  state.goals.rehab.forEach(g => {
-    L.push('- ' + g.name + ': ' + g.current + ' ' + g.unit + ' → ' + g.targets.join('/') + ' ' + g.unit);
-  });
-  L.push('');
-  L.push('VOIMATAVOITTEET (nyt → tavoitteet vk4/8/12)');
+  if (state.goals.rehab.length) {
+    L.push('KUNTOUTUSTAVOITTEET');
+    state.goals.rehab.forEach(g => {
+      L.push('- ' + g.name + ': ' + g.current + ' ' + g.unit + ' → ' + g.targets.join('/') + ' ' + g.unit);
+    });
+    L.push('');
+  }
+  L.push('VOIMATAVOITTEET (nyt → tavoitteet vk ' + ((state.goals.strength[0]||{}).weeks||[4,8,12]).join('/') + ')');
   state.goals.strength.forEach(g => {
     L.push('- ' + g.name + ': ' + g.current + ' ' + g.unit + ' → ' + g.targets.join('/') + ' ' + g.unit);
   });
@@ -2436,7 +2677,7 @@ function buildCoachSummary() {
     });
   }
   L.push('');
-  L.push('TAUSTA: 37v mies, vasemman takareiden avulsiokorjaus 29.1.2026. Tavoitteet: kuntoutus (etusijalla), lihaskasvu, painonhallinta. Fysioterapeutti sallinut vain rauhallisen juoksun.');
+  L.push('TAUSTA: 37v mies, 190 cm, n. 99 kg. Vasemman takareiden proksimaalinen avulsiokorjaus 29.1.2026, kuntoutus päättynyt ja palannut salibandyyn (treenit ti + to, pelit la). Yliliikkuvat olkapäät ja nilkat. Tavoitteet: lihaskasvu (painopiste ylävartalo/rinta), vammojen ehkäisy (eksentrinen takareisi, lähentäjät, lapatuki), rasvanpudotus n. -5 kg. Ohjelma: K1 su (raskas jalkapäivä) + K2 ke, valinnainen K3 pe.');
   L.push('Pyydän palautetta edistymisestä, kuormituksen tasapainosta ja seuraavista askelista.');
   return L.join('\n');
 }
@@ -2723,7 +2964,7 @@ function renderRuns() {
     </div>`}
 
     <div class="card" style="background:var(--surface2);font-size:12px;color:var(--text2);line-height:1.5">
-      <b style="color:var(--text)">Muista takareisi:</b> Fysioterapeutti on sallinut vain rauhallisen juoksun. Pidä tempo-lenkit maltillisina ja varmista kovempi vauhti erikseen. Lämmittele aina ennen lenkkiä (lantionnostot + hallitut jalanheilautukset) ja nosta vauhtia asteittain.
+      <b style="color:var(--text)">Muista takareisi:</b> Kovat vedot ja sprintit aina lämmenneenä, ja vähintään 48 h K1:stä. Sählykaudella kestävyydelle riittää yksi kevyt tai kohtuullinen lenkki viikossa.
     </div>
 
     <div style="height:20px"></div>
